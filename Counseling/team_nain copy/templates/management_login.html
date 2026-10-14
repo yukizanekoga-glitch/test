@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- 文字コードをUTF-8に設定 -->
+  <meta charset="UTF-8">
+
+  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ページのタイトル -->
+  <title>ログイン スクールカウンセラー</title>
+
+  <!-- Bootstrap 5.3.0のCSSを読み込む -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- ナビゲーションバー -->
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+      <!-- サイト名を表示 -->
+      <span class="navbar-brand">スクールカウンセラー</span>
+    </div>
+  </nav>
+
+  <!-- メインコンテンツ -->
+  <div class="container mt-5">
+
+    <!-- フォームを中央寄せにするための行 -->
+    <div class="row justify-content-center">
+
+      <!-- フォームの横幅を設定（中画面以上では4/12） -->
+      <div class="col-md-4">
+
+        <!-- ページの見出し -->
+        <h2 class="text-center mb-4">ログイン</h2>
+
+        <!-- ログインフォーム -->
+        <form action="{{ url_for('management_top') }}">
+
+          <!-- ユーザー名入力欄 -->
+          <div class="mb-3">
+            <!-- 入力欄の説明 -->
+            <label for="username" class="form-label">アカウントID</label>
+
+            <!-- ユーザー名を入力するテキストボックス -->
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username">
+          </div>
+
+          <!-- パスワード入力欄 -->
+          <div class="mb-3">
+            <!-- 入力欄の説明 -->
+            <label for="password" class="form-label">パスワード</label>
+
+            <!-- パスワードを入力する欄 -->
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password">
+          </div>
+
+          <!-- ログインボタン -->
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">
+              職員
+            </button>
+          </div>
+
+        </form>
+
+        <!-- カウンセラー用ログイン -->
+        <div class="d-grid mt-2">
+          <a href="{{ url_for('care_top') }}" class="btn btn-primary">
+            カウンセラー
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

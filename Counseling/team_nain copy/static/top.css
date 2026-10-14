@@ -1,0 +1,379 @@
+img {
+  /* 画像の横幅 */
+  width: 85%;
+  /* 画像の縦の大きさ */
+  height: 300px;
+  /* 画像の角を丸める */
+  border-radius: 30px;
+  /* 画像を上から63pxの位置にする */
+  top: 63px;
+  /* 画像の位置を指定する */
+  position: absolute;
+  /* 画像を右 */
+  right: 30px;
+  /* ブロック要素として表示する */
+  display: block;
+  /* 左側の余白を自動にする */
+  margin-left: auto;
+  /* 写真を枠いっぱいに表示する */
+  object-fit: cover;
+}
+
+h3 {
+  /* 見出しの位置を調整する */
+  position: relative;
+  /* 下に移動する */
+  top: 305px;
+  /* 右に移動する */
+  margin-left: 355px;
+}
+
+button {
+  /* ボタンの位置を指定する */
+  position: absolute;
+  /* 上から10pxの位置 */
+  top: 10px;
+  /* 右から30pxの位置 */
+  right: 30px;
+}
+
+/* 3つのメニューカード全体の設定 */
+.menu-container {
+  /* 中のカードを横並びにする */
+  display: flex;
+  /* カード全体を左右中央に配置する */
+  justify-content: center;
+  /* カードを上下中央に揃える */
+  align-items: center;
+  /* カードとカードの間を30px空ける */
+  gap: 30px;
+  /* メニュー全体の横幅を画面いっぱいにする */
+  width: 100%;
+  /* メニュー全体の最大幅を1400pxにする */
+  max-width: 1400px;
+  /* 上に390px、下に50pxの余白を作る */
+  /* 左右はautoにして中央に配置する */
+  margin: 290px auto 50px;
+  /* メニュー全体の内側に20pxの余白を作る */
+  padding: 20px;
+  /* paddingを含めて幅を計算する */
+  box-sizing: border-box;
+}
+
+/* 3つのカードに共通する設定*/
+.menu-card,
+.menu-card2,
+.menu-card3 {
+  /* カードの位置を基準にする */
+  position: relative;
+  /* カードの横幅を300pxにする */
+  width: 300px;
+  /* カードの高さを300pxにする */
+  height: 300px;
+  /* カードの角を20px丸くする */
+  border-radius: 20px;
+  /* リンクの下線を消す */
+  text-decoration: none;
+  /* カードの中の文字を中央揃えにする */
+  text-align: center;
+  /* カードの内側に上下35px、左右30pxの余白を作る */
+  padding: 35px 30px;
+  /* paddingを含めた大きさで幅と高さを計算する */
+  box-sizing: border-box;
+  /* カードを右に移動 */
+  right: 50px;
+}
+
+/* カウンセラー予約カードのデザイン */
+.reservation {
+  /* 背景を薄い水色にする */
+  background: #eef8ff;
+  /* 水色の枠線を2px付ける */
+  border: 2px solid #c8e6ff;
+  /* 文字を青色にする */
+  color: #1765ad;
+}
+
+/* 面談履歴カードのデザイン */
+.reservation2 {
+  /* 背景を薄い緑色にする */
+  background: #eefff0;
+  /* 緑色の枠線を2px付ける */
+  border: 2px solid #c8ffca;
+  /* 文字を緑色にする */
+  color: #17ad69;
+}
+
+/* 予約確認カードのデザイン */
+.reservation3 {
+  /* 背景を薄い黄色にする */
+  background: #ffeeee;
+  /* 黄色っぽい枠線を2px付ける */
+  border: 2px solid #ffc8c8;
+  /* 文字を黄緑色にする */
+  color: #ad1717;
+}
+
+/* 3つのアイコンに共通する設定*/
+.icon,
+.icon2,
+.icon3 {
+  /* アイコンの横幅を90pxにする */
+  width: 90px;
+  /* アイコンの高さを90pxにする */
+  height: 90px;
+  /* アイコンを中央に配置し、下に5pxの余白を作る */
+  margin: 3px auto 5px;
+  /* アイコンの中身を配置しやすくする */
+  display: flex;
+  /* アイコンを上下中央に配置する */
+  align-items: center;
+  /* アイコンを左右中央に配置する */
+  justify-content: center;
+  /* アイコンの角を20px丸くする */
+  border-radius: 20px;
+  /* アイコンの文字や絵文字を52pxにする */
+  font-size: 52px;
+  /* アイコンの文字を太くする */
+  font-weight: bold;
+}
+
+/* カウンセラー予約のアイコン */
+.reservation .icon {
+  /* アイコンの背景を青色にする */
+  background: #2879c7;
+  /* アイコンの色を白にする */
+  color: white;
+}
+
+/* 面談履歴のアイコン*/
+.reservation2 .icon2 {
+  /* アイコンの背景を緑色にする */
+  background: #28c758;
+  /* アイコンの色を白にする */
+  color: white;
+}
+
+/* 予約確認のアイコン */
+.reservation3 .icon3 {
+  /* アイコンの背景を黄色にする */
+  background: #ce5e5e;
+  /* アイコンの色を白にする */
+  color: white;
+}
+
+/* 3つのカード内にある文章の設定*/
+.menu-card p,
+.menu-card2 p,
+.menu-card3 p {
+  /* 文章の文字サイズを18pxにする */
+  font-size: 18px;
+  /* 文章の行間を2倍にする */
+  line-height: 2;
+  /* 文章の外側の余白をなくす */
+  margin: 0;
+}
+
+/* サイドバー全体 */
+.sidebar {
+  /* 画面の左側に固定する */
+  position: fixed;
+  /* 画面の左端に配置 */
+  left: 0;
+  /* 画面の一番上に配置 */
+  top: 0;
+  /* 画面の下まで表示 */
+  height: 100vh;
+  /* サイドバーの横幅 */
+  width: 130px;
+  /* 背景色 */
+  background: #f5f9ff;
+  /* 右側に薄い線を付ける */
+  border-right: 2px solid #dbe9f5;
+  /* 内側の余白 */
+  padding: 30px 15px;
+  /* paddingを含めたサイズにする */
+  box-sizing: border-box;
+  /* 他の要素より前に表示する */
+  z-index: 1000;
+}
+
+/* サイドバーのタイトル */
+.sidebar h2 {
+  /* 文字を中央揃え */
+  text-align: center;
+  /* 文字の色 */
+  color: #1765ad;
+  /* 下側の余白 */
+  margin-bottom: 40px;
+}
+
+/* サイドバーの各メニュー */
+.sidebar-item {
+  /* アイコンと文字を横並びにする */
+  display: flex;
+  /* 上下中央に揃える */
+  align-items: center;
+  /* アイコンと文字の間 */
+  gap: 10px;
+  /* メニューの内側の余白 */
+  padding: 1px;
+  /* 下線を消す */
+  text-decoration: none;
+  /* 文字色 */
+  color: #555;
+  /* 文字サイズ */
+  font-size: 14px;
+  /* 角を丸くする */
+  border-radius: 10px;
+  /* メニュー同士の間隔 */
+  margin-bottom: 15px;
+  /* 色の変化を滑らかにする */
+  transition: 0.3s;
+}
+
+/* マウスを乗せたとき */
+.sidebar-item:hover {
+  /* 背景を水色にする */
+  background: #e3f2ff;
+  /* 文字を青色にする */
+  color: #1765ad;
+}
+
+/* サイドバーを作った分、メイン画面を右にずらす */
+body {
+  /* サイドバーの幅分だけ左側に余白を作る */
+  margin-left: 230px;
+}
+
+.navbar {
+  /* 画面の左端に配置 */
+  right: 0px;
+  margin-left: -100px;
+}
+
+/* 職員用のメニュー */
+/* 2つのメニューカード全体の設定 */
+.menu-container2 {
+  /* 中のカードを横並びにする */
+  display: flex;
+  /* カード全体を左右中央に配置する */
+  justify-content: center;
+  /* カードを上下中央に揃える */
+  align-items: center;
+  /* カードとカードの間を30px空ける */
+  gap: 30px;
+  /* メニュー全体の横幅を画面いっぱいにする */
+  width: 100%;
+  /* メニュー全体の最大幅を1400pxにする */
+  max-width: 1400px;
+  /* 上に390px、下に50pxの余白を作る */
+  /* 左右はautoにして中央に配置する */
+  margin: 290px auto 50px;
+  /* メニュー全体の内側に20pxの余白を作る */
+  padding: 20px;
+  /* paddingを含めて幅を計算する */
+  box-sizing: border-box;
+}
+
+/* 3つのカードに共通する設定*/
+.menu-card4,
+.menu-card5 {
+  /* カードの位置を基準にする */
+  position: relative;
+  /* カードの横幅を500pxにする */
+  width: 500px;
+  /* カードの高さを300pxにする */
+  height: 300px;
+  /* カードの角を20px丸くする */
+  border-radius: 20px;
+  /* リンクの下線を消す */
+  text-decoration: none;
+  /* カードの中の文字を中央揃えにする */
+  text-align: center;
+  /* カードの内側に上下35px、左右30pxの余白を作る */
+  padding: 35px 30px;
+  /* paddingを含めた大きさで幅と高さを計算する */
+  box-sizing: border-box;
+  /* カードを右に移動 */
+  right: 50px;
+}
+
+/* カウンセラー予約カードのデザイン */
+.reservation4 {
+  /* 背景を薄い水色にする */
+  background: #eef8ff;
+  /* 水色の枠線を2px付ける */
+  border: 2px solid #c8e6ff;
+  /* 文字を青色にする */
+  color: #1765ad;
+}
+
+/* 予約確認カードのデザイン */
+.reservation5 {
+  /* 背景を薄い黄色にする */
+  background: #ffeeee;
+  /* 黄色っぽい枠線を2px付ける */
+  border: 2px solid #ffc8c8;
+  /* 文字を黄緑色にする */
+  color: #ad1717;
+}
+
+/* 3つのアイコンに共通する設定*/
+.icon4,
+.icon5 {
+  /* アイコンの横幅を90pxにする */
+  width: 90px;
+  /* アイコンの高さを90pxにする */
+  height: 90px;
+  /* アイコンを中央に配置し、下に5pxの余白を作る */
+  margin: 3px auto 5px;
+  /* アイコンの中身を配置しやすくする */
+  display: flex;
+  /* アイコンを上下中央に配置する */
+  align-items: center;
+  /* アイコンを左右中央に配置する */
+  justify-content: center;
+  /* アイコンの角を20px丸くする */
+  border-radius: 20px;
+  /* アイコンの文字や絵文字を52pxにする */
+  font-size: 52px;
+  /* アイコンの文字を太くする */
+  font-weight: bold;
+}
+
+/* カウンセラー予約のアイコン */
+.reservation .icon {
+  /* アイコンの背景を青色にする */
+  background: #2879c7;
+  /* アイコンの色を白にする */
+  color: white;
+}
+
+/* 面談履歴のアイコン*/
+.reservation2 .icon2 {
+  /* アイコンの背景を緑色にする */
+  background: #28c758;
+  /* アイコンの色を白にする */
+  color: white;
+}
+
+/* 予約確認のアイコン */
+.reservation3 .icon3 {
+  /* アイコンの背景を黄色にする */
+  background: #ce5e5e;
+  /* アイコンの色を白にする */
+  color: white;
+}
+
+/* 3つのカード内にある文章の設定*/
+.menu-card p,
+.menu-card2 p,
+.menu-card3 p {
+  /* 文章の文字サイズを18pxにする */
+  font-size: 18px;
+  /* 文章の行間を2倍にする */
+  line-height: 2;
+  /* 文章の外側の余白をなくす */
+  margin: 0;
+}
