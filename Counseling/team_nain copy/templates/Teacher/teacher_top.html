@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- 文字コードをUTF-8に設定 -->
+  <meta charset="UTF-8">
+
+  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ページのタイトル -->
+  <title>ようこそ 先生</title>
+
+  <!-- Bootstrap 5.3.0のCSSを読み込む -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- top.cssを読み込む -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='top.css') }}">
+</head>
+
+<body>
+
+  <!-- ナビゲーションバー -->
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+      <!-- サイト名を表示 -->
+      <span class="navbar-brand">🏫スクールカウンセラーシステム（{{ session.get('display_name') }} 先生）</span>
+
+      <!-- ログアウト -->
+      <form action="{{ url_for('logout') }}">
+        <button type="submit" class="btn btn-primary">
+          ログアウト
+        </button>
+      </form>
+    </div>
+  </nav>
+
+  <!-- 画像を表示 -->
+  <img src="{{ url_for('static', filename='職員用.jpg') }}" class="スクールカウンセラー">
+
+  <h3>━━  メニュー  ━━</h3>
+
+<!-- メニュー -->
+<div class="menu-container2">
+
+    <!-- クラスの生徒一覧 -->
+    <a href="{{ url_for('teacher_class_students') }}" class="menu-card4 reservation4">
+        <div class="icon4">👫</div>
+        <h2>クラスの生徒一覧</h2>
+        <p>
+            担当クラスの生徒一覧を<br>
+            表示します
+        </p>
+    </a>
+
+    <!-- クラスの生徒の面談予約日時 -->
+    <a href="{{ url_for('teacher_class_schedule') }}" class="menu-card5 reservation5">
+        <div class="icon5">📋</div>
+        <h2>面談予約日時</h2>
+        <p>
+            担当クラスの生徒の<br>
+            面談予約日時を表示します
+        </p>
+    </a>
+</div>
+
+<!-- サイドバー -->
+<div class="sidebar">
+    <!-- サイドバーのタイトル -->
+    <h2>メニュー</h2>
+
+    <!-- ホーム -->
+    <a href="{{ url_for('teacher_top') }}" class="sidebar-item">
+        🏠
+      <span>ホーム</span>
+    </a>
+    <!-- クラスの生徒一覧 -->
+    <a href="{{ url_for('teacher_class_students') }}" class="sidebar-item">
+        👫
+      <span>クラスの生徒一覧</span>
+    </a>
+    <!-- 面談予約日時 -->
+    <a href="{{ url_for('teacher_class_schedule') }}" class="sidebar-item">
+        📋
+      <span>面談予約日時</span>
+    </a>
+</div>
+
+</body>
+</html>

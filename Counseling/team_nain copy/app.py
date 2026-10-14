@@ -1,10 +1,54 @@
-from flask import Flask, render_template, redirect, url_for
+import os
+from functools import wraps
+
+from flask import Flask, render_template, redirect, url_for, request, session, flash
 #######################
 import subprocess
 from threading import Timer
 ########################
 
+from models import db, User
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
 app = Flask(__name__)
+app.secret_key = 'dev-secret-key-change-in-production'
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(BASE_DIR, 'counseling.db')}"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+
+# ロールごとのログイン後トップ画面
+ROLE_TOP_ENDPOINT = {
+    User.ROLE_STUDENT: 'top',
+    User.ROLE_COUNSELOR: 'care_top',
+    User.ROLE_TEACHER: 'teacher_top',
+}
+
+
+def login_required(view):
+    """ログイン済みでなければログイン画面へ戻す"""
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('ログインしてください。')
+            return redirect(url_for('login', next=request.path))
+        return view(*args, **kwargs)
+    return wrapped
+
+
+def role_required(role):
+    """指定ロール以外のユーザーはアクセスできないようにする"""
+    def decorator(view):
+        @wraps(view)
+        @login_required
+        def wrapped(*args, **kwargs):
+            if session.get('role') != role:
+                flash('このページへのアクセス権限がありません。')
+                return redirect(url_for('login'))
+            return view(*args, **kwargs)
+        return wrapped
+    return decorator
 
 
 # =========================
@@ -16,32 +60,34 @@ def index():
     return redirect(url_for("login"))
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+
+        user = User.query.filter_by(username=username).first()
+
+        if user is None or not user.check_password(password) or user.role == User.ROLE_ADMIN:
+            flash("ユーザー名またはパスワードが正しくありません。")
+            return render_template("login.html")
+
+        session.clear()
+        session["user_id"] = user.id
+        session["username"] = user.username
+        session["display_name"] = user.display_name
+        session["role"] = user.role
+
+        next_endpoint = ROLE_TOP_ENDPOINT.get(user.role, "login")
+        return redirect(url_for(next_endpoint))
+
     return render_template("login.html")
 
 
 @app.route("/logout")
 def logout():
+    session.clear()
     return redirect(url_for("login"))
-
-
-# =========================
-# 職員ログイン画面
-# =========================
-
-@app.route("/management_login")
-def management_login():
-    return render_template("management_login.html")
-
-
-# =========================
-# 職員トップ画面
-# =========================
-
-@app.route("/management_top")
-def management_top():
-    return render_template("Management/management_top.html")
 
 
 # =========================
@@ -49,6 +95,7 @@ def management_top():
 # =========================
 
 @app.route("/top")
+@role_required(User.ROLE_STUDENT)
 def top():
     return render_template("Student/top.html")
 
@@ -58,6 +105,7 @@ def top():
 # =========================
 
 @app.route("/reserva")
+@role_required(User.ROLE_STUDENT)
 def reserva():
     return render_template("Student/reserva.html")
 
@@ -67,6 +115,7 @@ def reserva():
 # =========================
 
 @app.route("/reservacheck")
+@role_required(User.ROLE_STUDENT)
 def reservacheck():
     return render_template("Student/reservacheck.html")
 
@@ -76,6 +125,7 @@ def reservacheck():
 # =========================
 
 @app.route("/reservadone")
+@role_required(User.ROLE_STUDENT)
 def reservadone():
     return render_template("Student/reservadone.html")
 
@@ -85,6 +135,7 @@ def reservadone():
 # =========================
 
 @app.route("/schedule")
+@role_required(User.ROLE_STUDENT)
 def schedule():
     return render_template("Student/schedule.html")
 
@@ -94,6 +145,7 @@ def schedule():
 # =========================
 
 @app.route("/reserva_delete")
+@role_required(User.ROLE_STUDENT)
 def reserva_delete():
     return render_template("Student/reserva_delete.html")
 
@@ -103,6 +155,7 @@ def reserva_delete():
 # =========================
 
 @app.route("/reserva_delete_complete")
+@role_required(User.ROLE_STUDENT)
 def reserva_delete_complete():
     return render_template("Student/reserva_delete_complete.html")
 
@@ -112,6 +165,7 @@ def reserva_delete_complete():
 # =========================
 
 @app.route("/history")
+@role_required(User.ROLE_STUDENT)
 def history():
     return render_template("Student/history.html")
 
@@ -121,6 +175,7 @@ def history():
 # =========================
 
 @app.route("/care_top")
+@role_required(User.ROLE_COUNSELOR)
 def care_top():
     return render_template("Counselor/care_top.html")
 
@@ -130,6 +185,7 @@ def care_top():
 # =========================
 
 @app.route("/care_schedule")
+@role_required(User.ROLE_COUNSELOR)
 def care_schedule():
     return render_template("Counselor/care_schedule.html")
 
@@ -139,6 +195,7 @@ def care_schedule():
 # =========================
 
 @app.route("/care_contents")
+@role_required(User.ROLE_COUNSELOR)
 def care_contents():
     return render_template("Counselor/care_contents.html")
 
@@ -148,6 +205,7 @@ def care_contents():
 # =========================
 
 @app.route("/care_contents_check")
+@role_required(User.ROLE_COUNSELOR)
 def care_contents_check():
     return render_template("Counselor/care_contents_check.html")
 
@@ -157,6 +215,7 @@ def care_contents_check():
 # =========================
 
 @app.route("/care_history")
+@role_required(User.ROLE_COUNSELOR)
 def care_history():
     return render_template("Counselor/care_history.html")
 
@@ -166,6 +225,7 @@ def care_history():
 # =========================
 
 @app.route("/care_student")
+@role_required(User.ROLE_COUNSELOR)
 def care_student():
     return render_template("Counselor/care_student.html")
 
@@ -175,6 +235,7 @@ def care_student():
 # =========================
 
 @app.route("/care_record")
+@role_required(User.ROLE_COUNSELOR)
 def care_record():
     return render_template("Counselor/care_record.html")
 
@@ -184,6 +245,7 @@ def care_record():
 # =========================
 
 @app.route("/care_record_check")
+@role_required(User.ROLE_COUNSELOR)
 def care_record_check():
     return render_template("Counselor/care_record_check.html")
 
@@ -193,6 +255,7 @@ def care_record_check():
 # =========================
 
 @app.route("/care_record_complete")
+@role_required(User.ROLE_COUNSELOR)
 def care_record_complete():
     return render_template("Counselor/care_record_complete.html")
 
@@ -202,6 +265,7 @@ def care_record_complete():
 # =========================
 
 @app.route("/care_charec")
+@role_required(User.ROLE_COUNSELOR)
 def care_charec():
     return render_template("Counselor/care_charec.html")
 
@@ -211,6 +275,7 @@ def care_charec():
 # =========================
 
 @app.route("/care_charec_check")
+@role_required(User.ROLE_COUNSELOR)
 def care_charec_check():
     return render_template("Counselor/care_charec_check.html")
 
@@ -220,6 +285,7 @@ def care_charec_check():
 # =========================
 
 @app.route("/care_charec_complete")
+@role_required(User.ROLE_COUNSELOR)
 def care_charec_complete():
     return render_template("Counselor/care_charec_complete.html")
 
@@ -229,6 +295,7 @@ def care_charec_complete():
 # =========================
 
 @app.route("/care_reseva")
+@role_required(User.ROLE_COUNSELOR)
 def care_reseva():
     return render_template("Counselor/care_reseva.html")
 
@@ -238,6 +305,7 @@ def care_reseva():
 # =========================
 
 @app.route("/care_reseva_check")
+@role_required(User.ROLE_COUNSELOR)
 def care_reseva_check():
     return render_template("Counselor/care_reseva_check.html")
 
@@ -247,6 +315,7 @@ def care_reseva_check():
 # =========================
 
 @app.route("/care_reseva_complete")
+@role_required(User.ROLE_COUNSELOR)
 def care_reseva_complete():
     return render_template("Counselor/care_reseva_complete.html")
 
@@ -256,6 +325,7 @@ def care_reseva_complete():
 # =========================
 
 @app.route("/care_chadel")
+@role_required(User.ROLE_COUNSELOR)
 def care_chadel():
     return render_template("Counselor/care_chadel.html")
 
@@ -265,6 +335,7 @@ def care_chadel():
 # =========================
 
 @app.route("/care_chadel_check")
+@role_required(User.ROLE_COUNSELOR)
 def care_chadel_check():
     return render_template("Counselor/care_chadel_check.html")
 
@@ -274,12 +345,43 @@ def care_chadel_check():
 # =========================
 
 @app.route("/care_chadel_complete")
+@role_required(User.ROLE_COUNSELOR)
 def care_chadel_complete():
     return render_template("Counselor/care_chadel_complete.html")
 
 
 # =========================
-# 生徒一覧画面
+# 先生トップ画面 (担当クラス管理機能)
+# =========================
+
+@app.route("/teacher_top")
+@role_required(User.ROLE_TEACHER)
+def teacher_top():
+    return render_template("Teacher/teacher_top.html")
+
+
+# =========================
+# クラスの生徒一覧を表示する
+# =========================
+
+@app.route("/teacher_class_students")
+@role_required(User.ROLE_TEACHER)
+def teacher_class_students():
+    return render_template("Teacher/teacher_class_students.html")
+
+
+# =========================
+# クラスの生徒の面談予約日時を表示する
+# =========================
+
+@app.route("/teacher_class_schedule")
+@role_required(User.ROLE_TEACHER)
+def teacher_class_schedule():
+    return render_template("Teacher/teacher_class_schedule.html")
+
+
+# =========================
+# 生徒一覧画面 (管理者機能: 今回は未対応)
 # =========================
 
 @app.route("/manage_student")
@@ -468,7 +570,7 @@ def manage_caredel_complete():
 
 
 if __name__ == "__main__":
-    ##################  
+    ##################
     Timer(
         1,
         lambda: subprocess.Popen([
@@ -483,4 +585,3 @@ if __name__ == "__main__":
         port=5000,
         debug=True
     )
-    
