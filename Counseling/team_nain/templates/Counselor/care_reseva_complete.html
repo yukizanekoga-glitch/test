@@ -34,7 +34,16 @@
         <!-- ページの見出し -->
         <h2 class="text-center mb-4">登録しました</h2>
 
-        <a href="{{ url_for('care_top') }}" class="btn btn-secondary">戻る</a>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-success" role="alert">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <a href="{{ url_for('care_reseva') }}" class="btn btn-secondary">日時登録に戻る</a>
+        <a href="{{ url_for('care_top') }}" class="btn btn-outline-secondary">トップへ</a>
 
       </div>
     </div>

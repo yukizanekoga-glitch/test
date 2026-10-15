@@ -32,9 +32,18 @@
       <div class="col-md-4">
 
         <!-- ページの見出し -->
-        <h2 class="text-center mb-4">登録しました</h2>
-        
-        <a href="{{ url_for('care_top') }}" class="btn btn-primary">戻る</a>
+        <h2 class="text-center mb-4">完了しました</h2>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-success" role="alert">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <a href="{{ url_for('care_chadel') }}" class="btn btn-secondary">変更/削除に戻る</a>
+        <a href="{{ url_for('care_top') }}" class="btn btn-outline-secondary">トップへ</a>
       </div>
     </div>
   </div>

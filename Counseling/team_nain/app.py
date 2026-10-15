@@ -1,4 +1,5 @@
 import os
+from datetime import date as date_cls, datetime, time as time_cls
 from functools import wraps
 
 from flask import Flask, render_template, redirect, url_for, request, session, flash
@@ -7,7 +8,7 @@ import subprocess
 from threading import Timer
 ########################
 
-from models import db, User
+from models import db, User, AvailableSlot, Reservation
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -181,13 +182,20 @@ def care_top():
 
 
 # =========================
-# 面談予約確認画面
+# 面談予約確認画面 (面談予約を確認する)
 # =========================
 
 @app.route("/care_schedule")
 @role_required(User.ROLE_COUNSELOR)
 def care_schedule():
-    return render_template("Counselor/care_schedule.html")
+    reservations = (
+        Reservation.query
+        .join(AvailableSlot)
+        .filter(AvailableSlot.counselor_id == session["user_id"])
+        .order_by(AvailableSlot.date, AvailableSlot.start_time)
+        .all()
+    )
+    return render_template("Counselor/care_schedule.html", reservations=reservations)
 
 
 # =========================
@@ -290,24 +298,100 @@ def care_charec_complete():
     return render_template("Counselor/care_charec_complete.html")
 
 
+def _parse_slot_form(form):
+    """日時登録・変更フォームの入力値を検証し、(値の辞書, エラーメッセージ) を返す"""
+    raw_date = form.get("date", "").strip()
+    raw_start = form.get("start_time", "").strip()
+    raw_end = form.get("end_time", "").strip()
+
+    try:
+        slot_date = date_cls.fromisoformat(raw_date)
+        start_time = time_cls.fromisoformat(raw_start)
+        end_time = time_cls.fromisoformat(raw_end)
+    except ValueError:
+        return None, "日付・時刻の形式が正しくありません。"
+
+    if slot_date < date_cls.today():
+        return None, "過去の日付は登録できません。"
+
+    if end_time <= start_time:
+        return None, "終了時刻は開始時刻より後にしてください。"
+
+    return {"date": raw_date, "start_time": raw_start, "end_time": raw_end}, None
+
+
+def _has_overlap(counselor_id, slot_date, start_time, end_time, exclude_slot_id=None):
+    query = AvailableSlot.query.filter(
+        AvailableSlot.counselor_id == counselor_id,
+        AvailableSlot.date == slot_date,
+        AvailableSlot.start_time < end_time,
+        AvailableSlot.end_time > start_time,
+    )
+    if exclude_slot_id is not None:
+        query = query.filter(AvailableSlot.id != exclude_slot_id)
+    return query.first() is not None
+
+
 # =========================
-# 面談可能日時登録画面
+# 面談可能日時登録画面 (面談可能日時を登録する)
 # =========================
 
-@app.route("/care_reseva")
+@app.route("/care_reseva", methods=["GET", "POST"])
 @role_required(User.ROLE_COUNSELOR)
 def care_reseva():
-    return render_template("Counselor/care_reseva.html")
+    if request.method == "POST":
+        values, error = _parse_slot_form(request.form)
+        if error:
+            flash(error)
+        else:
+            session["pending_slot"] = values
+            return redirect(url_for("care_reseva_check"))
+
+    slots = (
+        AvailableSlot.query
+        .filter_by(counselor_id=session["user_id"])
+        .order_by(AvailableSlot.date, AvailableSlot.start_time)
+        .all()
+    )
+    return render_template("Counselor/care_reseva.html", slots=slots)
 
 
 # =========================
 # 面談可能日時登録確認画面
 # =========================
 
-@app.route("/care_reseva_check")
+@app.route("/care_reseva_check", methods=["GET", "POST"])
 @role_required(User.ROLE_COUNSELOR)
 def care_reseva_check():
-    return render_template("Counselor/care_reseva_check.html")
+    pending = session.get("pending_slot")
+    if not pending:
+        flash("登録内容が見つかりません。もう一度入力してください。")
+        return redirect(url_for("care_reseva"))
+
+    if request.method == "POST":
+        slot_date = date_cls.fromisoformat(pending["date"])
+        start_time = time_cls.fromisoformat(pending["start_time"])
+        end_time = time_cls.fromisoformat(pending["end_time"])
+
+        if _has_overlap(session["user_id"], slot_date, start_time, end_time):
+            flash("同じ日時に登録済みの面談可能日時があります。")
+            session.pop("pending_slot", None)
+            return redirect(url_for("care_reseva"))
+
+        slot = AvailableSlot(
+            counselor_id=session["user_id"],
+            date=slot_date,
+            start_time=start_time,
+            end_time=end_time,
+        )
+        db.session.add(slot)
+        db.session.commit()
+
+        session.pop("pending_slot", None)
+        flash("面談可能日時を登録しました。")
+        return redirect(url_for("care_reseva_complete"))
+
+    return render_template("Counselor/care_reseva_check.html", pending=pending)
 
 
 # =========================
@@ -320,24 +404,109 @@ def care_reseva_complete():
     return render_template("Counselor/care_reseva_complete.html")
 
 
+def _get_own_slot(slot_id):
+    return AvailableSlot.query.filter_by(id=slot_id, counselor_id=session["user_id"]).first()
+
+
 # =========================
-# 面談可能日時変更・削除画面
+# 面談可能日時変更・削除画面 (面談可能日時を変更する/削除する)
 # =========================
 
-@app.route("/care_chadel")
+@app.route("/care_chadel", methods=["GET", "POST"])
 @role_required(User.ROLE_COUNSELOR)
 def care_chadel():
-    return render_template("Counselor/care_chadel.html")
+    if request.method == "POST":
+        slot_id = request.form.get("slot_id", type=int)
+        action = request.form.get("action")
+        slot = _get_own_slot(slot_id)
+
+        if slot is None:
+            flash("対象の面談可能日時が見つかりません。")
+            return redirect(url_for("care_chadel"))
+
+        if slot.is_booked:
+            flash("予約済みの日時は変更・削除できません。")
+            return redirect(url_for("care_chadel"))
+
+        if action == "delete":
+            session["pending_chadel"] = {"action": "delete", "slot_id": slot_id}
+            return redirect(url_for("care_chadel_check"))
+
+        if action == "edit":
+            values, error = _parse_slot_form(request.form)
+            if error:
+                flash(error)
+                return redirect(url_for("care_chadel", edit=slot_id))
+            session["pending_chadel"] = {"action": "edit", "slot_id": slot_id, **values}
+            return redirect(url_for("care_chadel_check"))
+
+        flash("不正な操作です。")
+        return redirect(url_for("care_chadel"))
+
+    slots = (
+        AvailableSlot.query
+        .filter_by(counselor_id=session["user_id"])
+        .order_by(AvailableSlot.date, AvailableSlot.start_time)
+        .all()
+    )
+
+    edit_slot = None
+    edit_id = request.args.get("edit", type=int)
+    if edit_id is not None:
+        edit_slot = _get_own_slot(edit_id)
+        if edit_slot is None:
+            flash("対象の面談可能日時が見つかりません。")
+        elif edit_slot.is_booked:
+            flash("予約済みの日時は変更・削除できません。")
+            edit_slot = None
+
+    return render_template("Counselor/care_chadel.html", slots=slots, edit_slot=edit_slot)
 
 
 # =========================
 # 面談可能日時変更・削除確認画面
 # =========================
 
-@app.route("/care_chadel_check")
+@app.route("/care_chadel_check", methods=["GET", "POST"])
 @role_required(User.ROLE_COUNSELOR)
 def care_chadel_check():
-    return render_template("Counselor/care_chadel_check.html")
+    pending = session.get("pending_chadel")
+    if not pending:
+        flash("変更・削除内容が見つかりません。もう一度操作してください。")
+        return redirect(url_for("care_chadel"))
+
+    slot = _get_own_slot(pending["slot_id"])
+    if slot is None:
+        session.pop("pending_chadel", None)
+        flash("対象の面談可能日時が見つかりません。")
+        return redirect(url_for("care_chadel"))
+
+    if request.method == "POST":
+        if pending["action"] == "delete":
+            db.session.delete(slot)
+            db.session.commit()
+            message = "面談可能日時を削除しました。"
+        else:
+            slot_date = date_cls.fromisoformat(pending["date"])
+            start_time = time_cls.fromisoformat(pending["start_time"])
+            end_time = time_cls.fromisoformat(pending["end_time"])
+
+            if _has_overlap(session["user_id"], slot_date, start_time, end_time, exclude_slot_id=slot.id):
+                session.pop("pending_chadel", None)
+                flash("同じ日時に登録済みの面談可能日時があります。")
+                return redirect(url_for("care_chadel"))
+
+            slot.date = slot_date
+            slot.start_time = start_time
+            slot.end_time = end_time
+            db.session.commit()
+            message = "面談可能日時を変更しました。"
+
+        session.pop("pending_chadel", None)
+        flash(message)
+        return redirect(url_for("care_chadel_complete"))
+
+    return render_template("Counselor/care_chadel_check.html", pending=pending, slot=slot)
 
 
 # =========================

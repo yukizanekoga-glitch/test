@@ -25,19 +25,94 @@
   <!-- メインコンテンツ -->
   <div class="container mt-5">
 
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
+    <!-- エラー・完了メッセージ表示 -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-info" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
 
         <!-- ページの見出し -->
-        <h2 class="text-center mb-4">変更/削除</h2>
-        
+        <h2 class="text-center mb-4">面談可能日時の変更/削除</h2>
+
+        {% if slots %}
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>日付</th>
+              <th>開始</th>
+              <th>終了</th>
+              <th>状態</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for slot in slots %}
+            <tr>
+              <td>{{ slot.date }}</td>
+              <td>{{ slot.start_time.strftime('%H:%M') }}</td>
+              <td>{{ slot.end_time.strftime('%H:%M') }}</td>
+              <td>
+                {% if slot.is_booked %}
+                  <span class="badge bg-danger">予約済み</span>
+                {% else %}
+                  <span class="badge bg-success">空き</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if not slot.is_booked %}
+                <a href="{{ url_for('care_chadel', edit=slot.id) }}" class="btn btn-sm btn-primary">変更</a>
+                <form method="post" action="{{ url_for('care_chadel') }}" class="d-inline">
+                  <input type="hidden" name="slot_id" value="{{ slot.id }}">
+                  <input type="hidden" name="action" value="delete">
+                  <button type="submit" class="btn btn-sm btn-danger">削除</button>
+                </form>
+                {% else %}
+                  <span class="text-muted">操作不可</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p class="text-muted">登録済みの面談可能日時はありません。</p>
+        {% endif %}
+
+        {% if edit_slot %}
+        <h3 class="mt-4 mb-3">面談可能日時の変更</h3>
+        <!-- 変更フォーム -->
+        <form method="post" action="{{ url_for('care_chadel') }}">
+          <input type="hidden" name="slot_id" value="{{ edit_slot.id }}">
+          <input type="hidden" name="action" value="edit">
+
+          <div class="mb-3">
+            <label for="date" class="form-label">日付</label>
+            <input type="date" class="form-control" id="date" name="date" value="{{ edit_slot.date }}" required>
+          </div>
+
+          <div class="row">
+            <div class="col mb-3">
+              <label for="start_time" class="form-label">開始時刻</label>
+              <input type="time" class="form-control" id="start_time" name="start_time" value="{{ edit_slot.start_time.strftime('%H:%M') }}" required>
+            </div>
+            <div class="col mb-3">
+              <label for="end_time" class="form-label">終了時刻</label>
+              <input type="time" class="form-control" id="end_time" name="end_time" value="{{ edit_slot.end_time.strftime('%H:%M') }}" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">次へ</button>
+        </form>
+        {% endif %}
+
         <!-- 戻るボタン -->
-        <a href="{{ url_for('care_reseva') }}" class="btn btn-secondary">戻る</a>
-        <!-- 変更削除確認ボタン　 -->
-        <a href="{{ url_for('care_chadel_check') }}" class="btn btn-primary">次へ</a>
+        <a href="{{ url_for('care_reseva') }}" class="btn btn-secondary mt-4">戻る</a>
       </div>
     </div>
   </div>

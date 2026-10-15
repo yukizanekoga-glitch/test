@@ -25,21 +25,85 @@
   <!-- メインコンテンツ -->
   <div class="container mt-5">
 
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
+    <!-- エラー・完了メッセージ表示 -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-info" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
 
         <!-- ページの見出し -->
         <h2 class="text-center mb-4">面談可能日時登録</h2>
-        
-        <!-- 戻るボタン -->
-        <a href="{{ url_for('care_top') }}" class="btn btn-secondary">戻る</a>
-        <!-- 日時登録　 -->
-        <a href="{{ url_for('care_reseva_check') }}" class="btn btn-primary">次へ</a>
-        <!-- 日時変更削除-->
-        <a href="{{ url_for('care_chadel') }}" class="btn btn-primary">変更/削除</a>
+
+        <!-- 日時登録フォーム -->
+        <form method="post" action="{{ url_for('care_reseva') }}">
+
+          <div class="mb-3">
+            <label for="date" class="form-label">日付</label>
+            <input type="date" class="form-control" id="date" name="date" required>
+          </div>
+
+          <div class="row">
+            <div class="col mb-3">
+              <label for="start_time" class="form-label">開始時刻</label>
+              <input type="time" class="form-control" id="start_time" name="start_time" required>
+            </div>
+            <div class="col mb-3">
+              <label for="end_time" class="form-label">終了時刻</label>
+              <input type="time" class="form-control" id="end_time" name="end_time" required>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <!-- 戻るボタン -->
+            <a href="{{ url_for('care_top') }}" class="btn btn-secondary">戻る</a>
+            <!-- 日時登録 -->
+            <button type="submit" class="btn btn-primary">次へ</button>
+            <!-- 日時変更削除 -->
+            <a href="{{ url_for('care_chadel') }}" class="btn btn-outline-primary ms-auto">変更/削除</a>
+          </div>
+
+        </form>
+
+        <!-- 登録済み面談可能日時の一覧 -->
+        <h3 class="mt-5 mb-3">登録済みの面談可能日時</h3>
+
+        {% if slots %}
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>日付</th>
+              <th>開始</th>
+              <th>終了</th>
+              <th>状態</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for slot in slots %}
+            <tr>
+              <td>{{ slot.date }}</td>
+              <td>{{ slot.start_time.strftime('%H:%M') }}</td>
+              <td>{{ slot.end_time.strftime('%H:%M') }}</td>
+              <td>
+                {% if slot.is_booked %}
+                  <span class="badge bg-danger">予約済み</span>
+                {% else %}
+                  <span class="badge bg-success">空き</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p class="text-muted">登録済みの面談可能日時はありません。</p>
+        {% endif %}
+
       </div>
     </div>
   </div>

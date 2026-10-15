@@ -34,3 +34,44 @@ class User(db.Model):
 
     def __repr__(self):
         return f"<User {self.username} ({self.role})>"
+
+
+class AvailableSlot(db.Model):
+    """スクールカウンセラーが登録する面談可能日時。"""
+    __tablename__ = 'available_slots'
+
+    id = db.Column(db.Integer, primary_key=True)
+    counselor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    counselor = db.relationship('User', foreign_keys=[counselor_id])
+
+    @property
+    def is_booked(self):
+        return self.reservation is not None
+
+    def __repr__(self):
+        return f"<AvailableSlot {self.date} {self.start_time}-{self.end_time}>"
+
+
+class Reservation(db.Model):
+    """生徒による面談予約（面談可能日時への紐付け）。"""
+    __tablename__ = 'reservations'
+
+    STATUS_CONFIRMED = 'confirmed'
+    STATUS_CANCELLED = 'cancelled'
+
+    id = db.Column(db.Integer, primary_key=True)
+    slot_id = db.Column(db.Integer, db.ForeignKey('available_slots.id'), unique=True, nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    status = db.Column(db.String(20), default=STATUS_CONFIRMED, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    slot = db.relationship('AvailableSlot', backref=db.backref('reservation', uselist=False))
+    student = db.relationship('User', foreign_keys=[student_id])
+
+    def __repr__(self):
+        return f"<Reservation slot={self.slot_id} student={self.student_id}>"

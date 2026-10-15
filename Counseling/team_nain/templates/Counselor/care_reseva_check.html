@@ -36,12 +36,33 @@
         <!-- ページの見出し -->
         <h2 class="text-center mb-4">こちらの内容を登録します</h2>
 
-        <a href="{{ url_for('care_reseva_complete') }}" class="btn btn-primary">完了</a>       
-        <a href="{{ url_for('care_reseva') }}" class="btn btn-secondary">戻る</a>
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <th>日付</th>
+              <td>{{ pending.date }}</td>
+            </tr>
+            <tr>
+              <th>開始時刻</th>
+              <td>{{ pending.start_time }}</td>
+            </tr>
+            <tr>
+              <th>終了時刻</th>
+              <td>{{ pending.end_time }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <form method="post" action="{{ url_for('care_reseva_check') }}">
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">完了</button>
+            <a href="{{ url_for('care_reseva') }}" class="btn btn-secondary">戻る</a>
+          </div>
+        </form>
 
       </div>
     </div>
   </div>
-  
+
 </body>
 </html>

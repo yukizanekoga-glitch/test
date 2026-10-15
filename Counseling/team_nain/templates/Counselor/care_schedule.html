@@ -27,25 +27,52 @@
   <!-- メインコンテンツ -->
   <div class="container mt-5">
 
-    <!-- フォームを中央寄せにするための行 -->
     <div class="row justify-content-center">
-
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
+      <div class="col-md-8">
 
         <!-- ページの見出し -->
-        <h2 class="text-center mb-4">予約確認</h2>
+        <h2 class="text-center mb-4">面談予約を確認する</h2>
 
-        <!-- 予約日を表示 -->
-        <p class="text-center">
-          予約日：<span id="reservation-date"></span>
-        </p>
+        {% if reservations %}
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>日付</th>
+              <th>開始</th>
+              <th>終了</th>
+              <th>生徒</th>
+              <th>状態</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for reservation in reservations %}
+            <tr>
+              <td>{{ reservation.slot.date }}</td>
+              <td>{{ reservation.slot.start_time.strftime('%H:%M') }}</td>
+              <td>{{ reservation.slot.end_time.strftime('%H:%M') }}</td>
+              <td>{{ reservation.student.display_name }}</td>
+              <td>
+                {% if reservation.status == 'confirmed' %}
+                  <span class="badge bg-success">予約確定</span>
+                {% else %}
+                  <span class="badge bg-secondary">キャンセル</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p class="text-muted text-center">現在、生徒からの面談予約はありません。</p>
+        {% endif %}
 
-        <a href="{{ url_for('care_top') }}" class="btn btn-secondary">戻る</a>
+        <div class="text-center">
+          <a href="{{ url_for('care_top') }}" class="btn btn-secondary">戻る</a>
+        </div>
 
       </div>
     </div>
   </div>
-  
+
 </body>
 </html>

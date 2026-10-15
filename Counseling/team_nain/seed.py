@@ -5,8 +5,10 @@
 
 テーブルが無ければ作成し、検証用アカウント（生徒・スクールカウンセラー・先生）を登録する。
 """
+from datetime import date, time, timedelta
+
 from app import app
-from models import db, User
+from models import db, User, AvailableSlot, Reservation
 
 SAMPLE_USERS = [
     {
@@ -49,6 +51,32 @@ def run():
         print("初期ユーザーを登録しました:")
         for data in SAMPLE_USERS:
             print(f"  - {data['role']}: {data['username']} / {data['password']}")
+
+        counselor = User.query.filter_by(username='counselor01').first()
+        student = User.query.filter_by(username='student01').first()
+
+        if counselor and not AvailableSlot.query.filter_by(counselor_id=counselor.id).first():
+            today = date.today()
+            booked_slot = AvailableSlot(
+                counselor_id=counselor.id,
+                date=today + timedelta(days=2),
+                start_time=time(10, 0),
+                end_time=time(10, 30),
+            )
+            free_slot = AvailableSlot(
+                counselor_id=counselor.id,
+                date=today + timedelta(days=3),
+                start_time=time(13, 0),
+                end_time=time(13, 30),
+            )
+            db.session.add_all([booked_slot, free_slot])
+            db.session.flush()
+
+            if student:
+                db.session.add(Reservation(slot_id=booked_slot.id, student_id=student.id))
+
+            db.session.commit()
+            print("面談可能日時のサンプルデータを登録しました。")
 
 
 if __name__ == '__main__':

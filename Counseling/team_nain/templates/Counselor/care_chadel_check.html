@@ -29,15 +29,66 @@
     <div class="row justify-content-center">
 
       <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
+      <div class="col-md-5">
 
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">こちらの内容を登録します</h2>
-        
-        <!-- 戻るボタン -->
-        <a href="{{ url_for('care_chadel') }}" class="btn btn-secondary">戻る</a>
-        <!-- 変更削除完了ボタン　 -->
-        <a href="{{ url_for('care_chadel_complete') }}" class="btn btn-primary">完了</a>
+        {% if pending.action == 'delete' %}
+          <h2 class="text-center mb-4">こちらの日時を削除します</h2>
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <th>日付</th>
+                <td>{{ slot.date }}</td>
+              </tr>
+              <tr>
+                <th>開始時刻</th>
+                <td>{{ slot.start_time.strftime('%H:%M') }}</td>
+              </tr>
+              <tr>
+                <th>終了時刻</th>
+                <td>{{ slot.end_time.strftime('%H:%M') }}</td>
+              </tr>
+            </tbody>
+          </table>
+        {% else %}
+          <h2 class="text-center mb-4">こちらの内容に変更します</h2>
+          <table class="table table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th></th>
+                <th>変更前</th>
+                <th>変更後</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>日付</th>
+                <td>{{ slot.date }}</td>
+                <td>{{ pending.date }}</td>
+              </tr>
+              <tr>
+                <th>開始時刻</th>
+                <td>{{ slot.start_time.strftime('%H:%M') }}</td>
+                <td>{{ pending.start_time }}</td>
+              </tr>
+              <tr>
+                <th>終了時刻</th>
+                <td>{{ slot.end_time.strftime('%H:%M') }}</td>
+                <td>{{ pending.end_time }}</td>
+              </tr>
+            </tbody>
+          </table>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('care_chadel_check') }}">
+          <div class="d-grid gap-2">
+            <!-- 変更削除完了ボタン -->
+            <button type="submit" class="btn btn-primary">
+              {{ '削除する' if pending.action == 'delete' else '変更する' }}
+            </button>
+            <a href="{{ url_for('care_chadel') }}" class="btn btn-secondary">戻る</a>
+          </div>
+        </form>
+
       </div>
     </div>
   </div>
