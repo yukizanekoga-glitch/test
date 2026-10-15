@@ -8,7 +8,7 @@
 from datetime import date, time, timedelta
 
 from app import app
-from models import db, User, AvailableSlot, Reservation
+from models import db, User, AvailableSlot, Reservation, Class
 
 SAMPLE_USERS = [
     {
@@ -54,6 +54,18 @@ def run():
 
         counselor = User.query.filter_by(username='counselor01').first()
         student = User.query.filter_by(username='student01').first()
+        teacher = User.query.filter_by(username='teacher01').first()
+
+        if teacher and not Class.query.filter_by(name='1年A組').first():
+            school_class = Class(name='1年A組', homeroom_teacher_id=teacher.id)
+            db.session.add(school_class)
+            db.session.flush()
+
+            if student:
+                student.class_id = school_class.id
+
+            db.session.commit()
+            print("クラスのサンプルデータを登録しました。")
 
         if counselor and not AvailableSlot.query.filter_by(counselor_id=counselor.id).first():
             today = date.today()
