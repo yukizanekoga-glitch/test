@@ -27,7 +27,7 @@ class User(db.Model):
     class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    school_class = db.relationship('Class', foreign_keys=[class_id], back_populates='members')
+    school_class = db.relationship('Class', foreign_keys=[class_id], back_populates='students')
 
     def set_password(self, raw_password):
         self.password_hash = generate_password_hash(raw_password)
@@ -40,22 +40,16 @@ class User(db.Model):
 
 
 class Class(db.Model):
-    """クラス（学級）。生徒・先生ともに User.class_id でどのクラスに所属するかが決まる。"""
+    """クラス（学級）。生徒は class_id でどのクラスに所属するかが決まる。"""
     __tablename__ = 'classes'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
+    homeroom_teacher_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    members = db.relationship('User', foreign_keys='User.class_id', back_populates='school_class')
-
-    @property
-    def students(self):
-        return [member for member in self.members if member.role == User.ROLE_STUDENT]
-
-    @property
-    def teachers(self):
-        return [member for member in self.members if member.role == User.ROLE_TEACHER]
+    homeroom_teacher = db.relationship('User', foreign_keys=[homeroom_teacher_id])
+    students = db.relationship('User', foreign_keys='User.class_id', back_populates='school_class')
 
     def __repr__(self):
         return f"<Class {self.name}>"
