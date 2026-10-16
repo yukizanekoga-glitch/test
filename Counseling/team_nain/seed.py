@@ -56,11 +56,13 @@ def run():
         student = User.query.filter_by(username='student01').first()
         teacher = User.query.filter_by(username='teacher01').first()
 
-        if teacher and not Class.query.filter_by(name='1年A組').first():
-            school_class = Class(name='1年A組', homeroom_teacher_id=teacher.id)
+        if not Class.query.filter_by(name='1年A組').first():
+            school_class = Class(name='1年A組')
             db.session.add(school_class)
             db.session.flush()
 
+            if teacher:
+                teacher.class_id = school_class.id
             if student:
                 student.class_id = school_class.id
 
