@@ -24,6 +24,7 @@ ROLE_TOP_ENDPOINT = {
     User.ROLE_STUDENT: 'top',
     User.ROLE_COUNSELOR: 'care_top',
     User.ROLE_TEACHER: 'teacher_top',
+    User.ROLE_ADMIN: 'management_top',
 }
 
 
@@ -69,7 +70,7 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        if user is None or not user.check_password(password) or user.role == User.ROLE_ADMIN:
+        if user is None or not user.check_password(password):
             flash("ユーザー名またはパスワードが正しくありません。")
             return render_template("login.html")
 
@@ -550,10 +551,21 @@ def teacher_class_schedule():
 
 
 # =========================
-# 生徒一覧画面 (管理者機能: 今回は未対応)
+# 管理者トップ画面
+# =========================
+
+@app.route("/management_top")
+@role_required(User.ROLE_ADMIN)
+def management_top():
+    return render_template("Management/management_top.html")
+
+
+# =========================
+# 生徒一覧画面 (管理者機能: 一覧・詳細・登録・編集・削除は今回は未対応)
 # =========================
 
 @app.route("/manage_student")
+@role_required(User.ROLE_ADMIN)
 def manage_student():
     return render_template("Management/manage_student.html")
 
@@ -563,6 +575,7 @@ def manage_student():
 # =========================
 
 @app.route("/manage_student_check")
+@role_required(User.ROLE_ADMIN)
 def manage_student_check():
     return render_template("Management/manage_student_check.html")
 
@@ -572,6 +585,7 @@ def manage_student_check():
 # =========================
 
 @app.route("/manage_sturec")
+@role_required(User.ROLE_ADMIN)
 def manage_sturec():
     return render_template("Management/manage_sturec.html")
 
@@ -581,6 +595,7 @@ def manage_sturec():
 # =========================
 
 @app.route("/manage_sturec_check")
+@role_required(User.ROLE_ADMIN)
 def manage_sturec_check():
     return render_template("Management/manage_sturec_check.html")
 
@@ -590,6 +605,7 @@ def manage_sturec_check():
 # =========================
 
 @app.route("/manage_sturec_complete")
+@role_required(User.ROLE_ADMIN)
 def manage_sturec_complete():
     return render_template("Management/manage_sturec_complete.html")
 
@@ -599,6 +615,7 @@ def manage_sturec_complete():
 # =========================
 
 @app.route("/manage_stuedit")
+@role_required(User.ROLE_ADMIN)
 def manage_stuedit():
     return render_template("Management/manage_stuedit.html")
 
@@ -608,6 +625,7 @@ def manage_stuedit():
 # =========================
 
 @app.route("/manage_stuedit_check")
+@role_required(User.ROLE_ADMIN)
 def manage_stuedit_check():
     return render_template("Management/manage_stuedit_check.html")
 
@@ -617,6 +635,7 @@ def manage_stuedit_check():
 # =========================
 
 @app.route("/manage_stuedit_complete")
+@role_required(User.ROLE_ADMIN)
 def manage_stuedit_complete():
     return render_template("Management/manage_stuedit_complete.html")
 
@@ -626,6 +645,7 @@ def manage_stuedit_complete():
 # =========================
 
 @app.route("/manage_studel_check")
+@role_required(User.ROLE_ADMIN)
 def manage_studel_check():
     return render_template("Management/manage_studel_check.html")
 
@@ -635,6 +655,7 @@ def manage_studel_check():
 # =========================
 
 @app.route("/manage_studel_complete")
+@role_required(User.ROLE_ADMIN)
 def manage_studel_complete():
     return render_template("Management/manage_studel_complete.html")
 
@@ -644,6 +665,7 @@ def manage_studel_complete():
 # =========================
 
 @app.route("/manage_care")
+@role_required(User.ROLE_ADMIN)
 def manage_care():
     return render_template("Management/manage_care.html")
 
@@ -653,6 +675,7 @@ def manage_care():
 # =========================
 
 @app.route("/manage_care_check")
+@role_required(User.ROLE_ADMIN)
 def manage_care_check():
     return render_template("Management/manage_care_check.html")
 
@@ -662,6 +685,7 @@ def manage_care_check():
 # =========================
 
 @app.route("/manage_schedule")
+@role_required(User.ROLE_ADMIN)
 def manage_schedule():
     return render_template("Management/manage_schedule.html")
 
@@ -671,6 +695,7 @@ def manage_schedule():
 # =========================
 
 @app.route("/manage_carereg")
+@role_required(User.ROLE_ADMIN)
 def manage_carereg():
     return render_template("Management/manage_carereg.html")
 
@@ -680,6 +705,7 @@ def manage_carereg():
 # =========================
 
 @app.route("/manage_carereg_check")
+@role_required(User.ROLE_ADMIN)
 def manage_carereg_check():
     return render_template("Management/manage_carereg_check.html")
 
@@ -689,6 +715,7 @@ def manage_carereg_check():
 # =========================
 
 @app.route("/manage_carereg_complete")
+@role_required(User.ROLE_ADMIN)
 def manage_carereg_complete():
     return render_template("Management/manage_carereg_complete.html")
 
@@ -698,6 +725,7 @@ def manage_carereg_complete():
 # =========================
 
 @app.route("/manage_caredit")
+@role_required(User.ROLE_ADMIN)
 def manage_caredit():
     return render_template("Management/manage_caredit.html")
 
@@ -707,6 +735,7 @@ def manage_caredit():
 # =========================
 
 @app.route("/manage_caredit_check")
+@role_required(User.ROLE_ADMIN)
 def manage_caredit_check():
     return render_template("Management/manage_caredit_check.html")
 
@@ -716,6 +745,7 @@ def manage_caredit_check():
 # =========================
 
 @app.route("/manage_caredit_complete")
+@role_required(User.ROLE_ADMIN)
 def manage_caredit_complete():
     return render_template("Management/manage_caredit_complete.html")
 
@@ -725,6 +755,7 @@ def manage_caredit_complete():
 # =========================
 
 @app.route("/manage_caredel_check")
+@role_required(User.ROLE_ADMIN)
 def manage_caredel_check():
     return render_template("Management/manage_caredel_check.html")
 
@@ -734,8 +765,103 @@ def manage_caredel_check():
 # =========================
 
 @app.route("/manage_caredel_complete")
+@role_required(User.ROLE_ADMIN)
 def manage_caredel_complete():
     return render_template("Management/manage_caredel_complete.html")
+
+
+# =========================
+# パスワード変更 (生徒/スクールカウンセラー/先生のパスワードを変更する)
+# =========================
+
+MANAGEABLE_ROLES = (User.ROLE_STUDENT, User.ROLE_COUNSELOR, User.ROLE_TEACHER)
+
+ROLE_LABELS = {
+    User.ROLE_STUDENT: "生徒",
+    User.ROLE_COUNSELOR: "スクールカウンセラー",
+    User.ROLE_TEACHER: "先生",
+}
+
+
+def _get_manageable_user(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user is None or user.role not in MANAGEABLE_ROLES:
+        return None
+    return user
+
+
+@app.route("/manage_password")
+@role_required(User.ROLE_ADMIN)
+def manage_password():
+    users = (
+        User.query
+        .filter(User.role.in_(MANAGEABLE_ROLES))
+        .order_by(User.role, User.username)
+        .all()
+    )
+    return render_template("Management/manage_password.html", users=users, role_labels=ROLE_LABELS)
+
+
+@app.route("/manage_password/<int:user_id>", methods=["GET", "POST"])
+@role_required(User.ROLE_ADMIN)
+def manage_password_edit(user_id):
+    target_user = _get_manageable_user(user_id)
+    if target_user is None:
+        flash("対象のユーザーが見つかりません。")
+        return redirect(url_for("manage_password"))
+
+    if request.method == "POST":
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if len(new_password) < 6:
+            flash("パスワードは6文字以上で入力してください。")
+        elif new_password != confirm_password:
+            flash("パスワードが一致しません。")
+        else:
+            session["pending_password"] = {"user_id": user_id, "new_password": new_password}
+            return redirect(url_for("manage_password_check"))
+
+    return render_template(
+        "Management/manage_password_edit.html",
+        target_user=target_user,
+        role_label=ROLE_LABELS.get(target_user.role, target_user.role),
+    )
+
+
+@app.route("/manage_password_check", methods=["GET", "POST"])
+@role_required(User.ROLE_ADMIN)
+def manage_password_check():
+    pending = session.get("pending_password")
+    if not pending:
+        flash("変更内容が見つかりません。もう一度操作してください。")
+        return redirect(url_for("manage_password"))
+
+    target_user = _get_manageable_user(pending["user_id"])
+    if target_user is None:
+        session.pop("pending_password", None)
+        flash("対象のユーザーが見つかりません。")
+        return redirect(url_for("manage_password"))
+
+    if request.method == "POST":
+        target_user.set_password(pending["new_password"])
+        db.session.commit()
+
+        session.pop("pending_password", None)
+        flash(f"{target_user.display_name}さんのパスワードを変更しました。")
+        return redirect(url_for("manage_password_complete"))
+
+    return render_template(
+        "Management/manage_password_check.html",
+        target_user=target_user,
+        role_label=ROLE_LABELS.get(target_user.role, target_user.role),
+    )
+
+
+@app.route("/manage_password_complete")
+@role_required(User.ROLE_ADMIN)
+def manage_password_complete():
+    return render_template("Management/manage_password_complete.html")
 
 
 if __name__ == "__main__":

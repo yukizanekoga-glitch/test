@@ -29,6 +29,12 @@ SAMPLE_USERS = [
         'display_name': '鈴木 一郎',
         'role': User.ROLE_TEACHER,
     },
+    {
+        'username': 'admin01',
+        'password': 'admin123',
+        'display_name': '管理者 太郎',
+        'role': User.ROLE_ADMIN,
+    },
 ]
 
 
