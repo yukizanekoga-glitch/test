@@ -1,0 +1,184 @@
+/* ログイン画面専用スタイル */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+
+  /* ぼかした教室風の背景をグラデーションと影で表現 */
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 35%),
+    radial-gradient(circle at 85% 10%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 30%),
+    linear-gradient(135deg, #cfe3f7 0%, #e9f1fb 45%, #f3ece1 100%);
+  background-attachment: fixed;
+}
+
+/* 背景に机やぼかし窓を思わせる装飾ブロック */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+  filter: blur(40px);
+  opacity: 0.5;
+}
+
+body::before {
+  top: -10%;
+  left: -8%;
+  width: 45vw;
+  height: 45vw;
+  background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+body::after {
+  bottom: -15%;
+  right: -10%;
+  width: 50vw;
+  height: 30vw;
+  background: linear-gradient(135deg, #e3c9a3 0%, rgba(227, 201, 163, 0) 70%);
+}
+
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(30, 50, 90, 0.18);
+  padding: 44px 40px 40px;
+}
+
+.login-icon {
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: #dbeafe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-title {
+  margin: 0;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #1b2a4e;
+}
+
+.login-divider {
+  width: 48px;
+  height: 3px;
+  margin: 18px auto 28px;
+  background: #3b7bf0;
+  border-radius: 2px;
+}
+
+.login-alert {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fdecec;
+  border: 1px solid #f6c6c6;
+  color: #b3261e;
+  font-size: 14px;
+}
+
+.login-field {
+  margin-bottom: 20px;
+}
+
+.login-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1b2a4e;
+}
+
+.login-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-input-wrap .icon-left {
+  position: absolute;
+  left: 14px;
+  display: flex;
+  color: #8a93a6;
+  pointer-events: none;
+}
+
+.login-input-wrap input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border: 1px solid #dde3ee;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #1b2a4e;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-input-wrap input::placeholder {
+  color: #aab2c2;
+}
+
+.login-input-wrap input:focus {
+  outline: none;
+  border-color: #3b7bf0;
+  box-shadow: 0 0 0 3px rgba(59, 123, 240, 0.15);
+}
+
+.login-input-wrap input[type="password"],
+.login-input-wrap input.has-toggle {
+  padding-right: 42px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #8a93a6;
+}
+
+.toggle-password:hover {
+  color: #5c6578;
+}
+
+.login-submit {
+  width: 100%;
+  margin-top: 8px;
+  padding: 13px 0;
+  border: none;
+  border-radius: 10px;
+  background: #3b7bf0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.login-submit:hover {
+  background: #2f66d0;
+}
