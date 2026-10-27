@@ -1,122 +1,131 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン｜スクールカウンセラー相談予約システム</title>
 
-  <!-- ページのタイトル -->
-  <title>ログイン スクールカウンセラーシステム</title>
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 
-  <!-- ログイン画面専用のCSSを読み込む -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <!-- Bootstrap Icons -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet">
+
+    <!-- 自作CSS -->
+    <link
+        href="{{ url_for('static', filename='css/login.css') }}"
+        rel="stylesheet">
 </head>
 
 <body>
 
-  <div class="login-card">
+    <!-- 背景 -->
+    <div class="background"></div>
 
-    <!-- 校舎アイコン -->
-    <div class="login-icon">
-      <svg width="40" height="40" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <line x1="36" y1="6" x2="36" y2="14" stroke="#1b2a4e" stroke-width="2" stroke-linecap="round"/>
-        <path d="M36 6 L44 8.5 L36 11 Z" fill="#1b2a4e"/>
-        <path d="M14 25 L28 14 L42 25" stroke="#1b2a4e" stroke-width="2.3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-        <rect x="16" y="25" width="24" height="18" rx="1.5" stroke="#1b2a4e" stroke-width="2.3" fill="none"/>
-        <rect x="24" y="33" width="8" height="10" stroke="#1b2a4e" stroke-width="2" fill="none"/>
-        <rect x="18.5" y="28" width="4" height="4" stroke="#1b2a4e" stroke-width="1.6" fill="none"/>
-        <rect x="33.5" y="28" width="4" height="4" stroke="#1b2a4e" stroke-width="1.6" fill="none"/>
-        <circle cx="28" cy="20" r="3.6" stroke="#1b2a4e" stroke-width="1.6" fill="#ffffff"/>
-        <path d="M28 18.2 V20 L29.3 20.9" stroke="#1b2a4e" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
+    <!-- ログイン画面 -->
+    <main class="login-card">
 
-    <!-- ページの見出し -->
-    <h2 class="login-title">スクールカウンセラー<br>相談予約システム</h2>
-    <div class="login-divider"></div>
-
-    <!-- エラーメッセージ表示 -->
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <div class="login-alert" role="alert">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <!-- ログインフォーム（生徒・スクールカウンセラー・先生共通） -->
-    <form method="post" action="{{ url_for('login') }}">
-
-      <!-- ユーザー名入力欄 -->
-      <div class="login-field">
-        <label for="username">ユーザー名</label>
-        <div class="login-input-wrap">
-          <span class="icon-left">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
-              <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            placeholder="ユーザー名を入力してください"
-            required>
+        <!-- ロゴ -->
+        <div class="logo">
+            <i class="bi bi-buildings"></i>
         </div>
-      </div>
 
-      <!-- パスワード入力欄 -->
-      <div class="login-field">
-        <label for="password">パスワード</label>
-        <div class="login-input-wrap">
-          <span class="icon-left">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/>
-              <path d="M8 11V7a4 4 0 1 1 8 0v4" stroke="currentColor" stroke-width="2"/>
-            </svg>
-          </span>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            class="has-toggle"
-            placeholder="パスワードを入力してください"
-            required>
-          <button type="button" class="toggle-password" id="togglePassword" aria-label="パスワードを表示">
-            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-            </svg>
-          </button>
-        </div>
-      </div>
+        <!-- タイトル -->
+        <h1 class="system-title">
+            スクールカウンセラー
+            <span>相談予約システム</span>
+        </h1>
 
-      <!-- ログインボタン -->
-      <button type="submit" class="login-submit">
-        ログイン
-      </button>
+        <div class="title-line"></div>
 
-    </form>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-danger" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-  </div>
+        <!-- ログインフォーム -->
+        <form action="{{ url_for('login') }}" method="post">
 
-  <script>
-    const toggleBtn = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
-    const eyeIcon = document.getElementById('eyeIcon');
+            <!-- ユーザー名 -->
+            <div class="form-item">
+                <label for="username">ユーザー名</label>
 
-    toggleBtn.addEventListener('click', () => {
-      const isHidden = passwordInput.type === 'password';
-      passwordInput.type = isHidden ? 'text' : 'password';
-      toggleBtn.setAttribute('aria-label', isHidden ? 'パスワードを隠す' : 'パスワードを表示');
-      eyeIcon.innerHTML = isHidden
-        ? '<path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M9.9 5.1A10.9 10.9 0 0 1 12 5c7 0 10.5 7 10.5 7a13.8 13.8 0 0 1-3.1 4.1M6.6 6.6C3.4 8.6 1.5 12 1.5 12s3.5 7 10.5 7c1.4 0 2.6-.3 3.7-.7M9.9 14.1a3 3 0 0 0 4.2-4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
-        : '<path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>';
-    });
-  </script>
+                <div class="input-box">
+                    <i class="bi bi-person input-icon"></i>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="ユーザー名を入力してください"
+                        autocomplete="username"
+                        required>
+                </div>
+            </div>
+
+            <!-- パスワード -->
+            <div class="form-item">
+                <label for="password">パスワード</label>
+
+                <div class="input-box">
+                    <i class="bi bi-lock input-icon"></i>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="パスワードを入力してください"
+                        autocomplete="current-password"
+                        required>
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        id="togglePassword"
+                        aria-label="パスワードを表示">
+
+                        <i class="bi bi-eye-slash" id="passwordIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ログインボタン -->
+            <button type="submit" class="login-button">
+                <span>ログイン</span>
+                <i class="bi bi-arrow-right"></i>
+            </button>
+
+        </form>
+
+    </main>
+
+    <!-- パスワード表示切り替え -->
+    <script>
+        const password = document.getElementById("password");
+        const toggle = document.getElementById("togglePassword");
+        const icon = document.getElementById("passwordIcon");
+
+        toggle.addEventListener("click", function () {
+            const show = password.type === "password";
+
+            password.type = show ? "text" : "password";
+            icon.className = show ? "bi bi-eye" : "bi bi-eye-slash";
+
+            toggle.setAttribute(
+                "aria-label",
+                show ? "パスワードを隠す" : "パスワードを表示"
+            );
+        });
+    </script>
 
 </body>
 </html>

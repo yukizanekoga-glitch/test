@@ -1,104 +1,188 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スクールカウンセラー相談予約システム</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-  <!-- ページのタイトル -->
-  <title>ようこそスクールカウンセラー</title>
-
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- top.cssを読み込む -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='top.css') }}">
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='care_top.css') }}">
 </head>
 
 <body>
 
-  <!-- ナビゲーションバー -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">🏫スクールカウンセラーシステム</span>
+    <!-- 上部ヘッダー -->
+    <header class="top-header">
+        <div class="site-title">
+            スクールカウンセラー相談予約システム
+        </div>
 
-      <!-- ログアウト -->
-      <form action="{{ url_for('logout') }}">
-        <button type="submit" class="btn btn-primary">
-          ログアウト
-        </button>
-      </form>
+        <div class="user-area">
+            <span class="user-name">
+                <i class="bi bi-person"></i>
+                {{ session.display_name }} 先生（スクールカウンセラー）
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('login') }}" class="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- 左側メニュー -->
+        <aside class="sidebar">
+
+            <a href="{{ url_for('care_top') }}" class="active">
+                <i class="bi bi-house-door"></i>
+                <span>ホーム</span>
+            </a>
+
+            <a href="{{ url_for('care_reseva_top') }}">
+                <i class="bi bi-calendar3"></i>
+                <span>面談可能日時登録</span>
+            </a>
+
+            <a href="{{ url_for('care_chadel') }}">
+                <i class="bi bi-calendar-check"></i>
+                <span>面談日時変更</span>
+            </a>
+
+            <a href="{{ url_for('care_history') }}">
+                <i class="bi bi-clock-history"></i>
+                <span>面談履歴</span>
+            </a>
+
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- あいさつエリア -->
+            <section class="hero">
+
+                <img
+                    src="{{ url_for('static', filename='aaaaaaaaaa.png') }}"
+                    alt="カウンセリング室"
+                    class="hero-image">
+
+                <div class="hero-overlay"></div>
+
+                <div class="hero-text">
+                    <h1>こんにちは！</h1>
+
+                    <p>
+                        今日もカウンセリング業務お疲れさまです。<br>
+                        メニューから面談の予定や予約状況を確認できます。
+                    </p>
+                </div>
+
+            </section>
+
+            <!-- メニュー -->
+            <section class="menu-section">
+
+                <h2 class="section-title">メニュー</h2>
+
+                <div class="menu-container">
+
+                    <!-- 面談可能日時登録 -->
+                    <a href="{{ url_for('care_reseva_top') }}"
+                       class="menu-card reservation">
+
+                        <div class="card-icon">
+                            <i class="bi bi-calendar3"></i>
+                        </div>
+
+                        <div class="menu-text">
+                            <h3>面談可能日時登録</h3>
+                            <p>
+                                面談できる日時を登録して<br>
+                                生徒からの予約を受け付けます
+                            </p>
+                        </div>
+
+                        <i class="bi bi-chevron-right arrow"></i>
+                    </a>
+
+                    <!-- 面談日時変更 -->
+                    <a href="{{ url_for('care_chadel') }}"
+                       class="menu-card confirmation">
+
+                        <div class="card-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+
+                        <div class="menu-text">
+                            <h3>面談日時変更</h3>
+                            <p>
+                                面談日の日時変更が<br>
+                                できます
+                            </p>
+                        </div>
+
+                        <i class="bi bi-chevron-right arrow"></i>
+                    </a>
+
+                    <!-- 面談履歴 -->
+                    <a href="{{ url_for('care_history') }}"
+                       class="menu-card history">
+
+                        <div class="card-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+
+                        <div class="menu-text">
+                            <h3>面談履歴</h3>
+                            <p>
+                                これまでの面談の<br>
+                                履歴を確認できます
+                            </p>
+                        </div>
+
+                        <i class="bi bi-chevron-right arrow"></i>
+                    </a>
+
+                </div>
+            </section>
+
+            <!-- お知らせ -->
+            <section class="announcements">
+
+                <div class="notice-heading">
+                    <span class="info-icon">
+                        <i class="bi bi-info"></i>
+                    </span>
+
+                    <h2>お知らせ</h2>
+                </div>
+
+                <div class="notice-row">
+                    <time datetime="2026-10-01">2026/10/01</time>
+                    <a href="#">
+                        10月のカウンセラー勤務予定を掲載しました
+                    </a>
+                </div>
+
+                <div class="notice-row">
+                    <time datetime="2026-09-15">2026/09/15</time>
+                    <a href="#">面談予約の手順について</a>
+                </div>
+
+            </section>
+
+        </main>
     </div>
-  </nav>
 
-           <!-- 画像を表示 -->
-    <img src="{{ url_for('static', filename='カウンセラー1.png') }}" class="スクールカウンセラー">
-
-   <h3>━━  メニュー  ━━</h3>
-  
-<!-- メニュー -->
-<div class="menu-container">
-
-    <!-- 面談日時 -->
-    <a href="{{ url_for('care_reseva') }}" class="menu-card reservation">
-        <div class="icon">📆</div>
-        <h2>日時登録</h2>
-        <p>
-            生徒との面談日時を<br>
-            登録することができます
-        </p>
-    </a>
-
-    <!-- 面談履歴 -->
-    <a href="{{ url_for('care_history') }}" class="menu-card2 reservation2">
-        <div class="icon2">📄</div>
-        <h2>面談履歴</h2>
-        <p>
-            これまでの面談相談履歴を<br>
-            確認できます
-        </p>
-    </a>
-
-    <!-- 予約確認 -->
-    <a href="{{ url_for('care_schedule') }}" class="menu-card3 reservation3">
-        <div class="icon3">📋</div>
-        <h2>予約確認</h2>
-        <p>
-            予約情報を<br>
-            確認できます
-        </p>
-    </a>
-</div>
-
-<!-- サイドバー -->
-<div class="sidebar">
-    <!-- サイドバーのタイトル -->
-    <h2>メニュー</h2>
-
-    <!-- ホーム -->
-    <a href="{{ url_for('care_top') }}" class="sidebar-item">
-        🏠
-      <span>ホーム</span>
-    </a>
-    <!-- 日時登録 -->
-    <a href="{{ url_for('care_reseva') }}" class="sidebar-item">
-        📆
-      <span>日時登録</span>
-    </a>
-    <!-- 面談履歴 -->
-    <a href="{{ url_for('care_history') }}" class="sidebar-item">
-        📄
-      <span>面談履歴</span>
-    </a>
-    <!-- 予約確認 -->
-    <a href="{{ url_for('care_schedule') }}" class="sidebar-item">
-        📋
-      <span>予約確認</span>
-    </a>
-</div>
-  
 </body>
 </html>

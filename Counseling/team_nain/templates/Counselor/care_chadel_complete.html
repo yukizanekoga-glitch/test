@@ -1,52 +1,182 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面談可能日時の登録完了 | スクールカウンセラー相談予約システム</title>
 
-  <!-- ページのタイトル -->
-  <title>日時変更/削除完了 スクールカウンセラー</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/care_chadel_complete.css') }}">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
 </head>
 
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー 変更/削除</span>
+
+    <!-- ヘッダー：前の画面と同じ -->
+    <header class="header">
+
+        <div class="site-title">
+            <i class="fa-solid fa-school"></i>
+            <span>スクールカウンセラー相談予約システム</span>
+        </div>
+
+        <div class="user-info">
+            <span>
+                <i class="fa-regular fa-user"></i>
+                {{ session.display_name }} 先生（スクールカウンセラー）
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                ログアウト
+            </a>
+        </div>
+
+    </header>
+
+    <!-- 全体レイアウト -->
+    <div class="layout">
+
+        <!-- サイドバー：前の画面と同じ -->
+        <aside class="sidebar">
+
+            <a href="{{ url_for('care_top') }}">
+                <i class="fa-solid fa-house"></i>
+                <span>ホーム</span>
+            </a>
+
+            <a href="{{ url_for('care_chadel') }}" class="active">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>面談日時変更</span>
+            </a>
+
+            <a href="{{ url_for('care_reseva_top') }}">
+                <i class="fa-regular fa-calendar-check"></i>
+                <span>面談可能日時</span>
+            </a>
+
+            <a href="{{ url_for('care_history') }}">
+                <i class="fa-regular fa-clock"></i>
+                <span>面談履歴</span>
+            </a>
+
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- ページタイトル -->
+            <h1 class="page-title">
+                面談可能日時の登録完了
+            </h1>
+
+            <!-- 登録完了メッセージ -->
+            <section class="success-panel">
+
+                <div class="success-icon">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+
+                <h2>
+                    面談可能日時の登録が完了しました。
+                </h2>
+
+                <p>
+                    下記の内容で登録しました。
+                </p>
+
+            </section>
+
+            <!-- 登録内容 -->
+            <section class="content-panel information-panel">
+
+                <h2 class="section-title">
+                    登録内容
+                </h2>
+
+                <table class="info-table">
+                    <tbody>
+                        <tr>
+                            <th>カウンセラー</th>
+                            <td>○○  先生</td>
+                        </tr>
+
+                        <tr>
+                            <th>対象期間</th>
+                            <td>
+                                2024年10月14日（月）～ 2024年10月18日（金）
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </section>
+
+            <!-- 登録した面談可能日時 -->
+            <section class="content-panel schedule-panel">
+
+                <h2 class="section-title">
+                    登録した面談可能日時
+                </h2>
+
+                <div class="table-wrapper">
+                    <table class="schedule-table">
+
+                        <thead>
+                            <tr>
+                                <th>日付</th>
+                                <th>面談可能な時間帯</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>10月14日（月）</td>
+                                <td>10:00 ～ 11:00</td>
+                            </tr>
+
+                            <tr>
+                                <td>10月15日（火）</td>
+                                <td>14:00 ～ 15:00</td>
+                            </tr>
+
+                            <tr>
+                                <td>10月17日（木）</td>
+                                <td>13:00 ～ 14:00</td>
+                            </tr>
+
+                            <tr>
+                                <td>10月18日（金）</td>
+                                <td>10:00 ～ 12:00</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </section>
+
+            <!-- ホームに戻る -->
+            <div class="button-area">
+                <a href="{{ url_for('care_top') }}" class="btn-home">
+                    ホームに戻る
+                </a>
+            </div>
+
+        </main>
+
     </div>
-  </nav>
-
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
-
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
-
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
-
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">完了しました</h2>
-
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-              <div class="alert alert-success" role="alert">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-
-        <a href="{{ url_for('care_chadel') }}" class="btn btn-secondary">変更/削除に戻る</a>
-        <a href="{{ url_for('care_top') }}" class="btn btn-outline-secondary">トップへ</a>
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>

@@ -14,7 +14,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.secret_key = 'dev-secret-key-change-in-production'
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(BASE_DIR, 'counseling.db')}"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(BASE_DIR, 'my_dev.db')}"#####
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -23,7 +23,7 @@ db.init_app(app)
 ROLE_TOP_ENDPOINT = {
     User.ROLE_STUDENT: 'top',
     User.ROLE_COUNSELOR: 'care_top',
-    User.ROLE_TEACHER: 'teacher_top',
+    User.ROLE_TEACHER: 'teacher_student_top',
     User.ROLE_ADMIN: 'management_top',
 }
 
@@ -106,11 +106,53 @@ def top():
 # 予約画面
 # =========================
 
-@app.route("/reserva")
+@app.route("/reserva", methods=["GET", "POST"])
 @role_required(User.ROLE_STUDENT)
 def reserva():
-    return render_template("Student/reserva.html")
+    # カウンセラー一覧 (プルダウン用)
+    counselors = (
+        User.query
+        .filter_by(role=User.ROLE_COUNSELOR)
+        .order_by(User.display_name)
+        .all()
+    )
 
+    selected_counselor_id = None
+    slots = []
+
+    if request.method == "POST":
+        raw_id = request.form.get("counselor_id", "").strip()
+
+        # 空欄 = 「指定なし」(全カウンセラーの空き枠を表示)
+        if raw_id:
+            try:
+                selected_counselor_id = int(raw_id)
+            except ValueError:
+                flash("カウンセラーの指定が正しくありません。")
+                return redirect(url_for("reserva"))
+
+            if not any(c.id == selected_counselor_id for c in counselors):
+                flash("選択したカウンセラーが見つかりません。")
+                return redirect(url_for("reserva"))
+
+        # まだ予約が入っていない、今日以降の面談可能日時
+        query = (
+            AvailableSlot.query
+            .outerjoin(Reservation, Reservation.slot_id == AvailableSlot.id)
+            .filter(Reservation.id.is_(None))
+            .filter(AvailableSlot.date >= date_cls.today())
+        )
+        if selected_counselor_id is not None:
+            query = query.filter(AvailableSlot.counselor_id == selected_counselor_id)
+
+        slots = query.order_by(AvailableSlot.date, AvailableSlot.start_time).all()
+
+    return render_template(
+        "Student/reserva.html",
+        counselors=counselors,
+        selected_counselor_id=selected_counselor_id,
+        slots=slots,
+    )
 
 # =========================
 # 予約確認画面
@@ -332,6 +374,21 @@ def _has_overlap(counselor_id, slot_date, start_time, end_time, exclude_slot_id=
         query = query.filter(AvailableSlot.id != exclude_slot_id)
     return query.first() is not None
 
+# =========================
+# 面談可能日時トップ画面 (面談可能日一覧)
+# =========================
+
+@app.route("/care_reseva_top")
+@role_required(User.ROLE_COUNSELOR)
+def care_reseva_top():
+    slots = (
+        AvailableSlot.query
+        .filter_by(counselor_id=session["user_id"])
+        .order_by(AvailableSlot.date, AvailableSlot.start_time)
+        .all()
+    )
+    return render_template("Counselor/care_reseva_top.html", slots=slots)
+
 
 # =========================
 # 面談可能日時登録画面 (面談可能日時を登録する)
@@ -340,14 +397,6 @@ def _has_overlap(counselor_id, slot_date, start_time, end_time, exclude_slot_id=
 @app.route("/care_reseva", methods=["GET", "POST"])
 @role_required(User.ROLE_COUNSELOR)
 def care_reseva():
-    if request.method == "POST":
-        values, error = _parse_slot_form(request.form)
-        if error:
-            flash(error)
-        else:
-            session["pending_slot"] = values
-            return redirect(url_for("care_reseva_check"))
-
     slots = (
         AvailableSlot.query
         .filter_by(counselor_id=session["user_id"])
@@ -361,38 +410,77 @@ def care_reseva():
 # 面談可能日時登録確認画面
 # =========================
 
+def _parse_bulk_slots(form):
+    """一括登録フォームの slot ("YYYY-MM-DD|HH:MM|HH:MM") を検証し、(枠のリスト, エラーメッセージ) を返す"""
+    slots = set()
+    for raw in form.getlist("slot"):
+        try:
+            raw_date, raw_start, raw_end = raw.split("|")
+            slot_date = date_cls.fromisoformat(raw_date)
+            start_time = time_cls.fromisoformat(raw_start)
+            end_time = time_cls.fromisoformat(raw_end)
+        except ValueError:
+            return None, "日付・時刻の形式が正しくありません。"
+
+        if slot_date <= date_cls.today():
+            return None, "明日以降の日付を選択してください。"
+
+        if end_time <= start_time:
+            return None, "終了時刻は開始時刻より後にしてください。"
+
+        slots.add((slot_date, start_time, end_time))
+
+    if not slots:
+        return None, "登録する日時を選択してください。"
+
+    return sorted(slots), None
+
+
 @app.route("/care_reseva_check", methods=["GET", "POST"])
 @role_required(User.ROLE_COUNSELOR)
 def care_reseva_check():
-    pending = session.get("pending_slot")
-    if not pending:
-        flash("登録内容が見つかりません。もう一度入力してください。")
+    # 登録内容は care_reseva のフォームから POST で受け取る (件数が多くなるため session には保存しない)
+    if request.method == "GET":
         return redirect(url_for("care_reseva"))
 
-    if request.method == "POST":
-        slot_date = date_cls.fromisoformat(pending["date"])
-        start_time = time_cls.fromisoformat(pending["start_time"])
-        end_time = time_cls.fromisoformat(pending["end_time"])
+    slots, error = _parse_bulk_slots(request.form)
+    if error:
+        flash(error)
+        return redirect(url_for("care_reseva"))
 
-        if _has_overlap(session["user_id"], slot_date, start_time, end_time):
-            flash("同じ日時に登録済みの面談可能日時があります。")
-            session.pop("pending_slot", None)
-            return redirect(url_for("care_reseva"))
+    # 既に登録済みの日時と重なる枠は登録しない
+    new_slots = [
+        s for s in slots
+        if not _has_overlap(session["user_id"], *s)
+    ]
+    skipped_count = len(slots) - len(new_slots)
 
-        slot = AvailableSlot(
-            counselor_id=session["user_id"],
-            date=slot_date,
-            start_time=start_time,
-            end_time=end_time,
-        )
-        db.session.add(slot)
+    if not new_slots:
+        flash("選択した日時はすべて登録済みです。")
+        return redirect(url_for("care_reseva"))
+
+    if request.form.get("confirm") == "1":
+        for slot_date, start_time, end_time in new_slots:
+            db.session.add(AvailableSlot(
+                counselor_id=session["user_id"],
+                date=slot_date,
+                start_time=start_time,
+                end_time=end_time,
+            ))
         db.session.commit()
-
-        session.pop("pending_slot", None)
-        flash("面談可能日時を登録しました。")
         return redirect(url_for("care_reseva_complete"))
 
-    return render_template("Counselor/care_reseva_check.html", pending=pending)
+    # 確認画面用に日付ごとにまとめる
+    grouped = {}
+    for slot_date, start_time, end_time in new_slots:
+        grouped.setdefault(slot_date, []).append((start_time, end_time))
+
+    return render_template(
+        "Counselor/care_reseva_check.html",
+        grouped=grouped,
+        new_slots=new_slots,
+        skipped_count=skipped_count,
+    )
 
 
 # =========================
@@ -471,12 +559,12 @@ def care_chadel():
 @app.route("/care_chadel_check", methods=["GET", "POST"])
 @role_required(User.ROLE_COUNSELOR)
 def care_chadel_check():
-    pending = session.get("pending_chadel")
+    pending = session.get("pending_chadel") # 操作内容をセッションから取得
     if not pending:
         flash("変更・削除内容が見つかりません。もう一度操作してください。")
         return redirect(url_for("care_chadel"))
 
-    slot = _get_own_slot(pending["slot_id"])
+    slot = _get_own_slot(pending["slot_id"])# 対象の日時を取得
     if slot is None:
         session.pop("pending_chadel", None)
         flash("対象の面談可能日時が見つかりません。")
@@ -484,8 +572,8 @@ def care_chadel_check():
 
     if request.method == "POST":
         if pending["action"] == "delete":
-            db.session.delete(slot)
-            db.session.commit()
+            db.session.delete(slot)# POSTされたら確定処理
+            db.session.commit()    # DBに反映して保留情報を削除 
             message = "面談可能日時を削除しました。"
         else:
             slot_date = date_cls.fromisoformat(pending["date"])
@@ -520,34 +608,7 @@ def care_chadel_complete():
     return render_template("Counselor/care_chadel_complete.html")
 
 
-# =========================
-# 先生トップ画面 (担当クラス管理機能)
-# =========================
 
-@app.route("/teacher_top")
-@role_required(User.ROLE_TEACHER)
-def teacher_top():
-    return render_template("Teacher/teacher_top.html")
-
-
-# =========================
-# クラスの生徒一覧を表示する
-# =========================
-
-@app.route("/teacher_class_students")
-@role_required(User.ROLE_TEACHER)
-def teacher_class_students():
-    return render_template("Teacher/teacher_class_students.html")
-
-
-# =========================
-# クラスの生徒の面談予約日時を表示する
-# =========================
-
-@app.route("/teacher_class_schedule")
-@role_required(User.ROLE_TEACHER)
-def teacher_class_schedule():
-    return render_template("Teacher/teacher_class_schedule.html")
 
 
 # =========================
@@ -567,7 +628,7 @@ def management_top():
 @app.route("/manage_student")
 @role_required(User.ROLE_ADMIN)
 def manage_student():
-    return render_template("Management/manage_student.html")
+    return render_template("Management/ManageStudent/manage_student.html")
 
 
 # =========================
@@ -577,7 +638,7 @@ def manage_student():
 @app.route("/manage_student_check")
 @role_required(User.ROLE_ADMIN)
 def manage_student_check():
-    return render_template("Management/manage_student_check.html")
+    return render_template("Management/ManageStudent/manage_student_check.html")
 
 
 # =========================
@@ -587,7 +648,7 @@ def manage_student_check():
 @app.route("/manage_sturec")
 @role_required(User.ROLE_ADMIN)
 def manage_sturec():
-    return render_template("Management/manage_sturec.html")
+    return render_template("Management/ManageStudent/manage_sturec.html")
 
 
 # =========================
@@ -597,7 +658,7 @@ def manage_sturec():
 @app.route("/manage_sturec_check")
 @role_required(User.ROLE_ADMIN)
 def manage_sturec_check():
-    return render_template("Management/manage_sturec_check.html")
+    return render_template("Management/ManageStudent/manage_sturec_check.html")
 
 
 # =========================
@@ -607,7 +668,7 @@ def manage_sturec_check():
 @app.route("/manage_sturec_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_sturec_complete():
-    return render_template("Management/manage_sturec_complete.html")
+    return render_template("Management/ManageStudent/manage_sturec_complete.html")
 
 
 # =========================
@@ -617,7 +678,7 @@ def manage_sturec_complete():
 @app.route("/manage_stuedit")
 @role_required(User.ROLE_ADMIN)
 def manage_stuedit():
-    return render_template("Management/manage_stuedit.html")
+    return render_template("Management/ManageStudent/manage_stuedit.html")
 
 
 # =========================
@@ -627,7 +688,7 @@ def manage_stuedit():
 @app.route("/manage_stuedit_check")
 @role_required(User.ROLE_ADMIN)
 def manage_stuedit_check():
-    return render_template("Management/manage_stuedit_check.html")
+    return render_template("Management/ManageStudent/manage_stuedit_check.html")
 
 
 # =========================
@@ -637,7 +698,7 @@ def manage_stuedit_check():
 @app.route("/manage_stuedit_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_stuedit_complete():
-    return render_template("Management/manage_stuedit_complete.html")
+    return render_template("Management/ManageStudent/manage_stuedit_complete.html")
 
 
 # =========================
@@ -647,7 +708,7 @@ def manage_stuedit_complete():
 @app.route("/manage_studel_check")
 @role_required(User.ROLE_ADMIN)
 def manage_studel_check():
-    return render_template("Management/manage_studel_check.html")
+    return render_template("Management/ManageStudent/manage_studel_check.html")
 
 
 # =========================
@@ -657,7 +718,7 @@ def manage_studel_check():
 @app.route("/manage_studel_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_studel_complete():
-    return render_template("Management/manage_studel_complete.html")
+    return render_template("Management/ManageStudent/manage_studel_complete.html")
 
 
 # =========================
@@ -667,7 +728,7 @@ def manage_studel_complete():
 @app.route("/manage_care")
 @role_required(User.ROLE_ADMIN)
 def manage_care():
-    return render_template("Management/manage_care.html")
+    return render_template("Management/ManageCare/manage_care.html")
 
 
 # =========================
@@ -677,7 +738,7 @@ def manage_care():
 @app.route("/manage_care_check")
 @role_required(User.ROLE_ADMIN)
 def manage_care_check():
-    return render_template("Management/manage_care_check.html")
+    return render_template("Management/ManageCare/manage_care_check.html")
 
 
 # =========================
@@ -687,7 +748,7 @@ def manage_care_check():
 @app.route("/manage_schedule")
 @role_required(User.ROLE_ADMIN)
 def manage_schedule():
-    return render_template("Management/manage_schedule.html")
+    return render_template("Management/ManageCare/manage_schedule.html")
 
 
 # =========================
@@ -697,7 +758,7 @@ def manage_schedule():
 @app.route("/manage_carereg")
 @role_required(User.ROLE_ADMIN)
 def manage_carereg():
-    return render_template("Management/manage_carereg.html")
+    return render_template("Management/ManageCare/manage_carereg.html")
 
 
 # =========================
@@ -707,7 +768,7 @@ def manage_carereg():
 @app.route("/manage_carereg_check")
 @role_required(User.ROLE_ADMIN)
 def manage_carereg_check():
-    return render_template("Management/manage_carereg_check.html")
+    return render_template("Management/ManageCare/manage_carereg_check.html")
 
 
 # =========================
@@ -717,7 +778,7 @@ def manage_carereg_check():
 @app.route("/manage_carereg_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_carereg_complete():
-    return render_template("Management/manage_carereg_complete.html")
+    return render_template("Management/ManageCare/manage_carereg_complete.html")
 
 
 # =========================
@@ -727,7 +788,7 @@ def manage_carereg_complete():
 @app.route("/manage_caredit")
 @role_required(User.ROLE_ADMIN)
 def manage_caredit():
-    return render_template("Management/manage_caredit.html")
+    return render_template("Management/ManageCare/manage_caredit.html")
 
 
 # =========================
@@ -737,7 +798,7 @@ def manage_caredit():
 @app.route("/manage_caredit_check")
 @role_required(User.ROLE_ADMIN)
 def manage_caredit_check():
-    return render_template("Management/manage_caredit_check.html")
+    return render_template("Management/ManageCare/manage_caredit_check.html")
 
 
 # =========================
@@ -747,7 +808,7 @@ def manage_caredit_check():
 @app.route("/manage_caredit_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_caredit_complete():
-    return render_template("Management/manage_caredit_complete.html")
+    return render_template("Management/ManageCare/manage_caredit_complete.html")
 
 
 # =========================
@@ -757,7 +818,7 @@ def manage_caredit_complete():
 @app.route("/manage_caredel_check")
 @role_required(User.ROLE_ADMIN)
 def manage_caredel_check():
-    return render_template("Management/manage_caredel_check.html")
+    return render_template("Management/ManageCare/manage_caredel_check.html")
 
 
 # =========================
@@ -767,101 +828,161 @@ def manage_caredel_check():
 @app.route("/manage_caredel_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_caredel_complete():
-    return render_template("Management/manage_caredel_complete.html")
+    return render_template("Management/ManageCare/manage_caredel_complete.html")
+
+
+
+
 
 
 # =========================
-# パスワード変更 (生徒/スクールカウンセラー/先生のパスワードを変更する)
+# 新しい画面遷移で追加された画面 (画面表示のみ。登録・更新などの処理は今後実装)
 # =========================
+@app.route("/reserva_check")
+@role_required(User.ROLE_STUDENT)
+def reserva_check():
+    return render_template("Student/reserva_check.html")
 
-MANAGEABLE_ROLES = (User.ROLE_STUDENT, User.ROLE_COUNSELOR, User.ROLE_TEACHER)
-
-ROLE_LABELS = {
-    User.ROLE_STUDENT: "生徒",
-    User.ROLE_COUNSELOR: "スクールカウンセラー",
-    User.ROLE_TEACHER: "先生",
-}
-
-
-def _get_manageable_user(user_id):
-    user = User.query.filter_by(id=user_id).first()
-    if user is None or user.role not in MANAGEABLE_ROLES:
-        return None
-    return user
+@app.route("/reserva_done")
+@role_required(User.ROLE_STUDENT)
+def reserva_done():
+    return render_template("Student/reserva_done.html")
 
 
-@app.route("/manage_password")
+@app.route("/teacher_student_top")
+@role_required(User.ROLE_TEACHER)
+def teacher_student_top():
+    return render_template("Teacher/teacher_student_top.html")
+
+@app.route("/teacher_caretime")
+@role_required(User.ROLE_TEACHER)
+def teacher_caretime():
+    return render_template("Teacher/teacher_caretime.html")
+
+@app.route("/teacher_pass")
+@role_required(User.ROLE_TEACHER)
+def teacher_pass():
+    return render_template("Teacher/teacher_pass.html")
+
+@app.route("/teacher_pass_complete")
+@role_required(User.ROLE_TEACHER)
+def teacher_pass_complete():
+    return render_template("Teacher/teacher_pass_complete.html")
+
+@app.route("/manage_carepass")
 @role_required(User.ROLE_ADMIN)
-def manage_password():
-    users = (
-        User.query
-        .filter(User.role.in_(MANAGEABLE_ROLES))
-        .order_by(User.role, User.username)
-        .all()
-    )
-    return render_template("Management/manage_password.html", users=users, role_labels=ROLE_LABELS)
+def manage_carepass():
+    return render_template("Management/ManageCare/manage_carepass.html")
 
-
-@app.route("/manage_password/<int:user_id>", methods=["GET", "POST"])
+@app.route("/manage_carepass_complete")
 @role_required(User.ROLE_ADMIN)
-def manage_password_edit(user_id):
-    target_user = _get_manageable_user(user_id)
-    if target_user is None:
-        flash("対象のユーザーが見つかりません。")
-        return redirect(url_for("manage_password"))
+def manage_carepass_complete():
+    return render_template("Management/ManageCare/manage_carepass_complete.html")
 
-    if request.method == "POST":
-        new_password = request.form.get("new_password", "")
-        confirm_password = request.form.get("confirm_password", "")
-
-        if len(new_password) < 6:
-            flash("パスワードは6文字以上で入力してください。")
-        elif new_password != confirm_password:
-            flash("パスワードが一致しません。")
-        else:
-            session["pending_password"] = {"user_id": user_id, "new_password": new_password}
-            return redirect(url_for("manage_password_check"))
-
-    return render_template(
-        "Management/manage_password_edit.html",
-        target_user=target_user,
-        role_label=ROLE_LABELS.get(target_user.role, target_user.role),
-    )
-
-
-@app.route("/manage_password_check", methods=["GET", "POST"])
+@app.route("/manage_class")
 @role_required(User.ROLE_ADMIN)
-def manage_password_check():
-    pending = session.get("pending_password")
-    if not pending:
-        flash("変更内容が見つかりません。もう一度操作してください。")
-        return redirect(url_for("manage_password"))
+def manage_class():
+    return render_template("Management/ManageClass/manage_class.html")
 
-    target_user = _get_manageable_user(pending["user_id"])
-    if target_user is None:
-        session.pop("pending_password", None)
-        flash("対象のユーザーが見つかりません。")
-        return redirect(url_for("manage_password"))
-
-    if request.method == "POST":
-        target_user.set_password(pending["new_password"])
-        db.session.commit()
-
-        session.pop("pending_password", None)
-        flash(f"{target_user.display_name}さんのパスワードを変更しました。")
-        return redirect(url_for("manage_password_complete"))
-
-    return render_template(
-        "Management/manage_password_check.html",
-        target_user=target_user,
-        role_label=ROLE_LABELS.get(target_user.role, target_user.role),
-    )
-
-
-@app.route("/manage_password_complete")
+@app.route("/manage_stuallo")
 @role_required(User.ROLE_ADMIN)
-def manage_password_complete():
-    return render_template("Management/manage_password_complete.html")
+def manage_stuallo():
+    return render_template("Management/ManageClass/manage_stuallo.html")
+
+@app.route("/manage_stuallo_check")
+@role_required(User.ROLE_ADMIN)
+def manage_stuallo_check():
+    return render_template("Management/ManageClass/manage_stuallo_check.html")
+
+@app.route("/manage_stuallo_complete")
+@role_required(User.ROLE_ADMIN)
+def manage_stuallo_complete():
+    return render_template("Management/ManageClass/manage_stuallo_complete.html")
+
+@app.route("/manage_stupass")
+@role_required(User.ROLE_ADMIN)
+def manage_stupass():
+    return render_template("Management/ManageStudent/manage_stupass.html")
+
+@app.route("/manage_stupass_complete")
+@role_required(User.ROLE_ADMIN)
+def manage_stupass_complete():
+    return render_template("Management/ManageStudent/manage_stupass_complete.html")
+
+@app.route("/manage_teacher")
+@role_required(User.ROLE_ADMIN)
+def manage_teacher():
+    return render_template("Management/ManageTeacher/manage_teacher.html")
+
+@app.route("/manage_teacher_check")
+@role_required(User.ROLE_ADMIN)
+def manage_teacher_check():
+    return render_template("Management/ManageTeacher/manage_teacher_check.html")
+
+@app.route("/manage_teadel_check")
+@role_required(User.ROLE_ADMIN)
+def manage_teadel_check():
+    return render_template("Management/ManageTeacher/manage_teadel_check.html")
+
+@app.route("/manage_teadel_complete")
+@role_required(User.ROLE_ADMIN)
+def manage_teadel_complete():
+    return render_template("Management/ManageTeacher/manage_teadel_complete.html")
+
+@app.route("/manage_teaedit")
+@role_required(User.ROLE_ADMIN)
+def manage_teaedit():
+    return render_template("Management/ManageTeacher/manage_teaedit.html")
+
+@app.route("/manage_teaedit_check")
+@role_required(User.ROLE_ADMIN)
+def manage_teaedit_check():
+    return render_template("Management/ManageTeacher/manage_teaedit_check.html")
+
+@app.route("/manage_teaedit_complete")
+@role_required(User.ROLE_ADMIN)
+def manage_teaedit_complete():
+    return render_template("Management/ManageTeacher/manage_teaedit_complete.html")
+
+@app.route("/manage_teallo")
+@role_required(User.ROLE_ADMIN)
+def manage_teallo():
+    return render_template("Management/ManageClass/manage_teallo.html")
+
+@app.route("/manage_teallo_check")
+@role_required(User.ROLE_ADMIN)
+def manage_teallo_check():
+    return render_template("Management/ManageClass/manage_teallo_check.html")
+
+@app.route("/manage_teallo_complete")
+@role_required(User.ROLE_ADMIN)
+def manage_teallo_complete():
+    return render_template("Management/ManageClass/manage_teallo_complete.html")
+
+@app.route("/manage_teapass")
+@role_required(User.ROLE_ADMIN)
+def manage_teapass():
+    return render_template("Management/ManageTeacher/manage_teapass.html")
+
+@app.route("/manage_teapass_complete")
+@role_required(User.ROLE_ADMIN)
+def manage_teapass_complete():
+    return render_template("Management/ManageTeacher/manage_teapass_complete.html")
+
+@app.route("/manage_tearec")
+@role_required(User.ROLE_ADMIN)
+def manage_tearec():
+    return render_template("Management/ManageTeacher/manage_tearec.html")
+
+@app.route("/manage_tearec_check")
+@role_required(User.ROLE_ADMIN)
+def manage_tearec_check():
+    return render_template("Management/ManageTeacher/manage_tearec_check.html")
+
+@app.route("/manage_tearec_complete")
+@role_required(User.ROLE_ADMIN)
+def manage_tearec_complete():
+    return render_template("Management/ManageTeacher/manage_tearec_complete.html")
 
 
 if __name__ == "__main__":

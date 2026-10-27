@@ -22,3 +22,4 @@ staticfiles/
 *.swp
 *~
 .DS_Store
+my_dev.db

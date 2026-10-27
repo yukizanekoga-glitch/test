@@ -1,0 +1,304 @@
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    background: #f3f6fb;
+    color: #263248;
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 14px;
+}
+
+/* ヘッダー */
+.header {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    border-bottom: 1px solid #e2e7ef;
+    background: #fff;
+}
+
+.site-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #172033;
+    white-space: nowrap;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: #263248;
+    white-space: nowrap;
+}
+
+.user-info i {
+    margin-right: 4px;
+}
+
+.header-divider {
+    width: 1px;
+    height: 18px;
+    background: #e1e6ee;
+}
+
+.logout {
+    color: #3473df;
+    text-decoration: none;
+}
+
+.logout:hover {
+    color: #2459bd;
+}
+
+/* 全体レイアウト */
+.layout {
+    display: flex;
+    min-height: calc(100vh - 48px);
+    background: #fff;
+    border-left: 1px solid #e5eaf2;
+    border-right: 1px solid #e5eaf2;
+    box-shadow: 0 2px 5px rgba(35, 58, 90, 0.04);
+}
+
+/* サイドバー */
+.sidebar {
+    width: 171px;
+    min-width: 171px;
+    flex-shrink: 0;
+    background: #f8faff;
+    border-right: 1px solid #e4e9f1;
+    padding-top: 8px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 42px;
+    padding: 0 22px;
+    color: #59657b;
+    text-decoration: none;
+    font-size: 12px;
+    border-left: 3px solid transparent;
+    white-space: nowrap;
+}
+
+.sidebar a i {
+    width: 17px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 17px;
+}
+
+.sidebar a.active,
+.sidebar a:hover {
+    background: #edf4ff;
+    color: #3473df;
+}
+
+.sidebar a.active {
+    border-left-color: #3473df;
+    font-weight: 700;
+}
+
+/* メインコンテンツ */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 32px 32px;
+    background: #fff;
+}
+
+/* パンくずリスト */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 10px;
+    margin: 0 0 19px;
+    color: #68748a;
+}
+
+.breadcrumb a {
+    color: #68748a;
+    text-decoration: none;
+}
+
+.breadcrumb span {
+    margin: 0 6px;
+}
+
+/* 見出し */
+.page-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 30px;
+}
+
+.heading-line {
+    width: 4px;
+    height: 25px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    background: #3978ed;
+}
+
+.page-heading h1 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    color: #111b30;
+}
+
+/* 登録完了カード */
+.success-panel {
+    width: 100%;
+    min-height: 228px;
+    border: 1px solid #e1e6ee;
+    border-radius: 6px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 29px 20px 30px;
+}
+
+/* チェックマーク */
+.success-icon {
+    width: 67px;
+    height: 67px;
+    border-radius: 50%;
+    background: #e6f5eb;
+    color: #4b9b70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.success-icon i {
+    font-size: 30px;
+}
+
+/* 完了メッセージ */
+.success-message {
+    margin: 0;
+    color: #111b30;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* 戻るボタン */
+.success-button-area {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.btn-back-list {
+    width: 167px;
+    min-height: 34px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #376fe5;
+    border-radius: 5px;
+    background: #376fe5;
+    color: #fff;
+    font-family: inherit;
+    font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-back-list:hover {
+    background: #285dc9;
+    border-color: #285dc9;
+    color: #fff;
+}
+
+/* スマートフォン対応 */
+@media (max-width: 768px) {
+    .header {
+        height: auto;
+        min-height: 48px;
+        padding: 10px 14px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .site-title {
+        font-size: 14px;
+        white-space: normal;
+    }
+
+    .user-info {
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 11px;
+    }
+
+    .layout {
+        min-height: calc(100vh - 48px);
+    }
+
+    .sidebar {
+        width: 60px;
+        min-width: 60px;
+    }
+
+    .sidebar a {
+        justify-content: center;
+        gap: 0;
+        padding: 0 5px;
+        min-height: 46px;
+    }
+
+    .sidebar a span {
+        display: none;
+    }
+
+    .main-content {
+        padding: 16px 14px 24px;
+    }
+
+    .page-heading {
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .page-heading h1 {
+        font-size: 16px;
+    }
+
+    .success-panel {
+        min-height: 220px;
+        padding: 28px 12px;
+    }
+
+    .success-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .success-message {
+        font-size: 14px;
+    }
+}

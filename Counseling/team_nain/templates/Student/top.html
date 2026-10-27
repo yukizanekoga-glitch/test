@@ -1,102 +1,183 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スクールカウンセラー相談予約システム</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-  <!-- ページのタイトル -->
-  <title>ログイン スクールカウンセラー</title>
-
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
-  <!-- top.cssを読み込む --> 
-  <link rel="stylesheet" href="{{ url_for('static', filename='top.css') }}">
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='top.css') }}">
 </head>
 
 <body>
 
-  <!-- ナビゲーションバー -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">🏫スクールカウンセラーシステム</span>
+    <!-- 上部ヘッダー -->
+    <header class="top-header">
+        <div class="site-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="user-area">
+            <span class="user-name">
+                <i class="bi bi-person"></i>
+                {{ session.class_name }} {{ session.display_name }}さん
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('login') }}" class="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- 左側メニュー -->
+        <aside class="sidebar">
+
+            <a href="{{ url_for('top') }}" class="active">
+                <i class="bi bi-house-door"></i>
+                <span>ホーム</span>
+            </a>
+
+            <a href="{{ url_for('reserva') }}">
+                <i class="bi bi-calendar3"></i>
+                <span>面談予約</span>
+            </a>
+
+            <a href="{{ url_for('schedule') }}">
+                <i class="bi bi-calendar-check"></i>
+                <span>予約変更削除</span>
+            </a>
+
+            <a href="{{ url_for('history') }}">
+                <i class="bi bi-clock-history"></i>
+                <span>面談履歴</span>
+            </a>
+
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- あいさつエリア -->
+            <section class="hero">
+
+                <img
+                    src="{{ url_for('static', filename='aaaaaaaaaa.png') }}"
+                    alt="カウンセリング室"
+                    class="hero-image">
+
+                <div class="hero-overlay"></div>
+
+                <div class="hero-text">
+                    <h1>こんにちは！</h1>
+
+                    <p>
+                        困ったことや話したいことがあったら、<br>
+                        スクールカウンセラーに相談してみましょう。
+                    </p>
+                </div>
+
+            </section>
+
+            <!-- メニュー -->
+            <section class="menu-section">
+
+                <h2 class="section-title">メニュー</h2>
+
+                <div class="menu-container">
+
+                    <!-- 面談予約 -->
+                    <a href="{{ url_for('reserva') }}"
+                       class="menu-card reservation">
+
+                        <div class="card-icon">
+                            <i class="bi bi-calendar3"></i>
+                        </div>
+
+                        <div class="menu-text">
+                            <h3>面談予約</h3>
+                            <p>
+                                カウンセラーとの面談予約を<br>
+                                登録することができます
+                            </p>
+                        </div>
+
+                        <i class="bi bi-chevron-right arrow"></i>
+                    </a>
+
+                    <!-- 予約変更削除 -->
+                    <a href="{{ url_for('schedule') }}"
+                       class="menu-card confirmation">
+
+                        <div class="card-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+
+                        <div class="menu-text">
+                            <h3>予約変更削除</h3>
+                            <p>
+                                予約情報を<br>
+                                変更または削除できます
+                            </p>
+                        </div>
+
+                        <i class="bi bi-chevron-right arrow"></i>
+                    </a>
+
+                    <!-- 面談履歴 -->
+                    <a href="{{ url_for('history') }}"
+                       class="menu-card history">
+
+                        <div class="card-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+
+                        <div class="menu-text">
+                            <h3>面談履歴</h3>
+                            <p>
+                                これまでの面談の<br>
+                                履歴を確認できます
+                            </p>
+                        </div>
+
+                        <i class="bi bi-chevron-right arrow"></i>
+                    </a>
+
+                </div>
+            </section>
+
+                        <!-- お知らせ -->
+            <section class="announcements">
+
+                <div class="notice-heading">
+                    <span class="info-icon">
+                        <i class="bi bi-info"></i>
+                    </span>
+
+                    <h2>お知らせ</h2>
+                </div>
+
+                <div class="notice-row">
+                    <time datetime="2026-10-31">2026/10/31</time>
+                    <a href="#">
+                        10月のアンケートを実施します
+                    </a>
+                </div>
+
+            </section>
+
+        </main>
     </div>
-    <title>ようこそスクールカウンセラー</title>
-          <!-- ログアウト -->
-      <form action="{{ url_for('logout') }}">
-        <button type="submit" class="btn btn-primary">
-          ログアウト
-        </button>
-      </form>
-    </div>
-  </nav>
 
-            <!-- 画像を表示 -->
-  <img src="{{ url_for('static', filename='カウンセラー.png') }}" class="スクールカウンセラー">
-
-  <h3>━━  メニュー  ━━</h3>
-  
-<!-- メニュー -->
-<div class="menu-container">
-
-    <!-- カウンセラー予約 -->
-    <a href="{{ url_for('reserva') }}" class="menu-card reservation">
-        <div class="icon">📆</div>
-        <h2>カウンセラー予約</h2>
-        <p>
-            カウンセラーとの面談予約を<br>
-            行うことができます
-        </p>
-    </a>
-
-    <!-- 面談履歴 -->
-    <a href="{{ url_for('history') }}" class="menu-card2 reservation2">
-        <div class="icon2">📄</div>
-        <h2>面談履歴</h2>
-        <p>
-            これまでの面談相談履歴を<br>
-            確認できます
-        </p>
-    </a>
-
-    <!-- 予約確認 -->
-    <a href="{{ url_for('schedule') }}" class="menu-card3 reservation3">
-        <div class="icon3">📋</div>
-        <h2>予約確認</h2>
-        <p>
-            予約情報を<br>
-            確認できます
-        </p>
-    </a>
-</div>
-
-<!-- サイドバー -->
-<div class="sidebar">
-    <!-- サイドバーのタイトル -->
-    <h2>メニュー</h2>
-
-    <!-- ホーム -->
-    <a href="{{ url_for('top') }}" class="sidebar-item">
-        🏠
-      <span>ホーム</span>
-    </a>
-    <!-- カウンセラー予約 -->
-    <a href="{{ url_for('reserva') }}" class="sidebar-item">
-        📆
-      <span>カウンセラー予約</span>
-    </a>
-    <!-- 面談履歴 -->
-    <a href="{{ url_for('history') }}" class="sidebar-item">
-        📄
-      <span>面談履歴</span>
-    </a>
-    <!-- 予約確認 -->
-    <a href="{{ url_for('schedule') }}" class="sidebar-item">
-        📋
-      <span>予約確認</span>
-    </a>
-</div>
+</body>
+</html>

@@ -1,112 +1,537 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スクールカウンセラー相談予約システム</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/care_reseva.css') }}">
 
-  <!-- ページのタイトル -->
-  <title>日時登録 スクールカウンセラー</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .error-message {
+            margin: 8px 0 0;
+            color: #d93025;
+            font-size: 14px;
+        }
+
+        .empty-message {
+            margin: 0;
+            padding: 24px 0;
+            text-align: center;
+            color: #666;
+        }
+
+        /* ページ切り替え (面談可能日一覧と同じ見た目) */
+        .pagination-area {
+            margin-top: 17px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pagination-area[hidden] {
+            display: none;
+        }
+
+        .page-number,
+        .page-arrow {
+            width: 29px;
+            height: 29px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            border-radius: 5px;
+            background: #ffffff;
+            color: #29364b;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .page-number:hover,
+        .page-arrow:hover {
+            background: #edf4ff;
+        }
+
+        .page-number.selected {
+            background: #1476f5;
+            color: #ffffff;
+        }
+
+        .page-arrow {
+            font-size: 14px;
+        }
+
+        .page-arrow:disabled {
+            opacity: 0.35;
+            cursor: default;
+            background: #ffffff;
+        }
+    </style>
 </head>
-
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー 日時登録</span>
-    </div>
-  </nav>
 
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="site-title">
+            <i class="fa-solid fa-school"></i>
+            スクールカウンセラー相談予約システム
+        </div>
 
-    <!-- エラー・完了メッセージ表示 -->
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-info" role="alert">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+        <div class="user-info">
+            <span>
+                <i class="fa-regular fa-user"></i>
+                {{ session.display_name }} 先生（スクールカウンセラー）
+            </span>
 
-    <div class="row justify-content-center">
-      <div class="col-md-6">
+            <span class="header-divider"></span>
 
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">面談可能日時登録</h2>
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
 
-        <!-- 日時登録フォーム -->
-        <form method="post" action="{{ url_for('care_reseva') }}">
+    <!-- 全体レイアウト -->
+    <div class="layout">
 
-          <div class="mb-3">
-            <label for="date" class="form-label">日付</label>
-            <input type="date" class="form-control" id="date" name="date" required>
-          </div>
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <a href="{{ url_for('care_top') }}">
+                <i class="fa-solid fa-house"></i>
+                <span>ホーム</span>
+            </a>
 
-          <div class="row">
-            <div class="col mb-3">
-              <label for="start_time" class="form-label">開始時刻</label>
-              <input type="time" class="form-control" id="start_time" name="start_time" required>
+            <a href="{{ url_for('care_reseva') }}" class="active">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>面談可能日時登録</span>
+            </a>
+
+            <a href="{{ url_for('care_reseva_top')}}">
+                <i class="fa-regular fa-calendar-check"></i>
+                <span>予約一覧</span>
+            </a>
+
+            <a href="{{ url_for('care_history')}}">
+                <i class="fa-regular fa-clock"></i>
+                <span>面談履歴</span>
+            </a>
+
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- ページ見出し -->
+            <div class="page-heading">
+                <span class="heading-line"></span>
+                <h1>面談可能日時の一括登録</h1>
             </div>
-            <div class="col mb-3">
-              <label for="end_time" class="form-label">終了時刻</label>
-              <input type="time" class="form-control" id="end_time" name="end_time" required>
-            </div>
-          </div>
 
-          <div class="d-flex gap-2">
-            <!-- 戻るボタン -->
-            <a href="{{ url_for('care_top') }}" class="btn btn-secondary">戻る</a>
-            <!-- 日時登録 -->
-            <button type="submit" class="btn btn-primary">次へ</button>
-            <!-- 日時変更削除 -->
-            <a href="{{ url_for('care_chadel') }}" class="btn btn-outline-primary ms-auto">変更/削除</a>
-          </div>
+            <p class="description">
+                面談可能な日時を期間・曜日・時間帯を選択して、一括で登録できます。
+            </p>
 
-        </form>
+            {% with messages = get_flashed_messages() %}
+                {% for message in messages %}
+                    <p class="error-message">{{ message }}</p>
+                {% endfor %}
+            {% endwith %}
 
-        <!-- 登録済み面談可能日時の一覧 -->
-        <h3 class="mt-5 mb-3">登録済みの面談可能日時</h3>
+            <!-- 登録条件の設定 -->
+            <section class="setting-panel">
 
-        {% if slots %}
-        <table class="table table-bordered align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>日付</th>
-              <th>開始</th>
-              <th>終了</th>
-              <th>状態</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for slot in slots %}
-            <tr>
-              <td>{{ slot.date }}</td>
-              <td>{{ slot.start_time.strftime('%H:%M') }}</td>
-              <td>{{ slot.end_time.strftime('%H:%M') }}</td>
-              <td>
-                {% if slot.is_booked %}
-                  <span class="badge bg-danger">予約済み</span>
-                {% else %}
-                  <span class="badge bg-success">空き</span>
-                {% endif %}
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {% else %}
-          <p class="text-muted">登録済みの面談可能日時はありません。</p>
-        {% endif %}
+                <h2 class="section-title">
+                    <span class="step-number">1</span>
+                    登録条件の設定
+                </h2>
 
-      </div>
+                <div class="setting-grid">
+
+                    <!-- 期間 -->
+                    <div class="setting-item">
+                        <label class="field-title">期間</label>
+
+                        <div class="date-range">
+                            <input type="date" id="startDate">
+                            <span>～</span>
+                            <input type="date" id="endDate">
+                        </div>
+
+                        <!-- 日付のエラーメッセージ -->
+                        <p class="error-message" id="dateError" hidden></p>
+                    </div>
+
+                    <!-- 曜日 -->
+                    <div class="setting-item">
+                        <label class="field-title">曜日</label>
+
+                        <div class="weekday-list">
+                            <label><input type="checkbox" data-day="1"> 月</label>
+                            <label><input type="checkbox" data-day="2"> 火</label>
+                            <label><input type="checkbox" data-day="3"> 水</label>
+                            <label><input type="checkbox" data-day="4"> 木</label>
+                            <label><input type="checkbox" data-day="5"> 金</label>
+                            <label><input type="checkbox" data-day="6"> 土</label>
+                            <label><input type="checkbox" data-day="0"> 日</label>
+                        </div>
+                    </div>
+
+                    <!-- 時間帯 -->
+                    <div class="setting-item">
+                        <label class="field-title">時間帯</label>
+
+                        <div class="time-checkbox-list">
+                            <label><input type="checkbox"> 09:00 ～ 09:30</label>
+                            <label><input type="checkbox"> 10:00 ～ 10:30</label>
+                            <label><input type="checkbox"> 11:00 ～ 11:30</label>
+                            <label><input type="checkbox"> 12:00 ～ 12:30</label>
+                            <label><input type="checkbox"> 13:00 ～ 13:30</label>
+                            <label><input type="checkbox"> 14:00 ～ 14:30</label>
+                            <label><input type="checkbox"> 15:00 ～ 15:30</label>
+                            <label><input type="checkbox"> 16:00 ～ 16:30</label>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- 登録内容の確認 -->
+            <section class="confirm-panel">
+
+                <h2 class="section-title">
+                    <span class="step-number">2</span>
+                    登録内容の確認
+                </h2>
+
+                <p class="section-description">
+                    下の表に、登録される日時が表示されます。
+                    内容を確認して「登録する」ボタンを押してください。
+                </p>
+
+                <div class="table-wrapper" id="scheduleArea">
+                    <!-- 登録条件に合わせてJavaScriptで表を作成します -->
+                </div>
+
+                <!-- ページ切り替え (5日ずつ表示) -->
+                <div class="pagination-area" id="paginationArea" hidden>
+                    <button type="button" class="page-arrow" id="prevPage"
+                            aria-label="前のページ">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+                    <span id="pageNumbers" style="display: contents;"></span>
+
+                    <button type="button" class="page-arrow" id="nextPage"
+                            aria-label="次のページ">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+            <!-- 登録・戻るボタン -->
+            <div class="register-area">
+                <a href="{{ url_for('care_reseva_top') }}" class="btn-back">
+                    戻る
+                </a>
+
+                <a href="{{ url_for('care_reseva_check') }}" class="btn-register">
+                    この内容で登録する
+                </a>
+            </div>          
+
+            <!-- 登録する枠を送信するフォーム (中身はJavaScriptで作成します) -->
+            <form method="post" action="{{ url_for('care_reseva_check') }}" id="registerForm" hidden></form>
+
+            </section>
+
+        </main>
     </div>
-  </div>
+
+    <script>
+        (function () {
+            const startInput = document.getElementById("startDate");
+            const endInput = document.getElementById("endDate");
+            const dateError = document.getElementById("dateError");
+            const weekdayBoxes = document.querySelectorAll(".weekday-list input[type=checkbox]");
+            const timeBoxes = document.querySelectorAll(".time-checkbox-list input[type=checkbox]");
+            const scheduleArea = document.getElementById("scheduleArea");
+            const registerButton = document.querySelector(".btn-register");
+            const paginationArea = document.getElementById("paginationArea");
+            const pageNumbers = document.getElementById("pageNumbers");
+            const prevButton = document.getElementById("prevPage");
+            const nextButton = document.getElementById("nextPage");
+            const registerForm = document.getElementById("registerForm");
+
+            // 1ページに表示する日数
+            const DAYS_PER_PAGE = 5;
+
+            // ページ番号を一度に表示する数
+            const PAGES_PER_BLOCK = 10;
+
+            // 現在の表示内容 (条件に合う日付・時間帯・表示中のページ)
+            let currentDates = [];
+            let currentTimes = [];
+            let currentPage = 1;
+
+            const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
+
+            // 登録対象から外された枠 ("日付|時間帯") を覚えておく
+            const excluded = new Set();
+
+            // "YYYY-MM-DD" を、その日の0時(ローカル時間)の Date にする
+            function parseDate(value) {
+                if (!value) return null;
+                const [y, m, d] = value.split("-").map(Number);
+                return new Date(y, m - 1, d);
+            }
+
+            function pad(n) {
+                return String(n).padStart(2, "0");
+            }
+
+            function toKey(date) {
+                return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+            }
+
+            // 現在の日付以前(当日を含む)かどうか
+            function isTodayOrPast(date) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return date <= today;
+            }
+
+            function showMessage(text) {
+                paginationArea.hidden = true;
+                currentDates = [];
+                currentTimes = [];
+                scheduleArea.replaceChildren();
+                const p = document.createElement("p");
+                p.className = "empty-message";
+                p.textContent = text;
+                scheduleArea.appendChild(p);
+            }
+
+            // 期間の入力チェック。エラーがあればメッセージを返す
+            function validateDates(start, end) {
+                if (start && isTodayOrPast(start)) {
+                    return "開始日は明日以降の日付を選択してください。（本日以前は選択できません）";
+                }
+                if (end && isTodayOrPast(end)) {
+                    return "終了日は明日以降の日付を選択してください。（本日以前は選択できません）";
+                }
+                if (start && end && end < start) {
+                    return "終了日は開始日以降の日付を選択してください。";
+                }
+                return "";
+            }
+
+            // 期間の中で、チェックされた曜日に当たる日付を集める
+            function collectDates(start, end) {
+                const days = new Set();
+                weekdayBoxes.forEach(function (box) {
+                    if (box.checked) days.add(Number(box.dataset.day));
+                });
+
+                const dates = [];
+                for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                    if (days.has(d.getDay())) dates.push(new Date(d));
+                }
+                return dates;
+            }
+
+            // チェックされた時間帯の表示文字を集める
+            function collectTimes() {
+                const times = [];
+                timeBoxes.forEach(function (box) {
+                    if (box.checked) times.push(box.parentElement.textContent.trim());
+                });
+                return times;
+            }
+
+            function render() {
+                const start = parseDate(startInput.value);
+                const end = parseDate(endInput.value);
+
+                // 日付のエラー表示
+                const error = validateDates(start, end);
+                dateError.textContent = error;
+                dateError.hidden = !error;
+                registerButton.classList.toggle("disabled", Boolean(error));
+
+                if (error) {
+                    showMessage("期間を正しく選択すると、登録内容が表示されます。");
+                    return;
+                }
+                if (!start || !end) {
+                    showMessage("期間を選択すると、登録内容が表示されます。");
+                    return;
+                }
+
+                const dates = collectDates(start, end);
+                const times = collectTimes();
+
+                if (!Array.from(weekdayBoxes).some(function (box) { return box.checked; })) {
+                    showMessage("曜日を選択してください。");
+                    return;
+                }
+                if (dates.length === 0) {
+                    showMessage("期間内に、選択した曜日の日付がありません。");
+                    return;
+                }
+                if (times.length === 0) {
+                    showMessage("時間帯を選択してください。");
+                    return;
+                }
+
+                // 条件に合う日付・時間帯を保存して、1ページ目から表示する
+                currentDates = dates;
+                currentTimes = times;
+                currentPage = 1;
+                renderTable();
+            }
+
+            // 現在のページ分(5日ずつ)の表を作る
+            function renderTable() {
+                const totalPages = Math.ceil(currentDates.length / DAYS_PER_PAGE);
+                currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+
+                const from = (currentPage - 1) * DAYS_PER_PAGE;
+                const dates = currentDates.slice(from, from + DAYS_PER_PAGE);
+
+                const table = document.createElement("table");
+                table.className = "schedule-table";
+
+                const thead = table.createTHead();
+                const headRow = thead.insertRow();
+                headRow.appendChild(document.createElement("th"));
+                dates.forEach(function (d) {
+                    const th = document.createElement("th");
+                    th.textContent = pad(d.getMonth() + 1) + "/" + pad(d.getDate()) + "（" + DAY_NAMES[d.getDay()] + "）";
+                    headRow.appendChild(th);
+                });
+
+                const tbody = table.createTBody();
+                currentTimes.forEach(function (time) {
+                    const row = tbody.insertRow();
+                    row.className = "selected-row";
+
+                    const th = document.createElement("th");
+                    th.textContent = time;
+                    row.appendChild(th);
+
+                    dates.forEach(function (d) {
+                        const key = toKey(d) + "|" + time;
+                        const td = row.insertCell();
+                        const label = document.createElement("label");
+                        const check = document.createElement("input");
+                        check.type = "checkbox";
+                        check.checked = !excluded.has(key);
+                        check.addEventListener("change", function () {
+                            if (check.checked) excluded.delete(key);
+                            else excluded.add(key);
+                        });
+                        label.appendChild(check);
+                        label.appendChild(document.createTextNode(" 登録"));
+                        td.appendChild(label);
+                    });
+                });
+
+                scheduleArea.replaceChildren(table);
+                renderPagination(totalPages);
+            }
+
+            // ページ番号と矢印を作る (1ページしかないときは隠す)
+            function renderPagination(totalPages) {
+                paginationArea.hidden = totalPages <= 1;
+                pageNumbers.replaceChildren();
+
+                // ページ番号は10個ずつ表示し、前後にまだあるときは「…」を出す
+                const block = Math.floor((currentPage - 1) / PAGES_PER_BLOCK);
+                const firstPage = block * PAGES_PER_BLOCK + 1;
+                const lastPage = Math.min(firstPage + PAGES_PER_BLOCK - 1, totalPages);
+
+                function addButton(label, page, extraClass) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "page-number" + (extraClass ? " " + extraClass : "");
+                    button.textContent = label;
+                    button.addEventListener("click", function () {
+                        currentPage = page;
+                        renderTable();
+                    });
+                    pageNumbers.appendChild(button);
+                }
+
+                // 前の10ページがあるとき
+                if (firstPage > 1) addButton("…", firstPage - 1, "page-ellipsis");
+
+                for (let page = firstPage; page <= lastPage; page++) {
+                    addButton(page, page, page === currentPage ? "selected" : "");
+                }
+
+                // 次の10ページがあるとき
+                if (lastPage < totalPages) addButton("…", lastPage + 1, "page-ellipsis");
+
+                prevButton.disabled = currentPage <= 1;
+                nextButton.disabled = currentPage >= totalPages;
+            }
+
+            prevButton.addEventListener("click", function () {
+                currentPage -= 1;
+                renderTable();
+            });
+            nextButton.addEventListener("click", function () {
+                currentPage += 1;
+                renderTable();
+            });
+
+            // 登録条件が変わるたびに、確認の表を作り直す
+            [startInput, endInput].forEach(function (el) {
+                el.addEventListener("input", render);
+                el.addEventListener("change", render);
+            });
+            weekdayBoxes.forEach(function (box) { box.addEventListener("change", render); });
+            timeBoxes.forEach(function (box) { box.addEventListener("change", render); });
+
+            // 「この内容で登録する」: 登録対象の枠をフォームに入れて確認画面へ送る
+            // (エラーがあるときは押しても進まない)
+            registerButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                if (registerButton.classList.contains("disabled")) return;
+
+                registerForm.replaceChildren();
+                currentDates.forEach(function (d) {
+                    currentTimes.forEach(function (time) {
+                        if (excluded.has(toKey(d) + "|" + time)) return;
+
+                        // "09:00 ～ 09:30" → 開始 "09:00" / 終了 "09:30"
+                        const [startTime, endTime] = time.split("～").map(function (t) { return t.trim(); });
+                        const input = document.createElement("input");
+                        input.type = "hidden";
+                        input.name = "slot";
+                        input.value = toKey(d) + "|" + startTime + "|" + endTime;
+                        registerForm.appendChild(input);
+                    });
+                });
+
+                if (registerForm.children.length === 0) {
+                    alert("登録する日時を選択してください。");
+                    return;
+                }
+                registerForm.submit();
+            });
+
+            render();
+        })();
+    </script>
 
 </body>
 </html>

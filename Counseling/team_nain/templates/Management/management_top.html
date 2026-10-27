@@ -35,7 +35,7 @@
   </nav>
 
            <!-- 画像を表示 -->
-  <img src="{{ url_for('static', filename='職員用.jpg') }}" class="スクールカウンセラー">
+  <img src="{{ url_for('static', filename='aaaaaaaaaa.png') }}" class="スクールカウンセラー">
   
   <h3>━━  メニュー  ━━</h3>
   
@@ -63,11 +63,6 @@
     </a>
 </div>
 
-<!-- その他の機能 -->
-<div class="container" style="margin-top: 20px;">
-    <a href="{{ url_for('manage_password') }}" class="btn btn-outline-primary">🔑 パスワード変更</a>
-</div>
-
 <!-- サイドバー -->
 <div class="sidebar">
     <!-- サイドバーのタイトル -->
@@ -88,10 +83,13 @@
         👦
       <span>カウンセラー一覧画面</span>
     </a>
-    <!-- パスワード変更 -->
-    <a href="{{ url_for('manage_password') }}" class="sidebar-item">
-        🔑
-      <span>パスワード変更</span>
+        <a href="{{ url_for('manage_teacher') }}" class="sidebar-item">
+        
+      <span>先生一覧画面</span>
+    </a>
+        <a href="{{ url_for('manage_class') }}" class="sidebar-item">
+        
+      <span>クラス一覧画面</span>
     </a>
 </div>
 

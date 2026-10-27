@@ -1,0 +1,351 @@
+
+/* ==============================
+   全体設定
+============================== */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    background-color: #f3f6fb;
+    color: #263248;
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 14px;
+}
+
+/* ==============================
+   ヘッダー
+============================== */
+.header {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    border-bottom: 1px solid #e2e7ef;
+    background: #fff;
+}
+
+/* システム名 */
+.site-title {
+    font-size: 17px;
+    font-weight: bold;
+    color: #172033;
+    white-space: nowrap;
+}
+
+/* ユーザー情報 */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    font-weight: normal;
+    color: #263248;
+    white-space: nowrap;
+}
+
+/* アイコン */
+.user-info i {
+    margin-right: 3px;
+    font-size: 14px;
+}
+
+/* 区切り線 */
+.header-divider {
+    width: 1px;
+    height: 18px;
+    background: #e1e6ee;
+}
+
+/* ログアウト */
+.logout {
+    color: #3473df;
+    text-decoration: none;
+    margin-left: 12px;
+}
+
+.logout:hover {
+    color: #2459bd;
+}
+
+/* ==============================
+   全体レイアウト
+============================== */
+.layout {
+    display: flex;
+    min-height: calc(100vh - 80px);
+    background: #fff;
+    margin: 0 ;
+    border-left: 1px solid #e5eaf2;
+    border-right: 1px solid #e5eaf2;
+    box-shadow: 0 0 5px rgba(35, 58, 90, 0.04);
+}
+
+/* ==============================
+   左側メニュー
+============================== */
+.sidebar {
+    width: 163px;
+    min-width: 163px;
+    flex-shrink: 0;
+    background: #f8faff;
+    border-right: 1px solid #e4e9f1;
+    padding-top: 8px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 46px;
+    padding: 15px 20px;
+    color: #59657b;
+    text-decoration: none;
+    font-size: 12px;
+    border-left: 3px solid transparent;
+    white-space: nowrap;
+}
+
+.sidebar a i {
+    width: 17px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 17px;
+}
+
+.sidebar a.active {
+    background: #edf4ff;
+    color: #3473df;
+    border-left-color: #3473df;
+    font-weight: bold;
+}
+
+.sidebar a:hover {
+    background: #edf4ff;
+}
+
+/* ==============================
+   メインコンテンツ
+============================== */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 16px 32px 36px;
+    background: #fff;
+}
+
+/* ==============================
+   パンくずリスト
+============================== */
+.breadcrumb {
+    font-size: 11px;
+    margin-bottom: 18px;
+    color: #68748a;
+}
+
+.breadcrumb span {
+    margin: 0 7px;
+}
+
+/* ==============================
+   見出し
+============================== */
+.page-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+}
+
+.heading-line {
+    display: block;
+    width: 4px;
+    height: 25px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    background: #3978ed;
+}
+
+.page-heading h1 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    color: #111b30;
+}
+
+.description {
+    margin: 0 0 17px 18px;
+    font-size: 12px;
+    color: #39445a;
+}
+
+/* ==============================
+   確認カード
+============================== */
+.confirm-panel {
+    padding: 16px;
+    border: 1px solid #e1e6ee;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.confirm-inner {
+    border: 1px solid #e4e8ef;
+    border-radius: 6px;
+    padding: 0 16px;
+}
+
+.confirm-row {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    padding: 17px 0;
+}
+
+.confirm-row + .confirm-row {
+    border-top: 1px solid #e9edf3;
+}
+
+.confirm-label {
+    font-weight: 600;
+    color: #28344a;
+}
+
+.confirm-value {
+    color: #29354b;
+    overflow-wrap: anywhere;
+}
+
+.time-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+/* ==============================
+   下部ボタン
+============================== */
+.button-area {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.button-area .btn {
+    width: 171px;
+    min-height: 34px;
+    font-family: inherit;
+    font-size: 12px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-back {
+    color: #536077;
+    background: #fff;
+    border: 1px solid #c8ced9;
+}
+
+.btn-back:hover {
+    background: #f3f5f8;
+    border-color: #aab3c2;
+}
+
+.btn-register {
+    background: #376fe5;
+    color: #fff;
+    border: 1px solid #376fe5;
+}
+
+.btn-register:hover {
+    background: #285dc9;
+    color: #fff;
+}
+
+/* ==============================
+   スマートフォン対応
+============================== */
+@media (max-width: 768px) {
+    .header {
+        height: auto;
+        min-height: 70px;
+        padding: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .site-title {
+        font-size: 15px;
+    }
+
+    .user-info {
+        flex-wrap: wrap;
+        font-size: 12px;
+        gap: 8px;
+    }
+
+    .layout {
+        margin: 0;
+        min-height: calc(100vh - 70px);
+    }
+
+    .sidebar {
+        width: 60px;
+        min-width: 60px;
+    }
+
+    .sidebar a {
+        justify-content: center;
+        gap: 0;
+        padding: 15px 5px;
+    }
+
+    .sidebar a span {
+        display: none;
+    }
+
+    .sidebar a i {
+        font-size: 17px;
+    }
+
+    .main-content {
+        padding: 18px 14px;
+    }
+
+    .page-heading h1 {
+        font-size: 16px;
+    }
+
+    .confirm-panel {
+        padding: 12px;
+    }
+
+    .confirm-inner {
+        padding: 0 12px;
+    }
+
+    .confirm-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .button-area {
+        flex-direction: column-reverse;
+    }
+
+    .button-area .btn {
+        width: 100%;
+        min-height: 40px;
+    }
+}

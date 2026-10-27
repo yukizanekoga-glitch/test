@@ -1,0 +1,454 @@
+/* =========================
+   基本設定
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px 20px;
+    font-family:
+        "Noto Sans JP",
+        "Yu Gothic",
+        "Meiryo",
+        sans-serif;
+
+    background: #f3f6fb;
+    color: #18294b;
+    overflow-x: hidden;
+}
+
+/* =========================
+   背景画像
+========================= */
+.background {
+    position: fixed;
+    inset: -8px;
+    z-index: -1;
+
+    background-image:
+        linear-gradient(
+            rgba(246, 249, 253, 0.60),
+            rgba(246, 249, 253, 0.60)
+        ),
+        url("../aaaaaaaaaa.png");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    filter: blur(3px);
+    transform: scale(1.02);
+}
+
+/* =========================
+   ログインカード
+========================= */
+.login-card {
+    width: 100%;
+    max-width: 435px;
+
+    padding: 38px 40px 37px;
+
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 11px;
+
+    box-shadow:
+        0 12px 35px rgba(36, 54, 85, 0.12),
+        0 2px 8px rgba(36, 54, 85, 0.04);
+
+    animation: cardAppear 0.55s ease both;
+}
+
+/* カード表示アニメーション */
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   ロゴ
+========================= */
+.logo {
+    width: 96px;
+    height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 8px;
+
+    background: #edf3ff;
+    border-radius: 50%;
+
+    color: #263b61;
+}
+
+.logo i {
+    font-size: 57px;
+    line-height: 1;
+}
+
+/* =========================
+   タイトル
+========================= */
+.system-title {
+    margin: 8px 0 0;
+
+    color: #17284d;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1.4;
+    letter-spacing: 0.5px;
+
+    text-align: center;
+}
+
+.system-title span {
+    display: block;
+}
+
+/* タイトル下の青い線 */
+.title-line {
+    width: 42px;
+    height: 2px;
+
+    margin: 17px auto 22px;
+
+    background: #3285f6;
+    border-radius: 10px;
+}
+
+/* =========================
+   入力フォーム
+========================= */
+.form-item {
+    margin-bottom: 18px;
+}
+
+.form-item label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #17284d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* 入力欄全体 */
+.input-box {
+    position: relative;
+    width: 100%;
+    height: 46px;
+}
+
+/* 入力欄 */
+.input-box input {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 43px 0 48px;
+
+    background: #fff;
+    border: 1px solid #d7dce5;
+    border-radius: 7px;
+    outline: none;
+
+    color: #243451;
+    font-size: 13px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* プレースホルダー */
+.input-box input::placeholder {
+    color: #929bad;
+    opacity: 1;
+}
+
+/* 入力中 */
+.input-box input:focus {
+    border-color: #3985f5;
+    box-shadow: 0 0 0 3px rgba(57, 133, 245, 0.12);
+}
+
+/* 入力欄左側のアイコン */
+.input-icon {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+
+    transform: translateY(-50%);
+
+    color: #77849b;
+    font-size: 18px;
+
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* =========================
+   パスワード表示ボタン
+========================= */
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 32px;
+
+    padding: 0;
+
+    transform: translateY(-50%);
+
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+
+    color: #77849b;
+    cursor: pointer;
+
+    transition: color 0.2s;
+}
+
+.password-toggle:hover {
+    color: #287cf0;
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid #3285f6;
+    outline-offset: 2px;
+}
+
+.password-toggle i {
+    font-size: 17px;
+}
+
+/* =========================
+   ログインボタン
+========================= */
+.login-button {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 48px;
+
+    margin-top: 23px;
+    padding: 0 18px;
+
+    background: #287cf0;
+    border: none;
+    border-radius: 7px;
+
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+
+    cursor: pointer;
+
+    box-shadow: 0 3px 7px rgba(40, 124, 240, 0.12);
+
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.login-button span {
+    flex: 1;
+    text-align: center;
+    padding-left: 18px;
+}
+
+.login-button i {
+    font-size: 17px;
+    opacity: 0;
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+.login-button:hover {
+    background: #1769dc;
+    box-shadow: 0 5px 12px rgba(40, 124, 240, 0.23);
+}
+
+.login-button:hover i {
+    opacity: 1;
+    transform: translateX(3px);
+}
+
+.login-button:active {
+    transform: translateY(1px);
+}
+
+/* =========================
+   職員・カウンセラー用リンク
+========================= */
+.staff-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    width: 100%;
+    min-height: 43px;
+
+    margin-top: 16px;
+    padding: 10px 12px;
+
+    background: #f5f8fd;
+    border: 1px solid #e0e7f1;
+    border-radius: 7px;
+
+    color: #52617a;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.staff-button > i:first-child {
+    font-size: 17px;
+}
+
+.staff-button .arrow-icon {
+    margin-left: auto;
+    font-size: 12px;
+
+    transition: transform 0.2s ease;
+}
+
+.staff-button:hover {
+    background: #edf4ff;
+    border-color: #b9d4ff;
+    color: #216fe0;
+}
+
+.staff-button:hover .arrow-icon {
+    transform: translateX(3px);
+}
+
+/* =========================
+   スマートフォン対応
+========================= */
+@media (max-width: 480px) {
+    body {
+        padding: 20px 15px;
+    }
+
+    .login-card {
+        max-width: 100%;
+        padding: 30px 23px 27px;
+        border-radius: 12px;
+    }
+
+    .logo {
+        width: 82px;
+        height: 68px;
+    }
+
+    .logo i {
+        font-size: 49px;
+    }
+
+    .system-title {
+        font-size: 21px;
+    }
+
+    .title-line {
+        margin: 15px auto 21px;
+    }
+
+    .form-item {
+        margin-bottom: 16px;
+    }
+
+    .input-box {
+        height: 46px;
+    }
+
+    .login-button {
+        margin-top: 21px;
+        height: 47px;
+    }
+}
+
+/* =========================
+   画面の高さが小さい場合
+========================= */
+@media (max-height: 650px) {
+    body {
+        align-items: flex-start;
+    }
+
+    .login-card {
+        margin: 10px auto;
+        padding-top: 25px;
+        padding-bottom: 25px;
+    }
+
+    .logo {
+        height: 60px;
+        width: 76px;
+    }
+
+    .logo i {
+        font-size: 45px;
+    }
+
+    .system-title {
+        font-size: 22px;
+    }
+
+    .title-line {
+        margin: 12px auto 16px;
+    }
+
+    .form-item {
+        margin-bottom: 13px;
+    }
+
+    .login-button {
+        margin-top: 17px;
+    }
+}

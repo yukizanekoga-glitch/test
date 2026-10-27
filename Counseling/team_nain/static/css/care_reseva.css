@@ -1,0 +1,685 @@
+
+/* ==============================
+   全体設定
+============================== */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    background-color: #f3f6fb;
+    color: #263248;
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 14px;
+}
+
+/* ==============================
+   ヘッダー
+============================== */
+.header {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    border-bottom: 1px solid #e2e7ef;
+    background: #fff;
+}
+
+.site-title {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #172033;
+    white-space: nowrap;
+}
+
+.site-title i {
+    margin-right: 9px;
+    color: #3473df;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: #263248;
+    white-space: nowrap;
+}
+
+.user-info i {
+    margin-right: 4px;
+    font-size: 13px;
+}
+
+.header-divider {
+    width: 1px;
+    height: 18px;
+    background: #e1e6ee;
+}
+
+.logout {
+    color: #3473df;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.logout:hover {
+    color: #2459bd;
+}
+
+/* ==============================
+   全体レイアウト
+============================== */
+.layout {
+    display: flex;
+    min-height: calc(100vh - 64px);
+    background: #fff;
+    border-left: 1px solid #e5eaf2;
+    border-right: 1px solid #e5eaf2;
+}
+
+/* ==============================
+   左側メニュー
+============================== */
+.sidebar {
+    width: 190px;
+    min-width: 190px;
+    flex-shrink: 0;
+    background: #f8faff;
+    border-right: 1px solid #e4e9f1;
+    padding-top: 8px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 42px;
+    padding: 11px 16px;
+    color: #59657b;
+    text-decoration: none;
+    font-size: 12px;
+    border-left: 3px solid transparent;
+    white-space: nowrap;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar a i {
+    width: 17px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 15px;
+}
+
+.sidebar a.active {
+    background: #edf4ff;
+    color: #3473df;
+    border-left-color: #3473df;
+    font-weight: bold;
+}
+
+.sidebar a:hover {
+    background: #edf4ff;
+    color: #3473df;
+}
+
+/* ==============================
+   メインコンテンツ
+============================== */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 22px 28px 30px;
+    background: #fff;
+}
+
+/* ==============================
+   ページ見出し
+============================== */
+.page-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 8px;
+}
+
+.heading-line {
+    display: block;
+    width: 4px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    background: #3978ed;
+}
+
+.page-heading h1 {
+    margin: 0;
+    color: #111b30;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.description {
+    margin: 0 0 16px 15px;
+    color: #68748a;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* ==============================
+   パネル共通
+============================== */
+.setting-panel,
+.confirm-panel {
+    width: 100%;
+    padding: 17px;
+    margin-bottom: 16px;
+    border: 1px solid #e1e6ee;
+    border-radius: 6px;
+    background: #fff;
+}
+
+/* ==============================
+   セクションタイトル
+============================== */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 15px;
+    color: #243149;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #1877eb;
+    color: #fff;
+    font-size: 14px;
+}
+
+.section-description {
+    margin: -2px 0 13px;
+    color: #68748a;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* ==============================
+   登録条件の設定
+============================== */
+.setting-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.setting-item {
+    min-width: 0;
+}
+
+.setting-item:last-child {
+    grid-column: 1 / -1;
+}
+
+.field-title {
+    display: block;
+    margin-bottom: 8px;
+    color: #354158;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* ==============================
+   期間
+============================== */
+.date-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.date-range input {
+    width: 0;
+    min-width: 0;
+    flex: 1;
+    height: 35px;
+    padding: 5px 8px;
+    border: 1px solid #dce2eb;
+    border-radius: 4px;
+    background: #fff;
+    color: #28344a;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.date-range input:focus {
+    outline: none;
+    border-color: #3473df;
+    box-shadow: 0 0 0 2px rgba(52, 115, 223, 0.12);
+}
+
+/* ==============================
+   曜日
+============================== */
+.weekday-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 5px;
+}
+
+.weekday-list label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 32px;
+    padding: 5px;
+    border: 1px solid #e1e6ee;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.weekday-list label:nth-child(6) {
+    grid-column: 1;
+}
+
+.weekday-list label:nth-child(7) {
+    grid-column: 2;
+}
+
+/* ==============================
+   時間帯
+============================== */
+.time-checkbox-list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.time-checkbox-list label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    min-height: 32px;
+    padding: 5px 8px;
+    border: 1px solid #e1e6ee;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* ==============================
+   チェックボックス
+============================== */
+input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    margin: 0;
+    accent-color: #1877eb;
+    cursor: pointer;
+}
+
+/* ==============================
+   確認テーブル
+============================== */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e4e8ef;
+    border-radius: 4px;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    color: #354158;
+    font-size: 12px;
+}
+
+.schedule-table th,
+.schedule-table td {
+    height: 36px;
+    padding: 5px 6px;
+    text-align: center;
+    vertical-align: middle;
+    border-right: 1px solid #e8edf4;
+    border-bottom: 1px solid #e8edf4;
+    font-weight: normal;
+}
+
+.schedule-table thead th {
+    height: 38px;
+    background: #f8faff;
+    color: #354158;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.schedule-table th:first-child {
+    width: 145px;
+}
+
+.schedule-table tbody th {
+    background: #fff;
+    white-space: nowrap;
+}
+
+.schedule-table td {
+    background: #fff;
+}
+
+.schedule-table tr.selected-row td {
+    background: #eaf3ff;
+}
+
+.schedule-table tr:last-child th,
+.schedule-table tr:last-child td {
+    border-bottom: none;
+}
+
+.schedule-table th:last-child,
+.schedule-table td:last-child {
+    border-right: none;
+}
+
+.schedule-table td label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #2671d9;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.schedule-table td input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+}
+
+/* ==============================
+   登録・戻るボタン
+============================== */
+.register-area {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+/* 戻るボタン */
+.btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    min-height: 42px;
+    padding: 8px 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    background: #fff;
+    color: #475569;
+    font-family: inherit;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-back:hover {
+    background: #f1f5f9;
+    border-color: #b8c4d4;
+    color: #263248;
+}
+
+/* 登録ボタン */
+.btn-register {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 280px;
+    min-height: 42px;
+    padding: 8px 15px;
+    border: 1px solid #1769e8;
+    border-radius: 5px;
+    background: #1769e8;
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-register:hover {
+    background: #1258c7;
+    border-color: #1258c7;
+    color: #fff;
+}
+
+/* ==============================
+   タブレット対応
+============================== */
+@media (max-width: 900px) {
+    .header {
+        padding: 0 16px;
+    }
+
+    .site-title {
+        font-size: 14px;
+    }
+
+    .user-info {
+        gap: 8px;
+        font-size: 11px;
+    }
+
+    .sidebar {
+        width: 165px;
+        min-width: 165px;
+    }
+
+    .main-content {
+        padding: 18px 18px 26px;
+    }
+
+    .setting-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 15px;
+    }
+
+    .setting-item:last-child {
+        grid-column: auto;
+    }
+
+    .time-checkbox-list {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .schedule-table {
+        min-width: 600px;
+    }
+}
+
+/* ==============================
+   スマートフォン対応
+============================== */
+@media (max-width: 600px) {
+    .header {
+        height: auto;
+        min-height: 64px;
+        padding: 12px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .site-title {
+        font-size: 13px;
+        white-space: normal;
+    }
+
+    .user-info {
+        gap: 8px;
+        font-size: 10px;
+        flex-wrap: wrap;
+    }
+
+    .layout {
+        min-height: calc(100vh - 64px);
+    }
+
+    .sidebar {
+        width: 48px;
+        min-width: 48px;
+        padding-top: 5px;
+    }
+
+    .sidebar a {
+        justify-content: center;
+        gap: 0;
+        min-height: 42px;
+        padding: 10px 3px;
+    }
+
+    .sidebar a span {
+        display: none;
+    }
+
+    .sidebar a i {
+        width: auto;
+        font-size: 16px;
+    }
+
+    .main-content {
+        padding: 14px 10px 22px;
+    }
+
+    .page-heading {
+        gap: 9px;
+    }
+
+    .page-heading h1 {
+        font-size: 15px;
+    }
+
+    .description {
+        margin-left: 0;
+        font-size: 11px;
+    }
+
+    .setting-panel,
+    .confirm-panel {
+        padding: 12px 9px;
+    }
+
+    .section-title {
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .step-number {
+        width: 23px;
+        height: 23px;
+        font-size: 12px;
+    }
+
+    .section-description {
+        font-size: 11px;
+    }
+
+    .setting-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .setting-item:last-child {
+        grid-column: auto;
+    }
+
+    .date-range {
+        gap: 5px;
+    }
+
+    .date-range input {
+        font-size: 10px;
+    }
+
+    .weekday-list {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .weekday-list label {
+        font-size: 11px;
+    }
+
+    .time-checkbox-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .time-checkbox-list label {
+        padding: 5px;
+        font-size: 10px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .schedule-table {
+        min-width: 560px;
+        font-size: 11px;
+    }
+
+    .schedule-table th:first-child {
+        width: 125px;
+    }
+
+    .register-area {
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .btn-back {
+        width: 90px;
+        min-height: 40px;
+        padding: 8px;
+        flex-shrink: 0;
+        font-size: 12px;
+    }
+
+    .btn-register {
+        width: auto;
+        min-height: 40px;
+        max-width: 300px;
+        flex: 1;
+        padding: 8px;
+        font-size: 12px;
+    }
+}

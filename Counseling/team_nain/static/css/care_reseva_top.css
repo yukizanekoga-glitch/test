@@ -1,0 +1,503 @@
+/* =========================
+   全体設定*/
+
+/* すべての要素で、幅と高さにpadding・borderを含めて計算する */
+* {
+    box-sizing: border-box;
+}
+
+/* ページ全体の基本デザインを設定する */
+body {
+    margin: 0; /* ブラウザ標準の余白をなくす */
+    font-family: "Noto Sans JP", "Meiryo", sans-serif; /* フォントを指定 */
+    font-size: 13px; /* 基本の文字サイズ */
+    color: #29364b; /* 基本の文字色 */
+    background: #ffffff; /* 背景色を白にする */
+}
+
+/* リンクの下線をなくす */
+a {
+    text-decoration: none;
+}
+
+/* 上部ヘッダー */
+
+/* ページ上部のヘッダーの配置とデザイン */
+.top-header {
+    height: 42px; /* ヘッダーの高さ */
+    padding: 0 24px 0 16px; /* 左右の内側余白 */
+    display: flex; /* 子要素を横並びにする */
+    justify-content: space-between; /* 左右の要素を両端に配置 */
+    align-items: center; /* 子要素を上下中央に配置 */
+    background: #ffffff; /* ヘッダーの背景色 */
+    border-bottom: 1px solid #e5eaf1; /* 下側に区切り線を表示 */
+}
+
+/* システム名の文字デザイン */
+.site-title {
+    font-size: 15px; /* 文字サイズ */
+    font-weight: 700; /* 太字にする */
+    color: #172338; /* 文字色 */
+}
+
+/* ユーザー情報とログアウトを横並びにする */
+.user-area {
+    display: flex; /* 子要素を横並びにする */
+    align-items: center; /* 上下中央に配置 */
+    gap: 14px; /* 子要素の間隔 */
+    color: #48566d; /* 文字色 */
+    font-size: 11px; /* 文字サイズ */
+}
+
+/* ユーザー名とログアウトのアイコン・文字を横並びにする */
+.user-name,
+.logout-link {
+    display: inline-flex; /* アイコンと文字を横並びにする */
+    align-items: center; /* 上下中央に配置 */
+    gap: 6px; /* アイコンと文字の間隔 */
+}
+
+/* ユーザーアイコンの大きさ */
+.user-name i {
+    font-size: 15px;
+}
+
+/* ヘッダー内の縦の区切り線 */
+.header-divider {
+    height: 18px; /* 線の高さ */
+    width: 1px; /* 線の幅 */
+    background: #e1e6ee; /* 線の色 */
+}
+
+/* ログアウトリンクの文字色と太さ */
+.logout-link {
+    color: #1674e8;
+    font-weight: 600;
+}
+
+/* ログアウトにマウスを合わせたときの色 */
+.logout-link:hover {
+    color: #0958b7;
+}
+
+/* =========================
+   左メニューとメイン画面
+========================= */
+
+/* サイドバーとメインコンテンツを横並びにする */
+.layout {
+    display: flex; /* 子要素を横並びにする */
+    min-height: calc(100vh - 42px); /* 画面の高さからヘッダー分を引く */
+}
+
+/* サイドバー*/
+
+/* 左側のメニュー領域 */
+.sidebar {
+    width: 178px; /* サイドバーの幅 */
+    flex-shrink: 0; /* 画面が狭くなっても幅を縮めない */
+    background: #f6fafd; /* サイドバーの背景色 */
+    border-right: 1px solid #e3eaf2; /* 右側に区切り線を表示 */
+}
+
+/* サイドバー内の各メニューリンク */
+.sidebar a {
+    min-height: 43px; /* メニューの最小高さ */
+    padding: 10px 18px; /* 内側の余白 */
+    display: flex; /* アイコンと文字を横並びにする */
+    align-items: center; /* 上下中央に配置 */
+    gap: 13px; /* アイコンと文字の間隔 */
+    border-left: 3px solid transparent; /* 選択状態を示す左線のスペース */
+    color: #56647a; /* 文字色 */
+    font-size: 12px; /* 文字サイズ */
+    transition: 0.2s; /* 色や背景の変化を滑らかにする */
+}
+
+/* サイドバーのアイコン */
+.sidebar a i {
+    width: 18px; /* アイコン領域の幅 */
+    flex-shrink: 0; /* アイコン領域を縮めない */
+    text-align: center; /* アイコンを中央に配置 */
+    font-size: 18px; /* アイコンの大きさ */
+}
+
+/* メニューにマウスを合わせたときのデザイン */
+.sidebar a:hover {
+    background: #edf4ff; /* 背景を薄い青色にする */
+    color: #1674e8; /* 文字とアイコンを青色にする */
+}
+
+/* 現在選択されているメニュー */
+.sidebar a.active {
+    background: #e6f0ff; /* 選択中の背景色 */
+    border-left-color: #1674e8; /* 左側の青い線を表示 */
+    color: #1674e8; /* 文字色を青色にする */
+    font-weight: 600; /* 文字を少し太くする */
+}
+
+/* メインコンテンツ*/
+
+/* 右側のメイン画面の領域 */
+.main-content {
+    flex: 1; /* 残りの横幅をすべて使用する */
+    min-width: 0; /* 内容による不要な横幅の拡大を防ぐ */
+    padding: 20px; /* 内側の余白 */
+    background: #ffffff; /* 背景色 */
+}
+
+/* ページタイトル全体のデザイン */
+.page-heading {
+    margin-bottom: 18px; /* 下側の余白 */
+    padding-left: 12px; /* 左側の内側余白 */
+    border-left: 4px solid #2580f3; /* 左側に青い縦線を表示 */
+}
+
+/* ページタイトルの文字 */
+.page-heading h1 {
+    margin: 0 0 7px; /* 上・左右の余白をなくし、下に7pxの余白 */
+    color: #19253a; /* 文字色 */
+    font-size: 21px; /* 文字サイズ */
+    font-weight: 700; /* 太字にする */
+}
+
+/* ページタイトルの下に表示する説明文 */
+.page-heading p {
+    margin: 0; /* 標準の余白をなくす */
+    color: #56647a; /* 文字色 */
+    font-size: 12px; /* 文字サイズ */
+}
+
+/* 一覧カード*/
+
+/* 一覧表を囲むカードのデザイン */
+.schedule-card {
+    padding: 12px 14px 16px; /* カード内の余白 */
+    background: #ffffff; /* 背景色 */
+    border: 1px solid #e6ebf2; /* 外枠 */
+    border-radius: 6px; /* 角を丸くする */
+}
+
+/* カードの見出しと登録ボタンを配置する領域 */
+.card-heading {
+    margin-bottom: 10px; /* 下側の余白 */
+    display: flex; /* 子要素を横並びにする */
+    justify-content: space-between; /* 見出しとボタンを左右に配置 */
+    align-items: center; /* 上下中央に配置 */
+    gap: 12px; /* 子要素の間隔 */
+}
+
+/* 一覧カード内の見出し */
+.card-heading h2 {
+    margin: 0; /* 標準の余白をなくす */
+    padding-left: 10px; /* 左側の内側余白 */
+    border-left: 4px solid #2580f3; /* 左側に青い縦線を表示 */
+    color: #29364b; /* 文字色 */
+    font-size: 17px; /* 文字サイズ */
+    font-weight: 700; /* 太字にする */
+}
+
+/* 登録ボタン*/
+
+/* 新規登録ボタンのデザイン */
+.btn-register {
+    margin-left: 550px; /* 右に550pxずらす */
+    padding: 7px 14px; /* 内側の余白 */
+    display: inline-flex; /* アイコンと文字を横並びにする */
+    justify-content: center; /* 水平方向の中央に配置 */
+    align-items: center; /* 垂直方向の中央に配置 */
+    gap: 7px; /* アイコンと文字の間隔 */
+    border-radius: 5px; /* 角を丸くする */
+    background: #1476f5; /* ボタンの背景色 */
+    color: #ffffff; /* 文字色 */
+    font-size: 12px; /* 文字サイズ */
+    font-weight: 600; /* 文字を太くする */
+    white-space: nowrap; /* 文字を折り返さない */
+    transition: 0.2s; /* 色の変化を滑らかにする */
+}
+
+/* 登録ボタンにマウスを合わせたときのデザイン */
+.btn-register:hover {
+    background: #075fcf; /* 背景を濃い青色にする */
+    color: #ffffff; /* 文字色を白に保つ */
+}
+
+/* 戻るボタン */
+.btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    padding: 5px 10px;
+    margin-right: auto; /* 左側に配置する */
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    background: #fff;
+    color: #475569;
+    font-family: inherit;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-back:hover {
+    background: #f1f5f9;
+    border-color: #b8c4d4;
+    color: #263248;
+}
+
+/* テーブル*/
+
+/* 一覧表全体の基本設定 */
+.schedule-table {
+    width: 100%; /* 親要素の幅いっぱいに広げる */
+    table-layout: fixed; /* 列幅を指定値に基づいて固定する */
+    border-collapse: collapse; /* セル同士の境界線をまとめる */
+    font-size: 12px; /* 表内の文字サイズ */
+}
+
+/* 表の見出し行の背景色 */
+.schedule-table thead {
+    background: #f0f3f8;
+}
+
+/* 表の見出しセル */
+.schedule-table th {
+    height: 33px; /* 見出し行の高さ */
+    padding: 7px 15px; /* セル内の余白 */
+    color: #48566d; /* 文字色 */
+    text-align: left; /* 文字を左揃えにする */
+    font-weight: 600; /* 文字を太くする */
+    border-bottom: 1px solid #e5eaf1; /* 下側の境界線 */
+}
+
+/* 表のデータセル */
+.schedule-table td {
+    height: 35px; /* データ行の高さ */
+    padding: 4px 15px; /* セル内の余白 */
+    color: #4c5a70; /* 文字色 */
+    border-bottom: 1px solid #e8ecf2; /* 下側の境界線 */
+    vertical-align: middle; /* 内容を上下中央に配置 */
+}
+
+/* 表の行にマウスを合わせたときの背景色 */
+.schedule-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+/* 1列目の日付列の幅を34%に設定 */
+.schedule-table th:nth-child(1),
+.schedule-table td:nth-child(1) {
+    width: 34%;
+}
+
+/* 2列目の時間列の幅を28%に設定 */
+.schedule-table th:nth-child(2),
+.schedule-table td:nth-child(2) {
+    width: 28%;
+}
+
+/* 3列目の操作列の幅を38%に設定 */
+.schedule-table th:nth-child(3),
+.schedule-table td:nth-child(3) {
+    width: 38%;
+}
+
+/* 操作列の見出しを中央揃えにする */
+.schedule-table .operation-heading {
+    text-align: center;
+}
+
+/* 操作列のボタンを中央に配置し、折り返しを防ぐ */
+.operation-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* 変更・削除ボタン */
+
+/* 変更ボタンと削除ボタンに共通する設定 */
+.btn-edit,
+.btn-delete {
+    min-width: 76px; /* ボタンの最小幅 */
+    min-height: 27px; /* ボタンの最小高さ */
+    margin: 0 2px; /* 左右の外側余白 */
+    padding: 5px 9px; /* 内側の余白 */
+    display: inline-flex; /* アイコンと文字を横並びにする */
+    justify-content: center; /* 水平方向の中央に配置 */
+    align-items: center; /* 垂直方向の中央に配置 */
+    gap: 5px; /* アイコンと文字の間隔 */
+    border: none; /* 枠線をなくす */
+    border-radius: 4px; /* 角を丸くする */
+    font-family: inherit; /* ページと同じフォントを使用 */
+    font-size: 11px; /* 文字サイズ */
+    cursor: pointer; /* マウスカーソルを指の形にする */
+    transition: 0.2s; /* 色の変化を滑らかにする */
+}
+
+/* 変更ボタンの通常時のデザイン */
+.btn-edit {
+    background: #e9f2ff; /* 薄い青色の背景 */
+    color: #176fe0; /* 青色の文字 */
+}
+
+/* 変更ボタンにマウスを合わせたとき */
+.btn-edit:hover {
+    background: #d6e7ff; /* 背景を少し濃くする */
+    color: #0758b8; /* 文字色を濃い青にする */
+}
+
+/* 削除ボタンの通常時のデザイン */
+.btn-delete {
+    background: #ffeded; /* 薄い赤色の背景 */
+    color: #df3535; /* 赤色の文字 */
+}
+
+/* 削除ボタンにマウスを合わせたとき */
+.btn-delete:hover {
+    background: #ffdbdb; /* 背景を少し濃くする */
+    color: #b91c1c; /* 文字色を濃い赤にする */
+}
+
+/* ページネーション */
+
+/* ページ番号と前後移動ボタンを配置する領域 */
+.pagination-area {
+    margin-top: 17px; /* 上側の余白 */
+    display: flex; /* ボタンを横並びにする */
+    justify-content: flex-end; /* 右寄せにする */
+    align-items: center; /* 上下中央に配置 */
+    gap: 5px; /* ボタン同士の間隔 */
+}
+
+/* ページ番号と前後移動ボタンの共通設定 */
+.page-number,
+.page-arrow {
+    width: 29px; /* ボタンの幅 */
+    height: 29px; /* ボタンの高さ */
+    display: inline-flex; /* 内容を中央に配置するための設定 */
+    justify-content: center; /* 水平方向の中央に配置 */
+    align-items: center; /* 垂直方向の中央に配置 */
+    border: none; /* 枠線をなくす */
+    border-radius: 5px; /* 角を丸くする */
+    background: #ffffff; /* 背景色 */
+    color: #29364b; /* 文字色 */
+    font-size: 12px; /* 文字サイズ */
+    cursor: pointer; /* マウスカーソルを指の形にする */
+}
+
+/* ページ番号や移動ボタンにマウスを合わせたとき */
+.page-number:hover,
+.page-arrow:hover {
+    background: #edf4ff; /* 背景を薄い青色にする */
+}
+
+/* 現在表示しているページ番号 */
+.page-number.selected {
+    background: #1476f5; /* 背景を青色にする */
+    color: #ffffff; /* 文字を白色にする */
+}
+
+/* 前後移動ボタンの文字サイズ */
+.page-arrow {
+    font-size: 14px;
+}
+
+/* スマートフォン対応*/
+
+/* 画面幅が768px以下の場合に適用する */
+@media (max-width: 768px) {
+
+    /* スマートフォンではヘッダーを縦方向に並べる */
+    .top-header {
+        height: auto; /* 高さを内容に合わせる */
+        min-height: 48px; /* 最小の高さ */
+        padding: 10px 12px; /* 内側の余白 */
+        flex-direction: column; /* 子要素を縦並びにする */
+        align-items: flex-start; /* 左揃えにする */
+        gap: 8px; /* 要素間の間隔 */
+    }
+
+    /* スマートフォンでのシステム名 */
+    .site-title {
+        font-size: 13px;
+    }
+
+    /* ユーザー情報の折り返しを許可する */
+    .user-area {
+        flex-wrap: wrap; /* 横幅が足りない場合は折り返す */
+        gap: 8px; /* 要素間の間隔 */
+    }
+
+    /* ヘッダーの高さを考慮して最低表示領域を設定 */
+    .layout {
+        min-height: calc(100vh - 48px);
+    }
+
+    /* サイドバーをアイコン中心の幅にする */
+    .sidebar {
+        width: 58px;
+    }
+
+    /* メニュー項目のアイコンを中央に配置する */
+    .sidebar a {
+        justify-content: center; /* 水平方向の中央に配置 */
+        padding: 12px 4px; /* 内側の余白 */
+        gap: 0; /* アイコンと文字の間隔をなくす */
+    }
+
+    /* スマートフォンではメニューの文字を非表示にする */
+    .sidebar a span {
+        display: none;
+    }
+
+    /* スマートフォンでのサイドバーアイコン */
+    .sidebar a i {
+        font-size: 20px;
+    }
+
+    /* メインコンテンツの余白を小さくする */
+    .main-content {
+        padding: 14px 9px;
+    }
+
+    /* スマートフォンでのページタイトル */
+    .page-heading h1 {
+        font-size: 19px;
+    }
+
+    /* 一覧カードの内側の余白を小さくする */
+    .schedule-card {
+        padding: 10px 8px;
+    }
+
+    /* カード見出しと登録ボタンを縦に並べる */
+    .card-heading {
+        align-items: flex-start; /* 左揃えにする */
+        flex-direction: column; /* 縦並びにする */
+    }
+
+    /* スマートフォンでのカード見出し */
+    .card-heading h2 {
+        font-size: 15px;
+    }
+
+    /* 表の列幅を確保し、必要に応じて横スクロールできる幅にする */
+    .schedule-table {
+        min-width: 570px;
+    }
+
+    /* 操作列内のボタンの折り返しを許可する */
+    .operation-cell {
+        white-space: normal;
+    }
+
+    /* スマートフォンでの変更・削除ボタン */
+    .btn-edit,
+    .btn-delete {
+        min-width: 60px; /* ボタンの最小幅を小さくする */
+        margin: 1px; /* ボタン間の余白 */
+        padding: 5px; /* 内側の余白を小さくする */
+    }
+
+}

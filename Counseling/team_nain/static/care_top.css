@@ -1,0 +1,686 @@
+
+@charset "UTF-8";
+
+/* =========================
+   全体設定
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Yu Gothic", "Meiryo", sans-serif;
+    font-size: 13px;
+    color: #14233b;
+    background: #fff;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* =========================
+   ヘッダー
+========================= */
+.top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100%;
+    height: 51px;
+    padding: 0 21px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #fff;
+    border-bottom: 1px solid #e1e7ef;
+}
+
+.site-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.user-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #293a52;
+}
+
+.user-name .bi {
+    font-size: 18px;
+}
+
+.header-divider {
+    height: 21px;
+    margin: 0 5px;
+    border-left: 1px solid #d8dee7;
+}
+
+.logout-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #075bd4;
+    font-weight: 600;
+}
+
+.logout-link .bi {
+    font-size: 16px;
+}
+
+.logout-link:hover {
+    color: #003e9e;
+}
+
+/* =========================
+   左側サイドバー
+========================= */
+.sidebar {
+    position: fixed;
+    top: 35px;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+
+    width: 185px;
+    padding-top: 16px;
+
+    background: linear-gradient(135deg, #f8fbff, #f5f9fe);
+    border-right: 1px solid #e0e7f0;
+
+    overflow-y: auto;
+}
+
+.sidebar a {
+    min-height: 44px;
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    border-left: 3px solid transparent;
+    color: #172943;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    transition: background 0.2s;
+}
+
+.sidebar a .bi {
+    width: 22px;
+    flex-shrink: 0;
+    color: #3e4e63;
+    font-size: 19px;
+    text-align: center;
+}
+
+.sidebar a:hover {
+    background: #edf4ff;
+}
+
+.sidebar a.active {
+    color: #075bd4;
+    background: #dfecff;
+    border-left-color: #1876f2;
+}
+
+.sidebar a.active .bi {
+    color: #075bd4;
+}
+
+/* =========================
+   メインコンテンツ
+========================= */
+.main-content {
+    min-height: 100vh;
+    margin-left: 185px;
+    padding: 69px 23px 27px;
+}
+
+/* =========================
+   あいさつ画像
+========================= */
+.hero {
+    position: relative;
+    height: 178px;
+
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    background: #f4f5f5;
+    border: 1px solid #e7ebf0;
+    border-radius: 8px;
+}
+
+.hero-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.96) 0%,
+        rgba(255, 255, 255, 0.85) 32%,
+        rgba(255, 255, 255, 0.30) 65%,
+        rgba(255, 255, 255, 0.02) 100%
+    );
+}
+
+.hero-text {
+    position: relative;
+    z-index: 1;
+    padding-left: 30px;
+}
+
+.hero-text h1 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    line-height: 1.45;
+    font-weight: 800;
+}
+
+.hero-text p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.8;
+    font-weight: 600;
+}
+
+/* =========================
+   メニュー見出し
+========================= */
+.menu-section {
+    margin-top: 19px;
+}
+
+.section-title {
+    min-height: 27px;
+    margin: 0 0 13px 8px;
+    padding-left: 12px;
+
+    display: flex;
+    align-items: center;
+
+    border-left: 3px solid #2879f0;
+    font-size: 18px;
+    line-height: 1.5;
+    font-weight: 800;
+}
+
+/* =========================
+   メニューカード
+========================= */
+.menu-container {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding: 0 4px 0 8px;
+}
+
+.menu-card {
+    position: relative;
+    min-width: 0;
+    min-height: 126px;
+    padding: 14px 24px 14px 13px;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    border: 1px solid;
+    border-radius: 9px;
+
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.menu-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 50, 90, 0.08);
+}
+
+.reservation {
+    background: #f6faff;
+    border-color: #d6e7ff;
+}
+
+.confirmation {
+    background: #f8fcf8;
+    border-color: #dcefe1;
+}
+
+.history {
+    background: #fffcf8;
+    border-color: #f2e7dc;
+}
+
+/* カードアイコン */
+.card-icon {
+    width: 43px;
+    height: 45px;
+    flex: 0 0 43px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #46566b;
+}
+
+.card-icon .bi {
+    font-size: 37px;
+    line-height: 1;
+}
+
+.reservation .card-icon .bi,
+.confirmation .card-icon .bi,
+.history .card-icon .bi {
+    color: #4d6076;
+}
+
+/* カード内テキスト */
+.menu-text {
+    min-width: 0;
+}
+
+.menu-text h3 {
+    margin: 0 0 7px;
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 800;
+    white-space: normal;
+}
+
+.menu-text p {
+    margin: 0;
+    color: #46566e;
+    font-size: 11px;
+    line-height: 1.8;
+    white-space: normal;
+}
+
+/* 右向き矢印 */
+.arrow {
+    position: absolute;
+    top: 50%;
+    right: 9px;
+
+    color: #60738e;
+    font-size: 14px;
+
+    transform: translateY(-50%);
+}
+
+/* =========================
+   お知らせ
+========================= */
+.announcements {
+    margin: 22px 2px 0 8px;
+    overflow: hidden;
+
+    background: #fff;
+    border: 1px solid #dfe5ee;
+    border-radius: 9px;
+}
+
+.notice-heading {
+    min-height: 45px;
+    padding: 0 17px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: linear-gradient(90deg, #f5f7fa, #fbfcfd);
+    border-bottom: 1px solid #e7ebf1;
+}
+
+.notice-heading h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.info-icon {
+    width: 25px;
+    height: 25px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: #2379e7;
+    color: #fff;
+}
+
+.info-icon .bi {
+    font-size: 17px;
+}
+
+.notice-row {
+    min-height: 40px;
+    margin: 0 17px;
+
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    align-items: center;
+    gap: 9px;
+
+    border-bottom: 1px solid #e3e8ef;
+    font-size: 12px;
+}
+
+.notice-row:last-child {
+    border-bottom: none;
+}
+
+.notice-row time {
+    color: #53627a;
+}
+
+.notice-row a {
+    color: #075bd4;
+    font-weight: 600;
+}
+
+.notice-row a:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   画面幅が狭い場合
+========================= */
+@media (max-width: 1200px) {
+    .sidebar {
+        width: 170px;
+    }
+
+    .sidebar a {
+        padding: 0 13px;
+        gap: 9px;
+        font-size: 12px;
+    }
+
+    .main-content {
+        margin-left: 170px;
+        padding-right: 17px;
+        padding-left: 17px;
+    }
+
+    .menu-container {
+        gap: 11px;
+    }
+
+    .menu-card {
+        padding-left: 10px;
+        padding-right: 19px;
+        gap: 7px;
+    }
+
+    .card-icon {
+        width: 36px;
+        height: 40px;
+        flex-basis: 36px;
+    }
+
+    .card-icon .bi {
+        font-size: 32px;
+    }
+
+    .menu-text h3 {
+        font-size: 12px;
+    }
+
+    .menu-text p {
+        font-size: 10px;
+    }
+}
+
+/* =========================
+   タブレット
+========================= */
+@media (max-width: 850px) {
+    .top-header {
+        padding: 0 13px;
+    }
+
+    .site-title {
+        font-size: 15px;
+    }
+
+    .user-area {
+        gap: 7px;
+        font-size: 12px;
+    }
+
+    .header-divider {
+        display: none;
+    }
+
+    .sidebar {
+        width: 58px;
+    }
+
+    .sidebar a {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .sidebar a span {
+        display: none;
+    }
+
+    .sidebar a .bi {
+        width: auto;
+        font-size: 21px;
+    }
+
+    .main-content {
+        margin-left: 58px;
+        padding: 68px 14px 22px;
+    }
+
+    .hero {
+        height: 158px;
+    }
+
+    .hero-text {
+        padding-left: 19px;
+    }
+
+    .hero-text h1 {
+        font-size: 22px;
+    }
+
+    .hero-text p {
+        font-size: 13px;
+    }
+
+    .menu-container {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-card {
+        min-height: 96px;
+        padding: 11px 27px 11px 15px;
+        gap: 13px;
+    }
+
+    .card-icon {
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
+    }
+
+    .card-icon .bi {
+        font-size: 37px;
+    }
+
+    .menu-text h3 {
+        font-size: 14px;
+    }
+
+    .menu-text p {
+        font-size: 12px;
+    }
+}
+
+/* =========================
+   スマートフォン
+========================= */
+@media (max-width: 500px) {
+    .top-header {
+        height: 49px;
+        padding: 0 8px;
+    }
+
+    .site-title {
+        max-width: 48%;
+        font-size: 11px;
+        white-space: normal;
+    }
+
+    .user-area {
+        gap: 5px;
+        font-size: 10px;
+    }
+
+    .logout-link {
+        gap: 4px;
+        font-size: 10px;
+    }
+
+    .logout-link .bi {
+        font-size: 13px;
+    }
+
+    .sidebar {
+        top: 49px;
+        width: 45px;
+    }
+
+    .sidebar a {
+        min-height: 41px;
+    }
+
+    .main-content {
+        margin-left: 45px;
+        padding: 61px 8px 17px;
+    }
+
+    .hero {
+        height: 132px;
+    }
+
+    .hero-text {
+        padding-left: 10px;
+    }
+
+    .hero-text h1 {
+        font-size: 18px;
+    }
+
+    .hero-text p {
+        font-size: 10px;
+    }
+
+    .section-title {
+        margin-left: 0;
+        font-size: 16px;
+    }
+
+    .menu-container {
+        padding: 0;
+    }
+
+    .menu-card {
+        min-height: 83px;
+        padding: 9px 20px 9px 8px;
+        gap: 8px;
+    }
+
+    .card-icon {
+        width: 33px;
+        height: 36px;
+        flex-basis: 33px;
+    }
+
+    .card-icon .bi {
+        font-size: 29px;
+    }
+
+    .menu-text h3 {
+        margin-bottom: 5px;
+        font-size: 12px;
+    }
+
+    .menu-text p {
+        font-size: 10px;
+    }
+
+    .announcements {
+        margin: 16px 0 0;
+    }
+
+    .notice-heading {
+        min-height: 39px;
+        padding: 0 9px;
+        gap: 8px;
+    }
+
+    .notice-heading h2 {
+        font-size: 13px;
+    }
+
+    .info-icon {
+        width: 21px;
+        height: 21px;
+    }
+
+    .info-icon .bi {
+        font-size: 15px;
+    }
+
+    .notice-row {
+        min-height: 37px;
+        margin: 0 8px;
+        grid-template-columns: 75px minmax(0, 1fr);
+        gap: 5px;
+        font-size: 10px;
+    }
+}
