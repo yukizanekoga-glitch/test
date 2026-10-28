@@ -63,21 +63,36 @@
 
             <h1 class="page-title">面談予約</h1>
 
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             <!-- カウンセラー選択 -->
             <section class="counselor-section">
-                <label for="counselor" class="section-title">
-                    カウンセラーを選択してください。
-                </label>
+                <form id="filterForm" method="get" action="{{ url_for('reserva') }}">
+                    <input type="hidden" name="week" value="{{ week_offset }}">
 
-                <select id="counselor"
-                        name="counselor"
-                        form="reservation-form">
-                    <option value="">
-                        指定なし（空いているカウンセラー）
-                    </option>
-                    <option value="counselor1">カウンセラー 1</option>
-                    <option value="counselor2">カウンセラー 2</option>
-                </select>
+                    <label for="counselor" class="section-title">
+                        カウンセラーを選択してください。
+                    </label>
+
+                    <select id="counselor"
+                            name="counselor_id"
+                            onchange="document.getElementById('filterForm').submit()">
+                        <option value="" {% if selected_counselor_id is none %}selected{% endif %}>
+                            指定なし（空いているカウンセラー）
+                        </option>
+                        {% for counselor in counselors %}
+                        <option value="{{ counselor.id }}" {% if counselor.id == selected_counselor_id %}selected{% endif %}>
+                            {{ counselor.display_name }} 先生
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
 
                 <p class="help-text">
                     ※「指定なし」を選択すると、空いているカウンセラーで予約できます。
@@ -98,19 +113,28 @@
                     <span>予約不可</span>
                 </div>
 
-                <!-- 週の表示（HTML/CSSのみのため固定） -->
+                <!-- 週の表示 -->
                 <div class="calendar-navigation">
-                    <span class="week-label">
+                    {% if week_offset > 0 %}
+                    <a class="week-label"
+                       href="{{ url_for('reserva', week=week_offset - 1, counselor_id=selected_counselor_id) }}">
+                        <i class="bi bi-chevron-left"></i>
+                        前の週
+                    </a>
+                    {% else %}
+                    <span class="week-label disabled">
                         <i class="bi bi-chevron-left"></i>
                         前の週
                     </span>
+                    {% endif %}
 
-                    <h2>2024年10月</h2>
+                    <h2>{{ week_dates[0].year }}年{{ week_dates[0].month }}月</h2>
 
-                    <span class="week-label">
+                    <a class="week-label"
+                       href="{{ url_for('reserva', week=week_offset + 1, counselor_id=selected_counselor_id) }}">
                         次の週
                         <i class="bi bi-chevron-right"></i>
-                    </span>
+                    </a>
                 </div>
 
                 <!-- 予約フォーム -->
@@ -123,201 +147,41 @@
                             <thead>
                                 <tr>
                                     <th class="time-heading">日時</th>
-                                    <th>10/14<br>（月）</th>
-                                    <th>10/15<br>（火）</th>
-                                    <th>10/16<br>（水）</th>
-                                    <th>10/17<br>（木）</th>
-                                    <th>10/18<br>（金）</th>
+                                    {% for d in week_dates %}
+                                    <th>{{ d.month }}/{{ d.day }}<br>（{{ '月火水木金土日'[d.weekday()] }}）</th>
+                                    {% endfor %}
                                 </tr>
                             </thead>
 
                             <tbody>
-                                <!-- 10:00 -->
+                                {% for row in grid_rows %}
                                 <tr>
-                                    <th>10:00 ～ 10:30</th>
+                                    <th>{{ row.start_time.strftime('%H:%M') }} ～ {{ row.end_time.strftime('%H:%M') }}</th>
+                                    {% for slot in row.cells %}
                                     <td>
+                                        {% if slot %}
                                         <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-14|10:00 ～ 10:30" required>
+                                            <input type="radio" name="slot_id" value="{{ slot.id }}" required>
                                             <span>○</span>
                                         </label>
+                                        {% else %}
+                                        <span class="unavailable">－</span>
+                                        {% endif %}
                                     </td>
-                                    <td><span class="unavailable">－</span></td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-16|10:00 ～ 10:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td><span class="unavailable">－</span></td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-18|10:00 ～ 10:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
+                                    {% endfor %}
                                 </tr>
-
-                                <!-- 11:00 -->
-                                <tr>
-                                    <th>11:00 ～ 11:30</th>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-14|11:00 ～ 11:30" required>
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-15|11:00 ～ 11:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-16|11:00 ～ 11:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-17|11:00 ～ 11:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td><span class="unavailable">－</span></td>
-                                </tr>
-
-                                <!-- 13:00 -->
-                                <tr>
-                                    <th>13:00 ～ 13:30</th>
-                                    <td><span class="unavailable">－</span></td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-15|13:00 ～ 13:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td><span class="unavailable">－</span></td>
-                                    <td><span class="unavailable">－</span></td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-18|13:00 ～ 13:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                </tr>
-
-                                <!-- 14:00 -->
-                                <tr>
-                                    <th>14:00 ～ 14:30</th>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-14|14:00 ～ 14:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-15|14:00 ～ 14:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-16|14:00 ～ 14:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-17|14:00 ～ 14:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td><span class="unavailable">－</span></td>
-                                </tr>
-
-                                <!-- 15:00 -->
-                                <tr>
-                                    <th>15:00 ～ 15:30</th>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-14|15:00 ～ 15:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-15|15:00 ～ 15:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-16|15:00 ～ 15:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-17|15:00 ～ 15:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-18|15:00 ～ 15:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                </tr>
-
-                                <!-- 16:00 -->
-                                <tr>
-                                    <th>16:00 ～ 16:30</th>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-14|16:00 ～ 16:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td><span class="unavailable">－</span></td>
-                                    <td>
-                                        <label class="slot">
-                                            <input type="radio" name="slot"
-                                                   value="2024-10-16|16:00 ～ 16:30">
-                                            <span>○</span>
-                                        </label>
-                                    </td>
-                                    <td><span class="unavailable">－</span></td>
-                                    <td><span class="unavailable">－</span></td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
 
+                    {% if not has_slots %}
+                    <p class="help-text">この週に予約可能な日時はありません。「次の週」をご確認ください。</p>
+                    {% else %}
                     <p class="help-text">
                         ※予約可能な「○」を1つ選択してから「次へ」を押してください。
                     </p>
+                    {% endif %}
 
                     <!-- ボタン -->
                     <div class="button-area">
@@ -325,9 +189,9 @@
                             戻る
                         </a>
 
-                        <a href="{{ url_for('reserva_check') }}" type="submit" class="btn-next">
+                        <button type="submit" class="btn-next">
                             次へ
-                        </a>
+                        </button>
                     </div>
 
                 </form>

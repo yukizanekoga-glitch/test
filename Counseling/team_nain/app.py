@@ -1,8 +1,9 @@
 import os
-from datetime import date as date_cls, datetime, time as time_cls
+from datetime import date as date_cls, datetime, time as time_cls, timedelta
 from functools import wraps
 
 from flask import Flask, render_template, redirect, url_for, request, session, flash
+from sqlalchemy.exc import IntegrityError
 #######################
 import subprocess
 from threading import Timer
@@ -108,7 +109,27 @@ def top():
 # 予約画面
 # =========================
 
-@app.route("/reserva", methods=["GET", "POST"])
+WEEKDAYS_JP = '月火水木金土日'
+
+# 面談可能日時として選択できる時間帯 (カウンセラー側の登録画面と同じ区切り)
+RESERVATION_TIME_SLOTS = [
+    (time_cls(hour, 0), time_cls(hour, 30))
+    for hour in range(9, 17)
+]
+
+
+def _format_date_jp(target_date):
+    return f"{target_date.year}年{target_date.month}月{target_date.day}日（{WEEKDAYS_JP[target_date.weekday()]}）"
+
+
+def _format_slot_datetime(slot):
+    return (
+        f"{_format_date_jp(slot.date)} "
+        f"{slot.start_time.strftime('%H:%M')} ～ {slot.end_time.strftime('%H:%M')}"
+    )
+
+
+@app.route("/reserva")
 @role_required(User.ROLE_STUDENT)
 def reserva():
     # カウンセラー一覧 (プルダウン用)
@@ -119,61 +140,134 @@ def reserva():
         .all()
     )
 
+    raw_counselor_id = request.args.get("counselor_id", "").strip()
     selected_counselor_id = None
-    slots = []
+    if raw_counselor_id:
+        try:
+            selected_counselor_id = int(raw_counselor_id)
+        except ValueError:
+            selected_counselor_id = None
+        if not any(c.id == selected_counselor_id for c in counselors):
+            selected_counselor_id = None
 
-    if request.method == "POST":
-        raw_id = request.form.get("counselor_id", "").strip()
+    try:
+        week_offset = int(request.args.get("week", 0))
+    except ValueError:
+        week_offset = 0
+    week_offset = max(week_offset, 0)
 
-        # 空欄 = 「指定なし」(全カウンセラーの空き枠を表示)
-        if raw_id:
-            try:
-                selected_counselor_id = int(raw_id)
-            except ValueError:
-                flash("カウンセラーの指定が正しくありません。")
-                return redirect(url_for("reserva"))
+    today = date_cls.today()
+    monday = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
+    week_dates = [monday + timedelta(days=i) for i in range(5)]  # 月～金
 
-            if not any(c.id == selected_counselor_id for c in counselors):
-                flash("選択したカウンセラーが見つかりません。")
-                return redirect(url_for("reserva"))
+    # まだ予約が入っていない、今週表示分の面談可能日時
+    query = (
+        AvailableSlot.query
+        .outerjoin(Reservation, Reservation.slot_id == AvailableSlot.id)
+        .filter(Reservation.id.is_(None))
+        .filter(AvailableSlot.date >= today)
+        .filter(AvailableSlot.date >= week_dates[0])
+        .filter(AvailableSlot.date <= week_dates[-1])
+    )
+    if selected_counselor_id is not None:
+        query = query.filter(AvailableSlot.counselor_id == selected_counselor_id)
 
-        # まだ予約が入っていない、今日以降の面談可能日時
-        query = (
-            AvailableSlot.query
-            .outerjoin(Reservation, Reservation.slot_id == AvailableSlot.id)
-            .filter(Reservation.id.is_(None))
-            .filter(AvailableSlot.date >= date_cls.today())
-        )
-        if selected_counselor_id is not None:
-            query = query.filter(AvailableSlot.counselor_id == selected_counselor_id)
+    week_slots = query.order_by(AvailableSlot.date, AvailableSlot.start_time).all()
 
-        slots = query.order_by(AvailableSlot.date, AvailableSlot.start_time).all()
+    # 日付・時間帯ごとに1枠だけ表示する（「指定なし」の場合は最初に見つかった枠を使う）
+    slot_by_cell = {}
+    for slot in week_slots:
+        slot_by_cell.setdefault((slot.date, slot.start_time), slot)
+
+    grid_rows = [
+        {
+            "start_time": start_time,
+            "end_time": end_time,
+            "cells": [slot_by_cell.get((d, start_time)) for d in week_dates],
+        }
+        for start_time, end_time in RESERVATION_TIME_SLOTS
+    ]
 
     return render_template(
         "Student/reserva.html",
         counselors=counselors,
         selected_counselor_id=selected_counselor_id,
-        slots=slots,
+        week_dates=week_dates,
+        grid_rows=grid_rows,
+        week_offset=week_offset,
+        has_slots=bool(week_slots),
     )
+
 
 # =========================
 # 予約確認画面
 # =========================
 
-@app.route("/reservacheck")
+@app.route("/reserva_check", methods=["GET", "POST"])
 @role_required(User.ROLE_STUDENT)
-def reservacheck():
-    return render_template("Student/reservacheck.html")
+def reserva_check():
+    if request.method == "POST":
+        raw_slot_id = request.form.get("slot_id", "").strip()
+        try:
+            slot_id = int(raw_slot_id)
+        except ValueError:
+            flash("面談の日時を選択してください。")
+            return redirect(url_for("reserva"))
+
+        slot = db.session.get(AvailableSlot, slot_id)
+        if slot is None or slot.is_booked or slot.date < date_cls.today():
+            flash("選択した日時はすでに予約できません。もう一度お選びください。")
+            return redirect(url_for("reserva"))
+
+        session["pending_slot_id"] = slot_id
+        return redirect(url_for("reserva_check"))
+
+    slot_id = session.get("pending_slot_id")
+    slot = db.session.get(AvailableSlot, slot_id) if slot_id else None
+    if slot is None or slot.is_booked or slot.date < date_cls.today():
+        flash("選択した日時が見つかりません。もう一度お選びください。")
+        session.pop("pending_slot_id", None)
+        return redirect(url_for("reserva"))
+
+    return render_template(
+        "Student/reserva_check.html",
+        counselor_name=f"{slot.counselor.display_name} 先生",
+        interview_datetime=_format_slot_datetime(slot),
+        reservation_date=_format_date_jp(slot.date),
+    )
 
 
 # =========================
 # 予約完了画面
 # =========================
 
-@app.route("/reservadone")
+@app.route("/reserva_done", methods=["POST"])
 @role_required(User.ROLE_STUDENT)
-def reservadone():
-    return render_template("Student/reservadone.html")
+def reserva_done():
+    slot_id = session.get("pending_slot_id")
+    slot = db.session.get(AvailableSlot, slot_id) if slot_id else None
+    if slot is None or slot.is_booked or slot.date < date_cls.today():
+        flash("選択した日時は予約できませんでした。もう一度お選びください。")
+        session.pop("pending_slot_id", None)
+        return redirect(url_for("reserva"))
+
+    db.session.add(Reservation(slot_id=slot.id, student_id=session["user_id"]))
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        flash("その日時はすでに他の人が予約しています。別の日時をお選びください。")
+        session.pop("pending_slot_id", None)
+        return redirect(url_for("reserva"))
+
+    session.pop("pending_slot_id", None)
+
+    return render_template(
+        "Student/reserva_done.html",
+        counselor_name=f"{slot.counselor.display_name} 先生",
+        interview_datetime=_format_slot_datetime(slot),
+        reservation_date=_format_date_jp(slot.date),
+    )
 
 
 # =========================
@@ -833,22 +927,6 @@ def manage_caredel_complete():
     return render_template("Management/ManageCare/manage_caredel_complete.html")
 
 
-
-
-
-
-# =========================
-# 新しい画面遷移で追加された画面 (画面表示のみ。登録・更新などの処理は今後実装)
-# =========================
-@app.route("/reserva_check")
-@role_required(User.ROLE_STUDENT)
-def reserva_check():
-    return render_template("Student/reserva_check.html")
-
-@app.route("/reserva_done")
-@role_required(User.ROLE_STUDENT)
-def reserva_done():
-    return render_template("Student/reserva_done.html")
 
 
 @app.route("/teacher_student_top")
