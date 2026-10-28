@@ -1,4 +1,3 @@
-
 @charset "UTF-8";
 
 /* =========================
@@ -344,132 +343,184 @@ a {
     transform: translateY(-50%);
 }
 
-/* =========================
-   お知らせ
-========================= */
-.announcements {
-    margin: 22px 2px 0 8px;
-    overflow: hidden;
 
-    background: #fff;
-    border: 1px solid #dfe5ee;
-    border-radius: 9px;
+
+/* =========================
+   今週のアンケート
+========================= */
+
+.survey-section {
+    margin: 16px 2px 0 8px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #cfe2ff;
+    border-radius: 8px;
 }
 
-.notice-heading {
-    min-height: 45px;
+/* 見出し */
+.survey-heading {
+    min-height: 43px;
     padding: 0 17px;
 
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 
-    background: linear-gradient(90deg, #f5f7fa, #fbfcfd);
-    border-bottom: 1px solid #e7ebf1;
+    background: linear-gradient(90deg, #edf5ff, #f3f8ff);
 }
 
-.notice-heading h2 {
+.survey-heading-icon {
+    color: #0878ff;
+    font-size: 23px;
+    line-height: 1;
+}
+
+.survey-heading h2 {
     margin: 0;
+    color: #14233b;
     font-size: 15px;
     font-weight: 800;
 }
 
-.info-icon {
-    width: 25px;
-    height: 25px;
-    flex-shrink: 0;
+/* アンケート内容 */
+.survey-content {
+    position: relative;
+    min-height: 100px;
+    margin: 11px 17px 13px;
+    padding: 12px 225px 12px 13px;
+
+    display: flex;
+    align-items: center;
+
+    background: linear-gradient(90deg, #f8fbff, #ffffff);
+    border-radius: 5px;
+}
+
+/* タイトルと説明 */
+.survey-info {
+    min-width: 0;
+}
+
+.survey-info h3 {
+    margin: 0 0 5px;
+    color: #0875ed;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
+.survey-info p {
+    margin: 0;
+    color: #405776;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* 回答ボタン */
+.survey-button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+
+    width: 205px;
+    min-height: 52px;
+    padding: 0 12px;
 
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
 
-    border-radius: 50%;
-    background: #2379e7;
-    color: #fff;
+    color: #ffffff;
+    background: #e60012;
+    border: 1px solid #e60012;
+    border-radius: 7px;
+
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+    white-space: nowrap;
+
+    transition: background 0.2s, box-shadow 0.2s;
 }
 
-.info-icon .bi {
-    font-size: 17px;
+.survey-button .bi {
+    font-size: 13px;
+    flex-shrink: 0;
 }
 
-.notice-row {
-    min-height: 40px;
-    margin: 0 17px;
-
-    display: grid;
-    grid-template-columns: 120px minmax(0, 1fr);
-    align-items: center;
-    gap: 9px;
-
-    border-bottom: 1px solid #e3e8ef;
-    font-size: 12px;
+.survey-button:hover {
+    background: #c90010;
+    border-color: #c90010;
+    box-shadow: 0 3px 8px rgba(230, 0, 18, 0.18);
 }
 
-.notice-row:last-child {
-    border-bottom: none;
-}
-
-.notice-row time {
-    color: #53627a;
-}
-
-.notice-row a {
-    color: #075bd4;
-    font-weight: 600;
-}
-
-.notice-row a:hover {
-    text-decoration: underline;
-}
-
-/* =========================
-   画面幅が狭い場合
-========================= */
+/* 画面幅が狭い場合 */
 @media (max-width: 1200px) {
-    .sidebar {
-        width: 170px;
+    .survey-content {
+        padding-right: 190px;
     }
 
-    .sidebar a {
-        padding: 0 13px;
-        gap: 9px;
-        font-size: 12px;
-    }
-
-    .main-content {
-        margin-left: 170px;
-        padding-right: 17px;
-        padding-left: 17px;
-    }
-
-    .menu-container {
-        gap: 11px;
-    }
-
-    .menu-card {
-        padding-left: 10px;
-        padding-right: 19px;
-        gap: 7px;
-    }
-
-    .card-icon {
-        width: 36px;
-        height: 40px;
-        flex-basis: 36px;
-    }
-
-    .card-icon .bi {
-        font-size: 32px;
-    }
-
-    .menu-text h3 {
-        font-size: 12px;
-    }
-
-    .menu-text p {
-        font-size: 10px;
+    .survey-button {
+        width: 175px;
+        padding: 0 8px;
+        font-size: 11px;
     }
 }
+
+/* スマートフォン */
+@media (max-width: 500px) {
+    .survey-section {
+        margin: 14px 0 0;
+    }
+
+    .survey-heading {
+        min-height: 38px;
+        padding: 0 10px;
+        gap: 8px;
+    }
+
+    .survey-heading-icon {
+        font-size: 20px;
+    }
+
+    .survey-heading h2 {
+        font-size: 13px;
+    }
+
+    .survey-content {
+        min-height: auto;
+        margin: 8px;
+        padding: 11px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .survey-info h3 {
+        font-size: 13px;
+    }
+
+    .survey-info p {
+        font-size: 11px;
+    }
+
+    .survey-button {
+        position: static;
+        transform: none;
+
+        width: 100%;
+        min-height: 42px;
+        padding: 8px;
+        gap: 7px;
+
+        font-size: 11px;
+    }
+}
+
 
 /* =========================
    タブレット

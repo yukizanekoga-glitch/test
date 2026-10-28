@@ -1,0 +1,631 @@
+
+/* ==============================
+   全体設定
+============================== */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    color: #101d3d;
+    background: #ffffff;
+    font-size: 14px;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+/* ==============================
+   上部ヘッダー
+============================== */
+.top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    height: 51px;
+    padding: 0 21px;
+
+    background: #ffffff;
+    border-bottom: 1px solid #e1e7ef;
+}
+
+.site-title {
+    color: #20324b;
+    font-size: 17px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.user-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #293a52;
+    font-size: 12px;
+}
+
+.user-name .bi {
+    font-size: 18px;
+}
+
+.header-divider {
+    width: 1px;
+    height: 21px;
+    margin: 0 5px;
+    background: #dce3ed;
+}
+
+.logout-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #526179;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.logout-link:hover {
+    color: #1769e8;
+}
+
+/* ==============================
+   全体レイアウト
+============================== */
+.layout {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 51px;
+}
+
+/* ==============================
+   左側メニュー
+============================== */
+.sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 900;
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    width: 222px;
+    min-width: 222px;
+    padding: 8px 0;
+
+    overflow-y: auto;
+
+    background: #f8faff;
+    border-right: 1px solid #e2e8f1;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    min-height: 40px;
+    padding: 9px 20px;
+
+    border-left: 4px solid transparent;
+
+    color: #586580;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+
+    transition: background 0.2s, color 0.2s;
+}
+
+.sidebar a .bi {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 17px;
+    font-size: 18px;
+}
+
+.sidebar a:hover {
+    background: #edf3ff;
+    color: #1769e8;
+}
+
+.sidebar a.active {
+    border-left-color: #1769e8;
+    background: #eaf2ff;
+    color: #1769e8;
+    font-weight: 600;
+}
+
+/* ==============================
+   メインコンテンツ
+============================== */
+.main-content {
+    width: calc(100% - 222px);
+    min-width: 0;
+    min-height: calc(100vh - 51px);
+
+    margin-left: 222px;
+    padding: 27px 32px 35px;
+}
+
+.page-title {
+    margin: 0 0 25px;
+
+    color: #101d3d;
+    font-size: 29px;
+    font-weight: 800;
+}
+
+/* ==============================
+   カウンセラー選択
+============================== */
+.counselor-section {
+    margin-bottom: 27px;
+}
+
+.section-title {
+    display: block;
+    margin: 0 0 10px;
+
+    color: #101d3d;
+    font-size: 20px;
+    font-weight: 750;
+}
+
+.counselor-section select {
+    display: block;
+    width: min(100%, 632px);
+    height: 47px;
+    padding: 0 14px;
+
+    border: 1px solid #b9c7d9;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #34435f;
+    font-size: 15px;
+}
+
+.counselor-section select:focus {
+    outline: 2px solid #1680ff;
+    outline-offset: 1px;
+}
+
+.help-text {
+    margin: 8px 0 0;
+
+    color: #63718e;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* ==============================
+   カレンダー説明
+============================== */
+.calendar-section {
+    width: 100%;
+}
+
+.calendar-section > .section-title {
+    margin-bottom: 5px;
+}
+
+.calendar-legend {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    margin-bottom: 11px;
+
+    color: #5b6885;
+    font-size: 14px;
+}
+
+.legend-circle {
+    color: #087cff;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.legend-dash {
+    margin-left: 9px;
+    color: #64718d;
+}
+
+/* ==============================
+   週ナビゲーション
+============================== */
+.calendar-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 48px;
+    padding: 0 16px;
+
+    border: 1px solid #d9e3ee;
+    border-radius: 6px 6px 0 0;
+
+    background: #ffffff;
+}
+
+.calendar-navigation h2 {
+    margin: 0;
+
+    font-size: 19px;
+    font-weight: 750;
+}
+
+.week-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #42608d;
+    font-size: 14px;
+}
+
+.week-label .bi {
+    color: #087cff;
+    font-size: 18px;
+}
+
+/* ==============================
+   カレンダー表
+============================== */
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.reservation-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    background: #ffffff;
+}
+
+.reservation-table th,
+.reservation-table td {
+    height: 49px;
+    padding: 5px;
+
+    border: 1px solid #dce5ee;
+
+    text-align: center;
+    vertical-align: middle;
+}
+
+.reservation-table thead th {
+    height: 65px;
+
+    background: #f5f8fb;
+    color: #101d3d;
+
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.reservation-table thead th:first-child {
+    width: 180px;
+}
+
+.reservation-table tbody th {
+    width: 180px;
+
+    background: #f8fafc;
+    color: #101d3d;
+
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.reservation-table td {
+    font-size: 18px;
+}
+
+/* ==============================
+   予約可能な○
+============================== */
+.slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+    min-height: 37px;
+
+    cursor: pointer;
+}
+
+/* ラジオボタン本体は隠す */
+.slot input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+}
+
+/* 通常時の○ */
+.slot span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 22px;
+    height: 22px;
+
+    border: 2px solid #087cff;
+    border-radius: 50%;
+
+    background: #ffffff;
+    color: transparent;
+    font-size: 0;
+    line-height: 1;
+    transition: background 0.15s, color 0.15s;
+}
+
+/* 選択したセル全体を薄い青色にして青枠を表示 */
+.reservation-table td:has(.slot input[type="radio"]:checked) {
+    background: #edf6ff;
+    box-shadow: inset 0 0 0 1px #087cff;
+}
+
+/* 選択したときの青い○ */
+.slot input[type="radio"]:checked + span {
+    position: relative;
+
+    width: 26px;
+    height: 26px;
+
+    border: 2px solid #087cff;
+    border-radius: 50%;
+
+    background: #087cff;
+    color: transparent;
+    font-size: 0;
+    box-shadow: none;
+}
+
+/* 青い○の中に白い点を表示 */
+.slot input[type="radio"]:checked + span::after {
+    content: "";
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+    background: #ffffff;
+
+    transform: translate(-50%, -50%);
+}
+
+/* 選択前にマウスを乗せたとき */
+.slot:hover span {
+    background: #e7f2ff;
+}
+
+/* キーボード操作時 */
+.slot input[type="radio"]:focus-visible + span {
+    outline: 2px solid #9ccaff;
+    outline-offset: 2px;
+}
+
+/* 予約できない日時 */
+.unavailable {
+    color: #66738b;
+    font-size: 17px;
+}
+
+/* ==============================
+   ボタンエリア
+============================== */
+.button-area {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+
+    margin-top: 22px;
+}
+
+.btn-back,
+.btn-next {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 180px;
+    min-height: 52px;
+    padding: 10px 22px;
+
+    border-radius: 7px;
+
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+
+    cursor: pointer;
+
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-back {
+    border: 1px solid #b2cceb;
+
+    background: #ffffff;
+    color: #455675;
+}
+
+.btn-back:hover {
+    background: #f2f6fb;
+}
+
+.btn-next {
+    border: 1px solid #087cff;
+
+    background: #087cff;
+    color: #ffffff;
+}
+
+.btn-next:hover {
+    border-color: #0069df;
+    background: #0069df;
+}
+
+.btn-back:focus-visible,
+.btn-next:focus-visible {
+    outline: 3px solid #9ccaff;
+    outline-offset: 3px;
+}
+
+/* ==============================
+   画面が狭い場合
+============================== */
+@media (max-width: 1000px) {
+    .main-content {
+        padding: 24px 20px;
+    }
+
+    .reservation-table {
+        min-width: 700px;
+    }
+
+    .button-area {
+        gap: 10px;
+    }
+
+    .btn-back,
+    .btn-next {
+        min-width: 140px;
+    }
+}
+
+@media (max-width: 600px) {
+    .top-header {
+        padding: 0 12px;
+    }
+
+    .site-title {
+        font-size: 12px;
+    }
+
+    .user-area {
+        gap: 7px;
+    }
+
+    .user-name {
+        font-size: 11px;
+    }
+
+    .user-name .bi {
+        font-size: 15px;
+    }
+
+    .logout-link {
+        gap: 3px;
+        font-size: 11px;
+    }
+
+    .header-divider {
+        margin: 0 2px;
+    }
+
+    .sidebar {
+        width: 58px;
+        min-width: 58px;
+    }
+
+    .sidebar a {
+        justify-content: center;
+        gap: 0;
+        padding: 10px 5px;
+    }
+
+    .sidebar a span {
+        display: none;
+    }
+
+    .main-content {
+        width: calc(100% - 58px);
+        margin-left: 58px;
+        padding: 20px 12px;
+    }
+
+    .page-title {
+        font-size: 23px;
+    }
+
+    .section-title {
+        font-size: 16px;
+    }
+
+    .calendar-navigation {
+        padding: 0 8px;
+    }
+
+    .calendar-navigation h2 {
+        font-size: 14px;
+    }
+
+    .week-label {
+        gap: 3px;
+        font-size: 11px;
+    }
+
+    .button-area {
+        gap: 8px;
+    }
+
+    .btn-back,
+    .btn-next {
+        flex: 1;
+        min-width: 0;
+        min-height: 45px;
+        padding: 8px;
+        font-size: 14px;
+    }
+}

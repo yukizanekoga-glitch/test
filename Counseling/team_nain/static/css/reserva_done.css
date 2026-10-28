@@ -1,0 +1,369 @@
+
+/* ==============================
+   全体設定
+============================== */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 14px;
+    color: #101d3b;
+    background: #ffffff;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* ==============================
+   ヘッダー：サイズ・位置を維持
+============================== */
+.top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    height: 51px;
+    padding: 0 21px;
+
+    background: #ffffff;
+    border-bottom: 1px solid #e1e7ef;
+}
+
+.site-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #101d3b;
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    height: 100%;
+}
+
+.user-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #293a52;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.user-name .bi {
+    font-size: 18px;
+}
+
+.header-divider {
+    width: 1px;
+    height: 21px;
+    margin: 0 5px;
+    background: #d7dfeb;
+}
+
+.logout-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #475569;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.logout-link:hover {
+    color: #1476f5;
+}
+
+/* ==============================
+   サイドバー：幅・位置を維持
+============================== */
+.sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 900;
+
+    width: 222px;
+    min-width: 222px;
+    overflow-y: auto;
+
+    padding: 8px 0;
+    background: #f8faff;
+    border-right: 1px solid #e2e8f1;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 20px 9px 0;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    min-height: 40px;
+    padding: 9px 11px;
+
+    border-left: 4px solid transparent;
+    border-radius: 5px;
+
+    color: #586580;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+
+    transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-nav a .bi {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    min-width: 17px;
+    font-size: 18px;
+}
+
+.sidebar-nav a:hover {
+    background: #edf4ff;
+    color: #087cff;
+}
+
+.sidebar-nav a.active {
+    color: #087cff;
+    background: #e7f2ff;
+    border-left-color: transparent;
+}
+
+/* ==============================
+   メインコンテンツ
+============================== */
+.main-content {
+    min-height: 100vh;
+    margin-left: 222px;
+    padding: 66px 34px 25px;
+    background: #ffffff;
+}
+
+.page-title {
+    margin: 0 0 40px;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+/* ==============================
+   予約完了カード
+============================== */
+.complete-card {
+    width: 90%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 11px 35px 17px;
+
+    background: #f3f8fd;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* 青いチェックマーク */
+.complete-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 61px;
+    height: 61px;
+    margin: 0 auto 7px;
+
+    border-radius: 50%;
+    background: #087cff;
+    color: #ffffff;
+}
+
+.complete-icon .bi {
+    font-size: 39px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* 完了メッセージ */
+.complete-card h2 {
+    margin: 0 0 3px;
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
+.complete-message {
+    margin: 0 0 14px;
+    color: #586580;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ==============================
+   予約内容テーブル
+============================== */
+.confirmation-table {
+    width: 100%;
+    overflow: hidden;
+
+    border: 1px solid #dbe3ee;
+    border-radius: 5px;
+    background: #ffffff;
+    text-align: left;
+}
+
+.confirmation-row {
+    display: grid;
+    grid-template-columns: 205px minmax(0, 1fr);
+    min-height: 39px;
+}
+
+.confirmation-row + .confirmation-row {
+    border-top: 1px solid #dbe3ee;
+}
+
+.confirmation-label {
+    display: flex;
+    align-items: center;
+    padding: 8px 22px;
+
+    background: #f1f3f5;
+    color: #101d3b;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.confirmation-value {
+    display: flex;
+    align-items: center;
+    padding: 8px 24px;
+
+    background: #ffffff;
+    color: #101d3b;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+/* ==============================
+   ホームに戻るボタン
+============================== */
+.home-button-area {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.btn-home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 343px;
+    min-height: 48px;
+    padding: 12px 20px;
+
+    border: 1px solid #087cff;
+    border-radius: 5px;
+
+    background: #087cff;
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-home:hover {
+    background: #0668dc;
+    border-color: #0668dc;
+    color: #ffffff;
+}
+
+/* ==============================
+   レスポンシブ対応
+============================== */
+@media (max-width: 1000px) {
+    .main-content {
+        padding-right: 22px;
+        padding-left: 22px;
+    }
+
+    .complete-card {
+        width: 100%;
+        padding-right: 22px;
+        padding-left: 22px;
+    }
+
+    .confirmation-row {
+        grid-template-columns: 170px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .main-content {
+        margin-left: 170px;
+        padding: 65px 14px 20px;
+    }
+
+    .sidebar {
+        width: 170px;
+        min-width: 170px;
+    }
+
+    .site-title {
+        font-size: 13px;
+    }
+
+    .user-area {
+        gap: 7px;
+    }
+
+    .complete-card {
+        padding: 15px 12px;
+    }
+
+    .complete-card h2 {
+        font-size: 18px;
+    }
+
+    .confirmation-row {
+        grid-template-columns: 1fr;
+    }
+
+    .confirmation-label {
+        padding: 8px 12px;
+    }
+
+    .confirmation-value {
+        padding: 9px 12px;
+    }
+
+    .btn-home {
+        width: 100%;
+    }
+}

@@ -79,6 +79,7 @@ def login():
         session["user_id"] = user.id
         session["username"] = user.username
         session["display_name"] = user.display_name
+        session["class_name"] = user.school_class.name if user.school_class else ""
         session["role"] = user.role
 
         next_endpoint = ROLE_TOP_ENDPOINT.get(user.role, "login")

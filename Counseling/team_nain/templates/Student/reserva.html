@@ -1,53 +1,339 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面談予約 | スクールカウンセラー相談予約システム</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- ページのタイトル -->
-  <title>予約 スクールカウンセラー</title>
-
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/reserva.css') }}">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-
 <body>
 
-  <!-- ナビゲーションバー -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー 予約</span>
+    <!-- 上部ヘッダー -->
+    <header class="top-header">
+        <div class="site-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="user-area">
+            <span class="user-name">
+                <i class="bi bi-person"></i>
+                {{ session.class_name }} {{ session.display_name }}さん
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('login') }}" class="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- 左側メニュー -->
+        <aside class="sidebar">
+            <a href="{{ url_for('top') }}">
+                <i class="bi bi-house-door"></i>
+                <span>ホーム</span>
+            </a>
+
+            <a href="{{ url_for('reserva') }}" class="active">
+                <i class="bi bi-calendar3"></i>
+                <span>面談予約</span>
+            </a>
+
+            <a href="{{ url_for('schedule') }}">
+                <i class="bi bi-calendar-check"></i>
+                <span>予約確認</span>
+            </a>
+
+            <a href="{{ url_for('history') }}">
+                <i class="bi bi-clock-history"></i>
+                <span>面談履歴</span>
+            </a>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+
+            <h1 class="page-title">面談予約</h1>
+
+            <!-- カウンセラー選択 -->
+            <section class="counselor-section">
+                <label for="counselor" class="section-title">
+                    カウンセラーを選択してください。
+                </label>
+
+                <select id="counselor"
+                        name="counselor"
+                        form="reservation-form">
+                    <option value="">
+                        指定なし（空いているカウンセラー）
+                    </option>
+                    <option value="counselor1">カウンセラー 1</option>
+                    <option value="counselor2">カウンセラー 2</option>
+                </select>
+
+                <p class="help-text">
+                    ※「指定なし」を選択すると、空いているカウンセラーで予約できます。
+                </p>
+            </section>
+
+            <!-- 日時選択 -->
+            <section class="calendar-section">
+
+                <h2 class="section-title">
+                    面談の日時を選択してください。
+                </h2>
+
+                <div class="calendar-legend">
+                    <span class="legend-circle">○</span>
+                    <span>予約可能</span>
+                    <span class="legend-dash">－</span>
+                    <span>予約不可</span>
+                </div>
+
+                <!-- 週の表示（HTML/CSSのみのため固定） -->
+                <div class="calendar-navigation">
+                    <span class="week-label">
+                        <i class="bi bi-chevron-left"></i>
+                        前の週
+                    </span>
+
+                    <h2>2024年10月</h2>
+
+                    <span class="week-label">
+                        次の週
+                        <i class="bi bi-chevron-right"></i>
+                    </span>
+                </div>
+
+                <!-- 予約フォーム -->
+                <form id="reservation-form"
+                      action="{{ url_for('reserva_check') }}"
+                      method="POST">
+
+                    <div class="table-scroll">
+                        <table class="reservation-table">
+                            <thead>
+                                <tr>
+                                    <th class="time-heading">日時</th>
+                                    <th>10/14<br>（月）</th>
+                                    <th>10/15<br>（火）</th>
+                                    <th>10/16<br>（水）</th>
+                                    <th>10/17<br>（木）</th>
+                                    <th>10/18<br>（金）</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <!-- 10:00 -->
+                                <tr>
+                                    <th>10:00 ～ 10:30</th>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-14|10:00 ～ 10:30" required>
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td><span class="unavailable">－</span></td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-16|10:00 ～ 10:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td><span class="unavailable">－</span></td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-18|10:00 ～ 10:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                </tr>
+
+                                <!-- 11:00 -->
+                                <tr>
+                                    <th>11:00 ～ 11:30</th>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-14|11:00 ～ 11:30" required>
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-15|11:00 ～ 11:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-16|11:00 ～ 11:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-17|11:00 ～ 11:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td><span class="unavailable">－</span></td>
+                                </tr>
+
+                                <!-- 13:00 -->
+                                <tr>
+                                    <th>13:00 ～ 13:30</th>
+                                    <td><span class="unavailable">－</span></td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-15|13:00 ～ 13:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td><span class="unavailable">－</span></td>
+                                    <td><span class="unavailable">－</span></td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-18|13:00 ～ 13:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                </tr>
+
+                                <!-- 14:00 -->
+                                <tr>
+                                    <th>14:00 ～ 14:30</th>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-14|14:00 ～ 14:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-15|14:00 ～ 14:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-16|14:00 ～ 14:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-17|14:00 ～ 14:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td><span class="unavailable">－</span></td>
+                                </tr>
+
+                                <!-- 15:00 -->
+                                <tr>
+                                    <th>15:00 ～ 15:30</th>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-14|15:00 ～ 15:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-15|15:00 ～ 15:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-16|15:00 ～ 15:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-17|15:00 ～ 15:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-18|15:00 ～ 15:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                </tr>
+
+                                <!-- 16:00 -->
+                                <tr>
+                                    <th>16:00 ～ 16:30</th>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-14|16:00 ～ 16:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td><span class="unavailable">－</span></td>
+                                    <td>
+                                        <label class="slot">
+                                            <input type="radio" name="slot"
+                                                   value="2024-10-16|16:00 ～ 16:30">
+                                            <span>○</span>
+                                        </label>
+                                    </td>
+                                    <td><span class="unavailable">－</span></td>
+                                    <td><span class="unavailable">－</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p class="help-text">
+                        ※予約可能な「○」を1つ選択してから「次へ」を押してください。
+                    </p>
+
+                    <!-- ボタン -->
+                    <div class="button-area">
+                        <a href="{{ url_for('top') }}" class="btn-back">
+                            戻る
+                        </a>
+
+                        <a href="{{ url_for('reserva_check') }}" type="submit" class="btn-next">
+                            次へ
+                        </a>
+                    </div>
+
+                </form>
+            </section>
+        </main>
     </div>
-  </nav>
-
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
-
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
-
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
-
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">予約</h2>
-
-        <!-- 予約日 -->
-        <label for="reservation-date" class="form-label">予約日</label>
-        <input type="date" id="reservation-date" class="form-control mb-4">
-
-        <!-- 次へボタン -->
-        <a href="{{ url_for('reserva_check') }}" class="btn btn-primary">次へ</a>
-        <!-- 戻るボタン -->
-        <a href="{{ url_for('top') }}" class="btn btn-secondary">戻る</a>
-
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>
