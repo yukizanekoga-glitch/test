@@ -251,6 +251,18 @@ def reserva_done():
         session.pop("pending_slot_id", None)
         return redirect(url_for("reserva"))
 
+    # 予約は常に1件のみ。新しく予約する際は、既存の今後の予約（未実施分）を
+    # 削除し、そのカウンセラー枠を他の生徒が予約できるよう空ける（実質的な「予約変更」）。
+    upcoming_reservations = (
+        Reservation.query
+        .join(AvailableSlot)
+        .filter(Reservation.student_id == session["user_id"])
+        .filter(AvailableSlot.date >= date_cls.today())
+        .all()
+    )
+    for old_reservation in upcoming_reservations:
+        db.session.delete(old_reservation)
+
     db.session.add(Reservation(slot_id=slot.id, student_id=session["user_id"]))
     try:
         db.session.commit()
@@ -307,7 +319,16 @@ def reserva_delete_complete():
 @app.route("/history")
 @role_required(User.ROLE_STUDENT)
 def history():
-    return render_template("Student/history.html")
+    reservations = (
+        Reservation.query
+        .join(AvailableSlot)
+        .filter(Reservation.student_id == session["user_id"])
+        .filter(Reservation.status == Reservation.STATUS_CONFIRMED)
+        .filter(AvailableSlot.date < date_cls.today())
+        .order_by(AvailableSlot.date.desc(), AvailableSlot.start_time.desc())
+        .all()
+    )
+    return render_template("Student/history.html", reservations=reservations)
 
 
 # =========================

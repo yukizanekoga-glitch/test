@@ -1,44 +1,136 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>面談履歴</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- ページのタイトル -->
-  <title>履歴 スクールカウンセラー</title>
-
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='history.css') }}">
 </head>
 
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー 履歴</span>
+
+    <!-- ヘッダー -->
+    <nav class="navbar navbar-expand">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                スクールカウンセラー相談予約システム
+            </span>
+
+            <span class="ms-auto me-3">♙ {{ session.class_name }} {{ session.display_name }}さん</span>
+
+            <a href="{{ url_for('logout') }}"
+               class="btn btn-outline-primary btn-sm">
+                ログアウト
+            </a>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- サイドバー -->
+            <aside class="col-md-2 sidebar">
+
+                <a href="{{ url_for('top') }}">
+                    ⌂ ホーム
+                </a>
+
+                <a href="{{ url_for('reserva') }}">
+                    ▦ 面談予約
+                </a>
+
+                <a href="{{ url_for('schedule') }}">
+                    ☑ 予約確認
+                </a>
+
+                <a href="{{ url_for('history') }}" class="active">
+                    ◷ 面談履歴
+                </a>
+
+            </aside>
+
+            <!-- メイン画面 -->
+            <main class="col-md-10 p-4">
+
+                <!-- タイトル -->
+                <div class="page-banner">
+                    <h1>面談履歴</h1>
+                    <p class="mb-0">
+                        これまでに実施した面談の履歴を確認できます。
+                    </p>
+                </div>
+
+                <!-- ご注意 -->
+                <div class="notice">
+                    <h5 class="fw-bold">ⓘ 注意事項</h5>
+
+                    <ul class="mb-0">
+                        <li>
+                            過去に実施した面談の履歴を新しい順に表示しています。
+                        </li>
+                        <li>
+                            今後の予定は「予約確認」から確認・変更・削除できます。
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 面談履歴一覧 -->
+                <section class="section-box">
+
+                    <h2 class="section-title">
+                        面談履歴一覧
+                    </h2>
+
+                    <div class="table-responsive">
+                        <table class="table history-table align-middle mb-0">
+
+                            <thead>
+                                <tr>
+                                    <th>面談日</th>
+                                    <th>曜日</th>
+                                    <th>開始時刻</th>
+                                    <th>終了時刻</th>
+                                    <th>担当カウンセラー</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for reservation in reservations %}
+                                <tr>
+                                    <td>{{ reservation.slot.date.strftime('%Y/%m/%d') }}</td>
+                                    <td>{{ '月火水木金土日'[reservation.slot.date.weekday()] }}</td>
+                                    <td>{{ reservation.slot.start_time.strftime('%H:%M') }}</td>
+                                    <td>{{ reservation.slot.end_time.strftime('%H:%M') }}</td>
+                                    <td>{{ reservation.slot.counselor.display_name }} 先生</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    {% if not reservations %}
+                    <p class="empty-message mb-0">
+                        まだ実施した面談はありません。
+                    </p>
+                    {% endif %}
+
+                </section>
+
+                <!-- 戻るボタン -->
+                <div class="back-area">
+                    <a href="{{ url_for('top') }}"
+                       class="btn btn-secondary btn-back">
+                        戻る
+                    </a>
+                </div>
+
+            </main>
+        </div>
     </div>
-  </nav>
-
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
-
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
-
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
-
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">予約履歴</h2>
-
-        <a href="{{ url_for('top') }}" class="btn btn-secondary">戻る</a>
-
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>
