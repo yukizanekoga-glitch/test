@@ -450,8 +450,9 @@ def _parse_slot_form(form):
     except ValueError:
         return None, "日付・時刻の形式が正しくありません。"
 
-    if slot_date < date_cls.today():
-        return None, "過去の日付は登録できません。"
+    # 当日の枠は変更できないため、変更先も明日以降に限る
+    if slot_date <= date_cls.today():
+        return None, "明日以降の日付を選択してください。"
 
     if end_time <= start_time:
         return None, "終了時刻は開始時刻より後にしてください。"
@@ -483,7 +484,12 @@ def care_reseva_top():
         .order_by(AvailableSlot.date, AvailableSlot.start_time)
         .all()
     )
-    return render_template("Counselor/care_reseva_top.html", slots=slots)
+
+    # 終了時刻を過ぎた枠は表示しない
+    now = datetime.now()
+    slots = [s for s in slots if datetime.combine(s.date, s.end_time) > now]
+
+    return render_template("Counselor/care_reseva_top.html", slots=slots, is_locked=_is_locked_slot)
 
 
 # =========================
@@ -593,6 +599,11 @@ def _get_own_slot(slot_id):
     return AvailableSlot.query.filter_by(id=slot_id, counselor_id=session["user_id"]).first()
 
 
+def _is_locked_slot(slot):
+    """予約済み、または当日の枠は変更・削除できない"""
+    return slot.is_booked or slot.date == date_cls.today()
+
+
 # =========================
 # 面談可能日時変更・削除画面 (面談可能日時を変更する/削除する)
 # =========================
@@ -609,9 +620,13 @@ def care_chadel():
             flash("対象の面談可能日時が見つかりません。")
             return redirect(url_for("care_chadel"))
 
-        if slot.is_booked:
-            flash("予約済みの日時は変更・削除できません。")
-            return redirect(url_for("care_chadel"))
+        # 予約済み・当日の枠は一覧で「予約済み」と表示しているので、メッセージは出さずに戻す
+        if _is_locked_slot(slot):
+            return redirect(url_for("care_reseva_top"))
+
+        # care_reseva_top で「変更」を押したとき: 選択した枠の内容を変更画面に表示する
+        if action == "select":
+            return render_template("Counselor/care_chadel.html", edit_slot=slot)
 
         if action == "delete":
             session["pending_chadel"] = {"action": "delete", "slot_id": slot_id}
@@ -641,8 +656,7 @@ def care_chadel():
         edit_slot = _get_own_slot(edit_id)
         if edit_slot is None:
             flash("対象の面談可能日時が見つかりません。")
-        elif edit_slot.is_booked:
-            flash("予約済みの日時は変更・削除できません。")
+        elif _is_locked_slot(edit_slot):
             edit_slot = None
 
     return render_template("Counselor/care_chadel.html", slots=slots, edit_slot=edit_slot)
@@ -666,6 +680,18 @@ def care_chadel_check():
         flash("対象の面談可能日時が見つかりません。")
         return redirect(url_for("care_chadel"))
 
+    # 確認中に予約が入った・当日になった枠は変更・削除しない
+    if _is_locked_slot(slot):
+        session.pop("pending_chadel", None)
+        return redirect(url_for("care_reseva_top"))
+
+    # 変更前の日時 (確認・完了画面に表示する)
+    before = {
+        "date": slot.date.isoformat(),
+        "start_time": slot.start_time.strftime("%H:%M"),
+        "end_time": slot.end_time.strftime("%H:%M"),
+    }
+
     if request.method == "POST":
         if pending["action"] == "delete":
             db.session.delete(slot)# POSTされたら確定処理
@@ -679,7 +705,7 @@ def care_chadel_check():
             if _has_overlap(session["user_id"], slot_date, start_time, end_time, exclude_slot_id=slot.id):
                 session.pop("pending_chadel", None)
                 flash("同じ日時に登録済みの面談可能日時があります。")
-                return redirect(url_for("care_chadel"))
+                return redirect(url_for("care_chadel", edit=slot.id))
 
             slot.date = slot_date
             slot.start_time = start_time
@@ -688,10 +714,17 @@ def care_chadel_check():
             message = "面談可能日時を変更しました。"
 
         session.pop("pending_chadel", None)
-        flash(message)
+        # 完了画面に表示する内容 (完了画面にはメッセージを表示する場所がないため flash は使わない)
+        session["chadel_result"] = {"action": pending["action"], "before": before, "after": pending}
         return redirect(url_for("care_chadel_complete"))
 
-    return render_template("Counselor/care_chadel_check.html", pending=pending, slot=slot)
+    return render_template(
+        "Counselor/care_chadel_check.html",
+        pending=pending,
+        slot=slot,
+        before=_slot_view(before),
+        after=_slot_view(pending) if pending["action"] == "edit" else None,
+    )
 
 
 # =========================
@@ -701,7 +734,27 @@ def care_chadel_check():
 @app.route("/care_chadel_complete")
 @role_required(User.ROLE_COUNSELOR)
 def care_chadel_complete():
-    return render_template("Counselor/care_chadel_complete.html")
+    result = session.get("chadel_result")
+    if not result:
+        return redirect(url_for("care_reseva_top"))
+
+    return render_template(
+        "Counselor/care_chadel_complete.html",
+        result=result,
+        before=_slot_view(result["before"]),
+        after=_slot_view(result["after"]) if result["action"] == "edit" else None,
+    )
+
+
+def _slot_view(values):
+    """{"date", "start_time", "end_time"} (文字列) を画面表示用の値にする"""
+    d = date_cls.fromisoformat(values["date"])
+    weekday = "月火水木金土日"[d.weekday()]
+    return {
+        "full_date": f"{d.year}年{d.month}月{d.day}日（{weekday}）",
+        "short_date": f"{d.month}月{d.day}日（{weekday}）",
+        "time": f"{values['start_time']} ～ {values['end_time']}",
+    }
 
 
 

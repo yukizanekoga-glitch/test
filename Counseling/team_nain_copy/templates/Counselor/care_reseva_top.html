@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>スクールカウンセラー相談予約システム</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/care_reseva_top.css') }}">
+</head>
+
+<body>
+
+    <!-- 上部ヘッダー -->
+    <header class="top-header">
+        <div class="site-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="user-area">
+            <span class="user-name">
+                <i class="bi bi-person"></i>
+                スクールカウンセラー
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('login')}}" class="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- 左側メニュー -->
+        <aside class="sidebar">
+
+            <a href="{{ url_for('care_top') }}" class="active">
+                <i class="bi bi-house-door"></i>
+                <span>ホーム</span>
+            </a>
+
+            <a href="{{ url_for('care_reseva') }}">
+                <i class="bi bi-calendar3"></i>
+                <span>面談可能日時登録</span>
+            </a>
+            
+            <a href="{{ url_for('care_chadel') }}">
+                <i class="bi bi-calendar-check"></i>
+                <span>面談日時変更</span>
+            </a>
+
+            <a href="{{ url_for('care_reseva') }}">
+                <i class="bi bi-clock-history"></i>
+                <span>面談履歴</span>
+            </a>
+
+        </aside>
+
+        <!-- メイン画面 -->
+        <main class="main-content">
+
+            <!-- ページ見出し -->
+            <div class="page-heading">
+                <h1>ホーム</h1>
+                <p>左のメニューから各機能を選択してください。</p>
+            </div>
+
+            <!-- 面談可能日時一覧カード -->
+            <section class="schedule-card">
+
+                <div class="card-heading">
+                    <h2>面談可能日時一覧</h2>
+
+                    <a href="{{ url_for('care_reseva') }}"
+                       class="btn-register">
+                        <i class="bi bi-plus-lg"></i>
+                        面談可能日時を登録する
+                    </a>
+                </div>
+
+                <!-- 一覧テーブル -->
+                <div class="table-responsive">
+                    <table class="schedule-table">
+
+                        <thead>
+                            <tr>
+                                <th>日付</th>
+                                <th>時間帯</th>
+                                <th class="operation-heading">操作</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>2026/10/20（火）</td>
+                                <td>09:00 ～ 09:30</td>
+                                <td class="operation-cell">
+                                    <a href="{{ url_for('care_chadel') }}"
+                                       class="btn-edit">
+                                        <i class="bi bi-pencil"></i>
+                                        変更
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn-delete"
+                                            onclick="confirmDelete()">
+                                        <i class="bi bi-trash"></i>
+                                        削除
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>2026/10/20（火）</td>
+                                <td>10:00 ～ 10:30</td>
+                                <td class="operation-cell">
+                                    <a href="{{ url_for('care_reseva') }}"
+                                       class="btn-edit">
+                                        <i class="bi bi-pencil"></i>
+                                        変更
+                                    </a>
+                                    <button type="button"
+                                            class="btn-delete"
+                                            onclick="confirmDelete()">
+                                        <i class="bi bi-trash"></i>
+                                        削除
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>2026/10/20（火）</td>
+                                <td>13:00 ～ 13:30</td>
+                                <td class="operation-cell">
+                                    <a href="{{ url_for('care_reseva') }}"
+                                       class="btn-edit">
+                                        <i class="bi bi-pencil"></i>
+                                        変更
+                                    </a>
+                                    <button type="button"
+                                            class="btn-delete"
+                                            onclick="confirmDelete()">
+                                        <i class="bi bi-trash"></i>
+                                        削除
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>2026/10/21（水）</td>
+                                <td>14:00 ～ 14:30</td>
+                                <td class="operation-cell">
+                                    <a href="{{ url_for('care_reseva') }}"
+                                       class="btn-edit">
+                                        <i class="bi bi-pencil"></i>
+                                        変更
+                                    </a>
+                                    <button type="button"
+                                            class="btn-delete"
+                                            onclick="confirmDelete()">
+                                        <i class="bi bi-trash"></i>
+                                        削除
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>2026/10/22（木）</td>
+                                <td>15:00 ～ 15:30</td>
+                                <td class="operation-cell">
+                                    <a href="{{ url_for('care_reseva') }}"
+                                       class="btn-edit">
+                                        <i class="bi bi-pencil"></i>
+                                        変更
+                                    </a>
+                                    <button type="button"
+                                            class="btn-delete"
+                                            onclick="confirmDelete()">
+                                        <i class="bi bi-trash"></i>
+                                        削除
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>2026/10/23（金）</td>
+                                <td>09:00 ～ 09:30</td>
+                                <td class="operation-cell">
+                                    <a href="{{ url_for('care_reseva') }}"
+                                       class="btn-edit">
+                                        <i class="bi bi-pencil"></i>
+                                        変更
+                                    </a>
+                                    <button type="button"
+                                            class="btn-delete"
+                                            onclick="confirmDelete()">
+                                        <i class="bi bi-trash"></i>
+                                        削除
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>2026/10/23（金）</td>
+                                <td>10:00 ～ 10:30</td>
+                                <td class="operation-cell">
+                                    <a href="{{ url_for('care_reseva') }}"
+                                       class="btn-edit">
+                                        <i class="bi bi-pencil"></i>
+                                        変更
+                                    </a>
+                                    <button type="button"
+                                            class="btn-delete"
+                                            onclick="confirmDelete()">
+                                        <i class="bi bi-trash"></i>
+                                        削除
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>2026/10/24（土）</td>
+                                <td>13:00 ～ 13:30</td>
+                                <td class="operation-cell">
+                                    <a href="{{ url_for('care_reseva') }}"
+                                       class="btn-edit">
+                                        <i class="bi bi-pencil"></i>
+                                        変更
+                                    </a>
+                                    <button type="button"
+                                            class="btn-delete"
+                                            onclick="confirmDelete()">
+                                        <i class="bi bi-trash"></i>
+                                        削除
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ページ切り替え -->
+                <div class="pagination-area">
+                <a href="{{ url_for('care_top') }}"
+                   class="btn btn-back">
+                    戻る
+                </a>
+                    <button type="button" class="page-arrow"
+                            aria-label="前のページ">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+
+                    <button type="button" class="page-number selected">1</button>
+                    <button type="button" class="page-number">2</button>
+                    <button type="button" class="page-number">3</button>
+
+                    <button type="button" class="page-arrow"
+                            aria-label="次のページ">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+
+            </section>
+        </main>
+
+    </div>
+
+    <!-- 削除確認 -->
+    <script>
+        function confirmDelete() {
+            alert("削除機能は、Flaskの削除処理と接続してください。");
+        }
+    </script>
+
+</body>
+</html>

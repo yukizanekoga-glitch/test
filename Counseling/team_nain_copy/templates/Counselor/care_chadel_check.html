@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>面談可能日時の登録内容の確認 | スクールカウンセラー相談予約システム</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/care_chadel_check.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ヘッダー：現在のデザインを維持 -->
+    <header class="header">
+        <div class="site-title">
+            <i class="fa-solid fa-school"></i>
+            <span>スクールカウンセラー相談予約システム</span>
+        </div>
+
+        <div class="user-info">
+            <span>
+                <i class="fa-regular fa-user"></i>
+                ○○ 先生（スクールカウンセラー）
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <!-- 全体レイアウト -->
+    <div class="layout">
+
+        <!-- サイドバー：現在のデザインを維持 -->
+        <aside class="sidebar">
+            <a href="{{ url_for('care_top') }}">
+                <i class="fa-solid fa-house"></i>
+                <span>ホーム</span>
+            </a>
+
+            <a href="{{ url_for('care_chadel') }}" class="active">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>面談日時変更</span>
+            </a>
+
+            <a href="{{ url_for('care_reseva_top') }}">
+                <i class="fa-regular fa-calendar-check"></i>
+                <span>面談可能日時</span>
+            </a>
+
+            <a href="{{ url_for('care_history') }}">
+                <i class="fa-regular fa-clock"></i>
+                <span>面談履歴</span>
+            </a>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- タイトル -->
+            <div class="page-heading">
+                <span class="heading-line"></span>
+                <h1>面談可能日時の登録内容の確認</h1>
+            </div>
+
+            <p class="description">
+                以下の内容でよろしければ、「登録する」ボタンを押してください。
+            </p>
+
+            <!-- 登録内容パネル -->
+            <section class="content-panel information-panel">
+
+                <h2 class="section-title">登録内容</h2>
+
+                <table class="info-table">
+                    <tbody>
+                        <tr>
+                            <th>カウンセラー</th>
+                            <td>○○  先生</td>
+                        </tr>
+                        <tr>
+                            <th>対象期間</th>
+                            <td>2024年10月14日（月）～ 2024年10月18日（金）</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </section>
+
+            <!-- 登録する時間帯パネル -->
+            <section class="content-panel schedule-panel">
+
+                <h2 class="section-title">
+                    下記の時間で登録します。
+                </h2>
+
+                <div class="table-wrapper">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>日付</th>
+                                <th>面談可能な時間帯</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>10月14日（月）</td>
+                                <td>10:00 ～ 11:00</td>
+                            </tr>
+                            <tr>
+                                <td>10月15日（火）</td>
+                                <td>14:00 ～ 15:00</td>
+                            </tr>
+                            <tr>
+                                <td>10月17日（木）</td>
+                                <td>13:00 ～ 14:00</td>
+                            </tr>
+                            <tr>
+                                <td>10月18日（金）</td>
+                                <td>10:00 ～ 12:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+
+            <!-- 操作ボタン -->
+            <div class="button-area">
+
+                <a href="{{ url_for('care_chadel') }}"
+                   class="btn btn-back">
+                    戻る
+                </a>
+
+                <form action="{{ url_for('care_chadel_complete') }}">
+                    <button type="submit" class="btn btn-register">
+                        登録する
+                    </button>
+                </form>
+
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

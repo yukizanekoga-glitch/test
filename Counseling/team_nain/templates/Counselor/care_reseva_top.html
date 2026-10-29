@@ -24,6 +24,24 @@
             cursor: default;
             background: #ffffff;
         }
+
+        /* 予約済みの枠 (変更・削除ボタン2つ分の幅で灰色表示) */
+        .reserved-label {
+            min-width: 156px;
+            min-height: 27px;
+            margin: 0 2px;
+            padding: 5px 9px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            border-radius: 4px;
+            background: #f1f3f6;
+            color: #8a94a6;
+            font-size: 11px;
+            cursor: default;
+            user-select: none;
+        }
     </style>
 </head>
 
@@ -117,11 +135,22 @@
                                 <td>{{ slot.date.strftime('%Y/%m/%d') }}（{{ '月火水木金土日'[slot.date.weekday()] }}）</td>
                                 <td>{{ slot.start_time.strftime('%H:%M') }} ～ {{ slot.end_time.strftime('%H:%M') }}</td>
                                 <td class="operation-cell">
-                                    <a href="{{ url_for('care_chadel', edit=slot.id) }}"
-                                       class="btn-edit">
-                                        <i class="bi bi-pencil"></i>
-                                        変更
-                                    </a>
+                                    {% if is_locked(slot) %}
+                                    <!-- 予約済み・当日の枠は変更・削除できない -->
+                                    <span class="reserved-label">
+                                        <i class="bi bi-lock"></i>
+                                        予約済み
+                                    </span>
+                                    {% else %}
+                                    <!-- 選択した枠の id を変更画面へ POST する -->
+                                    <form method="post" action="{{ url_for('care_chadel') }}" style="display: contents;">
+                                        <input type="hidden" name="slot_id" value="{{ slot.id }}">
+                                        <input type="hidden" name="action" value="select">
+                                        <button type="submit" class="btn-edit">
+                                            <i class="bi bi-pencil"></i>
+                                            変更
+                                        </button>
+                                    </form>
 
                                     <button type="button"
                                             class="btn-delete"
@@ -129,6 +158,7 @@
                                         <i class="bi bi-trash"></i>
                                         削除
                                     </button>
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% else %}

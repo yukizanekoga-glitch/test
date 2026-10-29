@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- 文字コードをUTF-8に設定 -->
+  <meta charset="UTF-8">
+
+  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ページのタイトル -->
+  <title>生徒編集完了 管理者</title>
+
+  <!-- Bootstrap 5.3.0のCSSを読み込む -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- ナビゲーションバー -->
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+      <!-- サイト名を表示 -->
+      <span class="navbar-brand">スクールカウンセラー 生徒編集</span>
+    </div>
+  </nav>
+
+  <!-- メインコンテンツ -->
+  <div class="container mt-5">
+
+    <!-- フォームを中央寄せにするための行 -->
+    <div class="row justify-content-center">
+
+      <!-- フォームの横幅を設定（中画面以上では4/12） -->
+      <div class="col-md-4">
+
+        <!-- ページの見出し -->
+        <h2 class="text-center mb-4">編集が完了しました</h2>
+
+        <a href="{{ url_for('management_top') }}" class="btn btn-primary">戻る</a>       
+
+      </div>
+    </div>
+  </div>
+  
+</body>
+</html>

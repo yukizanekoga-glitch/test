@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スクールカウンセラー相談予約システム</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/care_reseva.css') }}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="site-title">
+            <i class="fa-solid fa-school"></i>
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="user-info">
+            <span>
+                <i class="fa-regular fa-user"></i>
+                ○○ 先生（スクールカウンセラー）
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <!-- 全体レイアウト -->
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <a href="{{ url_for('care_top') }}">
+                <i class="fa-solid fa-house"></i>
+                <span>ホーム</span>
+            </a>
+
+            <a href="{{ url_for('care_reseva') }}" class="active">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>面談可能日時登録</span>
+            </a>
+
+            <a href="{{ url_for('care_reseva_top')}}">
+                <i class="fa-regular fa-calendar-check"></i>
+                <span>予約一覧</span>
+            </a>
+
+            <a href="{{ url_for('care_history')}}">
+                <i class="fa-regular fa-clock"></i>
+                <span>面談履歴</span>
+            </a>
+
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- ページ見出し -->
+            <div class="page-heading">
+                <span class="heading-line"></span>
+                <h1>面談可能日時の一括登録</h1>
+            </div>
+
+            <p class="description">
+                面談可能な日時を期間・曜日・時間帯を選択して、一括で登録できます。
+            </p>
+
+            <!-- 登録条件の設定 -->
+            <section class="setting-panel">
+
+                <h2 class="section-title">
+                    <span class="step-number">1</span>
+                    登録条件の設定
+                </h2>
+
+                <div class="setting-grid">
+
+                    <!-- 期間 -->
+                    <div class="setting-item">
+                        <label class="field-title">期間</label>
+
+                        <div class="date-range">
+                            <input type="date" value="2026-10-20">
+                            <span>～</span>
+                            <input type="date" value="2026-10-24">
+                        </div>
+                    </div>
+
+                    <!-- 曜日 -->
+                    <div class="setting-item">
+                        <label class="field-title">曜日</label>
+
+                        <div class="weekday-list">
+                            <label><input type="checkbox"> 月</label>
+                            <label><input type="checkbox" checked> 火</label>
+                            <label><input type="checkbox" checked> 水</label>
+                            <label><input type="checkbox" checked> 木</label>
+                            <label><input type="checkbox" checked> 金</label>
+                            <label><input type="checkbox"> 土</label>
+                            <label><input type="checkbox"> 日</label>
+                        </div>
+                    </div>
+
+                    <!-- 時間帯 -->
+                    <div class="setting-item">
+                        <label class="field-title">時間帯</label>
+
+                        <div class="time-checkbox-list">
+                            <label><input type="checkbox"> 09:00 ～ 09:30</label>
+                            <label><input type="checkbox" checked> 10:00 ～ 10:30</label>
+                            <label><input type="checkbox" checked> 11:00 ～ 11:30</label>
+                            <label><input type="checkbox"> 12:00 ～ 12:30</label>
+                            <label><input type="checkbox" checked> 13:00 ～ 13:30</label>
+                            <label><input type="checkbox" checked> 14:00 ～ 14:30</label>
+                            <label><input type="checkbox"> 15:00 ～ 15:30</label>
+                            <label><input type="checkbox"> 16:00 ～ 16:30</label>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- 登録内容の確認 -->
+            <section class="confirm-panel">
+
+                <h2 class="section-title">
+                    <span class="step-number">2</span>
+                    登録内容の確認
+                </h2>
+
+                <p class="section-description">
+                    下の表に、登録される日時が表示されます。
+                    内容を確認して「登録する」ボタンを押してください。
+                </p>
+
+                <div class="table-wrapper">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>10/20（火）</th>
+                                <th>10/21（水）</th>
+                                <th>10/22（木）</th>
+                                <th>10/23（金）</th>
+                                <th>10/24（土）</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <th>09:00 ～ 09:30</th>
+                                <td>－</td><td>－</td><td>－</td><td>－</td><td>－</td>
+                            </tr>
+
+                            <tr class="selected-row">
+                                <th>10:00 ～ 10:30</th>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td>－</td>
+                            </tr>
+
+                            <tr class="selected-row">
+                                <th>11:00 ～ 11:30</th>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td>－</td>
+                            </tr>
+
+                            <tr>
+                                <th>12:00 ～ 12:30</th>
+                                <td>－</td><td>－</td><td>－</td><td>－</td><td>－</td>
+                            </tr>
+
+                            <tr class="selected-row">
+                                <th>13:00 ～ 13:30</th>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td>－</td>
+                            </tr>
+
+                            <tr class="selected-row">
+                                <th>14:00 ～ 14:30</th>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td><label><input type="checkbox" checked> 登録</label></td>
+                                <td>－</td>
+                            </tr>
+
+                            <tr>
+                                <th>15:00 ～ 15:30</th>
+                                <td>－</td><td>－</td><td>－</td><td>－</td><td>－</td>
+                            </tr>
+
+                            <tr>
+                                <th>16:00 ～ 16:30</th>
+                                <td>－</td><td>－</td><td>－</td><td>－</td><td>－</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                
+            <!-- 登録・戻るボタン -->
+            <div class="register-area">
+                <a href="{{ url_for('care_reseva_top') }}" class="btn-back">
+                    戻る
+                </a>
+
+                <a href="{{ url_for('care_reseva_check') }}" class="btn-register">
+                    この内容で登録する
+                </a>
+            </div>          
+
+            </section>
+
+        </main>
+    </div>
+
+</body>
+</html>

@@ -109,14 +109,11 @@
                     <tbody>
                         <tr>
                             <th>カウンセラー</th>
-                            <td>○○  先生</td>
+                            <td>{{ session.display_name }} 先生</td>
                         </tr>
-
                         <tr>
-                            <th>対象期間</th>
-                            <td>
-                                2024年10月14日（月）～ 2024年10月18日（金）
-                            </td>
+                            <th>変更前の日時</th>
+                            <td>{{ before.full_date }} {{ before.time }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -132,7 +129,6 @@
 
                 <div class="table-wrapper">
                     <table class="schedule-table">
-
                         <thead>
                             <tr>
                                 <th>日付</th>
@@ -141,24 +137,10 @@
                         </thead>
 
                         <tbody>
+                            {% set shown = after or before %}
                             <tr>
-                                <td>10月14日（月）</td>
-                                <td>10:00 ～ 11:00</td>
-                            </tr>
-
-                            <tr>
-                                <td>10月15日（火）</td>
-                                <td>14:00 ～ 15:00</td>
-                            </tr>
-
-                            <tr>
-                                <td>10月17日（木）</td>
-                                <td>13:00 ～ 14:00</td>
-                            </tr>
-
-                            <tr>
-                                <td>10月18日（金）</td>
-                                <td>10:00 ～ 12:00</td>
+                                <td>{{ shown.short_date }}</td>
+                                <td>{{ shown.time }}</td>
                             </tr>
                         </tbody>
 

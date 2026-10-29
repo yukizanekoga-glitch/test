@@ -1,0 +1,487 @@
+
+/* ==============================
+   全体設定
+============================== */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0px;
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 12px;
+    color: #202b42;
+    background: #f3f6fb;
+}
+
+/* ==============================
+   アプリケーション全体
+============================== */
+.app-container {
+    width: 100%;
+    height: 580px;
+    min-height: 0;
+    margin-bottom: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 11px;
+    box-shadow: 0 1px 4px rgba(30, 50, 80, 0.06);
+    overflow: hidden;
+}
+
+/* ヘッダー */
+.top-header {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    border-bottom: 1px solid #e2e7ef;
+    background: #fff;
+}
+
+/* システム名 */
+.system-title {
+    font-size: 17px;
+    font-weight: bold;
+    color: #172033;
+    white-space: nowrap;
+}
+
+/* ユーザー情報 */
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    font-weight: normal;
+    color: #263248;
+    white-space: nowrap;
+}
+
+/* アイコン */
+.header-user i {
+    margin-right: 3px;
+    font-size: 14px;
+}
+
+/* 区切り線 */
+.header-divider {
+    width: 1px;
+    height: 18px;
+    background: #e1e6ee;
+}
+
+/* ログアウト */
+.logout-link {
+    color: #3473df;
+    text-decoration: none;
+    margin-left: 12px;
+}
+
+.logout-link:hover {
+    color: #2459bd;
+}
+
+/* ==============================
+   メインレイアウト
+============================== */
+.main-layout {
+    display: flex;
+    min-height: 0;
+}
+
+/* ==============================
+   サイドバー
+   確認画面と共通の設定
+============================== */
+.sidebar {
+    width: 163px;
+    min-width: 163px;
+    flex-shrink: 0;
+    padding-top: 8px;
+    background: #f8faff;
+    border-right: 1px solid #e4e9f1;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 46px;
+    padding: 15px 20px;
+    color: #59657b;
+    font-size: 12px;
+    text-decoration: none;
+    white-space: nowrap;
+    border-left: 3px solid transparent;
+    transition: background 0.2s;
+}
+
+.sidebar-item i {
+    width: 17px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 17px;
+}
+
+.sidebar-item:hover {
+    background: #edf4ff;
+}
+
+.sidebar-item.active {
+    color: #3473df;
+    background: #edf4ff;
+    font-weight: bold;
+    border-left-color: #3473df;
+}
+
+.sidebar-item.active::before {
+    content: none;
+}
+
+/* ==============================
+   メインコンテンツ
+============================== */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 16px 32px 36px;
+    background: #fff;
+}
+
+/* ==============================
+   パンくずリスト
+============================== */
+.breadcrumb-area {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    height: 20px;
+    margin-bottom: 20px;
+    color: #68748b;
+    font-size: 11px;
+}
+
+.breadcrumb-area i {
+    color: #9aa5b6;
+    font-size: 9px;
+}
+
+/* ==============================
+   ページ見出し
+============================== */
+.page-heading {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 17px;
+}
+
+.page-heading::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 0;
+    width: 4px;
+    height: 24px;
+    border-radius: 3px;
+    background: #3977ef;
+}
+
+.page-heading h1 {
+    margin: -1px 0 7px;
+    color: #182238;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 700;
+}
+
+.page-heading p {
+    margin: 0;
+    color: #4e5b72;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+/* ==============================
+   登録フォーム
+============================== */
+.registration-form {
+    position: relative;
+    min-height: 303px;
+    padding: 23px 23px 20px;
+    margin-left: 1px;
+    border: 1px solid #dfe4ec;
+    border-radius: 7px;
+    background: #fff;
+}
+
+/* フォーム各項目 */
+.form-row {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    align-items: start;
+}
+
+.date-row {
+    margin-bottom: 17px;
+}
+
+/* 項目ラベル */
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 30px;
+    margin: 0;
+    color: #1c263b;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* 必須ラベル */
+.required-label {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 29px;
+    height: 16px;
+    border-radius: 3px;
+    background: #c96b67;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+/* 日付入力欄 */
+.date-input {
+    display: block;
+    width: 225px;
+    max-width: 100%;
+    height: 31px;
+    padding: 0 9px;
+    border: 1px solid #cfd6e1;
+    border-radius: 5px;
+    outline: none;
+    background: #fff;
+    color: #28344c;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.date-input:focus {
+    border-color: #6191f0;
+    box-shadow: 0 0 0 2px rgba(57, 119, 239, 0.12);
+}
+
+/* ==============================
+   時間帯一覧
+============================== */
+.time-label {
+    align-items: flex-start;
+    padding-top: 1px;
+}
+
+.time-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.time-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 16px;
+    margin: 0;
+    color: #38445b;
+    font-size: 11px;
+    line-height: 16px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* チェックボックス */
+.time-option input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    flex-shrink: 0;
+    width: 13px;
+    height: 13px;
+    margin: 0;
+    border: 1px solid #8d99ad;
+    border-radius: 2px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.time-option input[type="checkbox"]:checked {
+    border-color: #3977ef;
+    background: #3977ef;
+}
+
+.time-option input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0;
+    width: 4px;
+    height: 7px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.time-option input[type="checkbox"]:focus-visible {
+    outline: 2px solid #a8c5ff;
+    outline-offset: 2px;
+}
+
+/* ==============================
+   フォーム下部ボタン
+============================== */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 37px;
+}
+
+.btn-cancel,
+.btn-confirm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+/* キャンセルボタン */
+.btn-cancel {
+    width: 171px;
+    border: 1px solid #c7cfdb;
+    background: #fff;
+    color: #465168;
+}
+
+.btn-cancel:hover {
+    background: #f6f8fb;
+    color: #26344c;
+}
+
+/* 確認ボタン */
+.btn-confirm {
+    width: 171px;
+    border: 1px solid #3972e6;
+    background: #3972e6;
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(57, 114, 230, 0.15);
+}
+
+.btn-confirm:hover {
+    background: #2e63d0;
+    border-color: #2e63d0;
+}
+
+/* ==============================
+   スマートフォン対応
+============================== */
+@media (max-width: 768px) {
+    .top-header {
+        height: auto;
+        min-height: 70px;
+        padding: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .system-title {
+        font-size: 15px;
+    }
+
+    .header-user {
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .main-layout {
+        min-height: calc(100vh - 70px);
+    }
+
+    .sidebar {
+        width: 60px;
+        min-width: 60px;
+    }
+
+    .sidebar-item {
+        justify-content: center;
+        gap: 0;
+        padding: 15px 5px;
+    }
+
+    .sidebar-item span {
+        display: none;
+    }
+
+    .sidebar-item i {
+        font-size: 17px;
+    }
+
+    .main-content {
+        padding: 18px 14px;
+    }
+
+    .page-heading h1 {
+        font-size: 15px;
+    }
+
+    .registration-form {
+        padding: 18px 12px;
+    }
+
+    .form-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .date-row {
+        margin-bottom: 18px;
+    }
+
+    .form-label {
+        gap: 12px;
+    }
+
+    .date-input {
+        width: 100%;
+    }
+
+    .time-list {
+        gap: 5px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        gap: 8px;
+        margin-top: 25px;
+    }
+
+    .btn-cancel,
+    .btn-confirm {
+        width: 100%;
+        flex: none;
+        height: 40px;
+    }
+}
