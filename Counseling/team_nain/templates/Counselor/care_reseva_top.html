@@ -42,6 +42,109 @@
             cursor: default;
             user-select: none;
         }
+
+        /* エラーメッセージ (削除ボタンと同じ赤系の色) */
+        .error-alert {
+            margin-bottom: 14px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #f5c2c2;
+            border-radius: 6px;
+            background: #ffeded;
+            color: #df3535;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* 削除確認ポップアップ */
+        .delete-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            background: rgba(20, 30, 50, 0.45);
+        }
+
+        .delete-modal[hidden] {
+            display: none;
+        }
+
+        .delete-dialog {
+            width: 100%;
+            max-width: 360px;
+            padding: 26px 24px 20px;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(20, 30, 50, 0.2);
+            text-align: center;
+        }
+
+        .delete-icon {
+            width: 46px;
+            height: 46px;
+            margin: 0 auto 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: #ffeded;
+            color: #df3535;
+            font-size: 20px;
+        }
+
+        .delete-message {
+            margin: 0 0 6px;
+            color: #29364b;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .delete-target {
+            margin: 0 0 20px;
+            color: #60738e;
+            font-size: 13px;
+        }
+
+        .delete-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .delete-buttons button {
+            flex: 1 1 0;
+            height: 38px;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-delete-yes {
+            border: 1px solid #df3535;
+            background: #df3535;
+            color: #ffffff;
+        }
+
+        .btn-delete-yes:hover {
+            border-color: #b91c1c;
+            background: #b91c1c;
+        }
+
+        .btn-delete-no {
+            border: 1px solid #c8ced9;
+            background: #ffffff;
+            color: #536077;
+        }
+
+        .btn-delete-no:hover {
+            background: #f3f5f8;
+        }
     </style>
 </head>
 
@@ -73,22 +176,22 @@
         <!-- 左側メニュー -->
         <aside class="sidebar">
 
-            <a href="{{ url_for('care_top') }}" class="active">
+            <a href="{{ url_for('care_top') }}" >
                 <i class="bi bi-house-door"></i>
                 <span>ホーム</span>
             </a>
 
-            <a href="{{ url_for('care_reseva') }}">
+            <a href="{{ url_for('care_reseva_top') }}" class="active">
                 <i class="bi bi-calendar3"></i>
                 <span>面談可能日時登録</span>
             </a>
             
-            <a href="{{ url_for('care_chadel') }}">
+            <a href="{{ url_for('care_schedule') }}">
                 <i class="bi bi-calendar-check"></i>
-                <span>面談日時変更</span>
+                <span>面談予約確認</span>
             </a>
 
-            <a href="{{ url_for('care_reseva') }}">
+            <a href="{{ url_for('care_history') }}">
                 <i class="bi bi-clock-history"></i>
                 <span>面談履歴</span>
             </a>
@@ -103,6 +206,16 @@
                 <h1>ホーム</h1>
                 <p>左のメニューから各機能を選択してください。</p>
             </div>
+
+            <!-- エラーメッセージ (削除しようとした枠に予約が入っていたときなど) -->
+            {% with messages = get_flashed_messages() %}
+                {% for message in messages %}
+                <div class="error-alert" role="alert">
+                    <i class="bi bi-exclamation-circle"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endwith %}
 
             <!-- 面談可能日時一覧カード -->
             <section class="schedule-card">
@@ -154,7 +267,9 @@
 
                                     <button type="button"
                                             class="btn-delete"
-                                            onclick="confirmDelete()">
+                                            data-slot-id="{{ slot.id }}"
+                                            data-slot-label="{{ slot.date.strftime('%Y/%m/%d') }}（{{ '月火水木金土日'[slot.date.weekday()] }}） {{ slot.start_time.strftime('%H:%M') }} ～ {{ slot.end_time.strftime('%H:%M') }}"
+                                            onclick="confirmDelete(this)">
                                         <i class="bi bi-trash"></i>
                                         削除
                                     </button>
@@ -194,11 +309,47 @@
 
     </div>
 
+    <!-- 削除確認ポップアップ -->
+    <div class="delete-modal" id="deleteModal" hidden>
+        <div class="delete-dialog" role="dialog" aria-modal="true" aria-labelledby="deleteMessage">
+            <div class="delete-icon">
+                <i class="bi bi-trash"></i>
+            </div>
+
+            <p class="delete-message" id="deleteMessage">この内容を削除しますか？</p>
+            <p class="delete-target" id="deleteTarget"></p>
+
+            <!-- 「はい」で選択した枠を削除し、更新された一覧を表示する -->
+            <form method="post" action="{{ url_for('care_chadel') }}" class="delete-buttons">
+                <input type="hidden" name="slot_id" id="deleteSlotId">
+                <input type="hidden" name="action" value="delete">
+                <button type="submit" class="btn-delete-yes">はい</button>
+                <button type="button" class="btn-delete-no" onclick="closeDeleteModal()">いいえ</button>
+            </form>
+        </div>
+    </div>
+
     <!-- 削除確認 -->
     <script>
-        function confirmDelete() {
-            alert("削除機能は、Flaskの削除処理と接続してください。");
+        const deleteModal = document.getElementById("deleteModal");
+
+        function confirmDelete(button) {
+            document.getElementById("deleteSlotId").value = button.dataset.slotId;
+            document.getElementById("deleteTarget").textContent = button.dataset.slotLabel;
+            deleteModal.hidden = false;
         }
+
+        function closeDeleteModal() {
+            deleteModal.hidden = true;
+        }
+
+        // 背景をクリック、または Esc キーで閉じる
+        deleteModal.addEventListener("click", function (event) {
+            if (event.target === deleteModal) closeDeleteModal();
+        });
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && !deleteModal.hidden) closeDeleteModal();
+        });
     </script>
 
     <!-- 一覧のページ切り替え (5件ずつ、ページ番号は10個ずつ表示) -->

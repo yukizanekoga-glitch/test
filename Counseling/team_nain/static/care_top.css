@@ -50,7 +50,15 @@ a {
 .site-title {
     margin: 0;
     font-size: 17px;
-    font-weight: 800;
+    font-weight: 700;
+    white-space: nowrap;
+    transform: translateY(1px);
+}
+
+.site-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 900;
     white-space: nowrap;
 }
 

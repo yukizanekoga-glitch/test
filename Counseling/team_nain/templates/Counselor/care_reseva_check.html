@@ -43,18 +43,17 @@
                 <span>ホーム</span>
             </a>
 
-            <a href="care_reseva" class="active">
+            <a href="{{ url_for('care_reseva') }}" class="active">
                 <i class="bi bi-calendar3"></i>
                 <span>面談可能日時登録</span>
             </a>
 
-            <a href="care_chadel">
+            <a href="{{ url_for('care_schedule')}}">
                 <i class="bi bi-calendar-check"></i>
-                <span>面談日時変更
-                </span>
+                <span>面談予約確認</span>
             </a>
 
-            <a href="{{ url_for('care_reseva') }}">
+            <a href="{{ url_for('care_history') }}">
                 <i class="bi bi-clock-history"></i>
                 <span>面談履歴</span>
             </a>

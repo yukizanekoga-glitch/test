@@ -23,3 +23,13 @@ staticfiles/
 *~
 .DS_Store
 my_dev.db
+# Virtual Environment (Windows/他OSで作り直すもの)
+.venv/
+
+# Database (各自のローカルDB)
+*.db
+
+# 個人用の作業ファイル
+/Counseling/team_nain copy/
+/docs/
+/比較用/

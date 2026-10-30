@@ -1,51 +1,239 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面談予約確認 | スクールカウンセラー相談予約システム</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/care_schedule.css') }}">
 
-  <!-- ページのタイトル -->
-  <title>予約確認 スクールカウンセラー</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 押せない矢印 (面談可能日時一覧と同じ見た目) */
+        .page-arrow.disabled {
+            opacity: 0.35;
+            cursor: default;
+            pointer-events: none;
+        }
+    </style>
 </head>
 
 <body>
 
-  <!-- ナビゲーションバー -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー 予約</span>
-    </div>
-  </nav>
+    <!-- ヘッダー -->
+    <header class="top-header">
+        <div class="site-title">
+            スクールカウンセラー相談予約システム
+        </div>
 
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
+        <div class="user-area">
+            <div class="user-name">
+                <i class="bi bi-person"></i>
+                <span>{{ session.display_name }} 先生（スクールカウンセラー）</span>
+            </div>
 
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
+            <div class="header-divider"></div>
 
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
+            <a href="{{ url_for('logout') }}" class="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>ログアウト</span>
+            </a>
+        </div>
+    </header>
 
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">予約確認</h2>
+    <!-- サイドバー -->
+    <aside class="sidebar">
+        <nav>
+            <a href="{{ url_for('care_top') }}" >
+                <i class="bi bi-house-door"></i>
+                <span>ホーム</span>
+            </a>
 
-        <!-- 予約日を表示 -->
-        <p class="text-center">
-          予約日：<span id="reservation-date"></span>
-        </p>
+            <a href="{{ url_for('care_reseva_top') }}">
+                <i class="bi bi-calendar3"></i>
+                <span>面談可能日時登録</span>
+            </a>
 
-        <a href="{{ url_for('care_top') }}" class="btn btn-secondary">戻る</a>
+            <a href="{{ url_for('care_schedule') }}" class="active">
+                <i class="bi bi-calendar-check"></i>
+                <span>面談予約確認</span>
+            </a>
 
-      </div>
-    </div>
-  </div>
-  
+            <a href="{{ url_for('care_history') }}">
+                <i class="bi bi-clock-history"></i>
+                <span>面談履歴</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+
+        <!-- ページタイトル -->
+        <section class="page-heading">
+            <h1>面談予約確認</h1>
+            <p>現在の予約状況を確認できます。</p>
+        </section>
+
+        <!-- 予約一覧 -->
+        <section class="reservation-card">
+
+            <div class="section-heading">
+                <h2>予約一覧</h2>
+            </div>
+
+            {% if reservations %}
+            <div class="table-wrapper">
+                <table class="reservation-table">
+                    <thead>
+                        <tr>
+                            <th>面談日</th>
+                            <th>時間帯</th>
+                            <th>生徒名</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for r in reservations %}
+                        <tr>
+                            <td>{{ r.slot.date.strftime('%Y/%m/%d') }}（{{ '月火水木金土日'[r.slot.date.weekday()] }}）</td>
+                            <td>{{ r.slot.start_time.strftime('%H:%M') }} ～ {{ r.slot.end_time.strftime('%H:%M') }}</td>
+                            <td>{{ r.student.display_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <!-- 予約なし表示 -->
+            <div class="empty-reservation">
+                <!-- カレンダーアイコン -->
+                <svg class="empty-icon"
+                     xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 64 64"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2.5"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     aria-hidden="true">
+                    <rect x="8" y="10" width="43" height="43" rx="4"/>
+                    <path d="M8 22h43"/>
+                    <path d="M19 5v11"/>
+                    <path d="M40 5v11"/>
+                    <path d="M19 31h3"/>
+                    <path d="M30 31h3"/>
+                    <path d="M19 41h3"/>
+                    <circle cx="47" cy="47" r="12" fill="#f9fcff"/>
+                    <path d="M42 42l10 10"/>
+                    <path d="M52 42L42 52"/>
+                </svg>
+
+                <p class="empty-message">
+                    今後の予約はありません。
+                </p>
+            </div>
+            {% endif %}
+
+            <!-- 下部操作 -->
+            <div class="table-footer">
+                <a href="{{ url_for('care_top') }}" class="btn-back">
+                    戻る
+                </a>
+
+                {% if reservations %}
+                <nav class="pagination" aria-label="ページ切り替え">
+                    <a href="#" class="page-arrow" id="prevPage" aria-label="前のページ">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <span id="pageNumbers" style="display: contents;"></span>
+                    <a href="#" class="page-arrow" id="nextPage" aria-label="次のページ">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </nav>
+                {% endif %}
+            </div>
+
+        </section>
+    </main>
+
+    <!-- 一覧のページ切り替え (5件ずつ、ページ番号は10個ずつ表示し、その先は「…」) -->
+    <script>
+        (function () {
+            const ROWS_PER_PAGE = 5;
+            const PAGES_PER_BLOCK = 10;
+
+            const rows = Array.from(document.querySelectorAll(".reservation-table tbody tr"));
+            const pageNumbers = document.getElementById("pageNumbers");
+            const prevButton = document.getElementById("prevPage");
+            const nextButton = document.getElementById("nextPage");
+            if (!pageNumbers) return; // 予約が無いときはページ切り替えを表示しない
+
+            const totalPages = Math.max(1, Math.ceil(rows.length / ROWS_PER_PAGE));
+            let currentPage = 1;
+
+            function setDisabled(el, disabled) {
+                el.classList.toggle("disabled", disabled);
+                el.setAttribute("aria-disabled", disabled ? "true" : "false");
+            }
+
+            function render() {
+                currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+
+                // 現在のページの行だけを表示する
+                const from = (currentPage - 1) * ROWS_PER_PAGE;
+                rows.forEach(function (row, index) {
+                    row.hidden = index < from || index >= from + ROWS_PER_PAGE;
+                });
+
+                // ページ番号は10個ずつ表示し、前後にまだあるときは「…」を出す
+                const block = Math.floor((currentPage - 1) / PAGES_PER_BLOCK);
+                const firstPage = block * PAGES_PER_BLOCK + 1;
+                const lastPage = Math.min(firstPage + PAGES_PER_BLOCK - 1, totalPages);
+
+                pageNumbers.replaceChildren();
+
+                function addButton(label, page, selected) {
+                    const link = document.createElement("a");
+                    link.href = "#";
+                    link.className = "page-number" + (selected ? " active" : "");
+                    link.textContent = label;
+                    link.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        currentPage = page;
+                        render();
+                    });
+                    pageNumbers.appendChild(link);
+                }
+
+                if (firstPage > 1) addButton("…", firstPage - 1, false);
+
+                for (let page = firstPage; page <= lastPage; page++) {
+                    addButton(page, page, page === currentPage);
+                }
+
+                if (lastPage < totalPages) addButton("…", lastPage + 1, false);
+
+                setDisabled(prevButton, currentPage <= 1);
+                setDisabled(nextButton, currentPage >= totalPages);
+            }
+
+            prevButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                if (currentPage > 1) { currentPage -= 1; render(); }
+            });
+            nextButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                if (currentPage < totalPages) { currentPage += 1; render(); }
+            });
+
+            render();
+        })();
+    </script>
+
 </body>
 </html>

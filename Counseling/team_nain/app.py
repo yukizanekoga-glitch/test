@@ -348,14 +348,26 @@ def care_top():
 @app.route("/care_schedule")
 @role_required(User.ROLE_COUNSELOR)
 def care_schedule():
-    reservations = (
+    # これからの予約 (終了時刻がまだ来ていないもの) を近い順に表示する
+    now = datetime.now()
+    reservations = [
+        r for r in _counselor_confirmed_reservations()
+        .filter(AvailableSlot.date >= now.date())
+        .order_by(AvailableSlot.date, AvailableSlot.start_time)
+        .all()
+        if datetime.combine(r.slot.date, r.slot.end_time) > now
+    ]
+    return render_template("Counselor/care_schedule.html", reservations=reservations)
+
+
+def _counselor_confirmed_reservations():
+    """ログイン中のカウンセラーの枠に入っている確定済み予約 (面談可能日時と結合したクエリ)"""
+    return (
         Reservation.query
         .join(AvailableSlot)
         .filter(AvailableSlot.counselor_id == session["user_id"])
-        .order_by(AvailableSlot.date, AvailableSlot.start_time)
-        .all()
+        .filter(Reservation.status == Reservation.STATUS_CONFIRMED)
     )
-    return render_template("Counselor/care_schedule.html", reservations=reservations)
 
 
 # =========================
@@ -385,7 +397,51 @@ def care_contents_check():
 @app.route("/care_history")
 @role_required(User.ROLE_COUNSELOR)
 def care_history():
-    return render_template("Counselor/care_history.html")
+    # 終了時刻を過ぎた予約 (実施済みの面談) を新しい順に表示する
+    now = datetime.now()
+    reservations = [
+        r for r in _counselor_confirmed_reservations()
+        .filter(AvailableSlot.date <= now.date())
+        .order_by(AvailableSlot.date.desc(), AvailableSlot.start_time.desc())
+        .all()
+        if datetime.combine(r.slot.date, r.slot.end_time) <= now
+    ]
+
+    # 検索条件 (期間・生徒名) で絞り込む。空欄の条件は使わない
+    search = {
+        "start": request.args.get("start", "").strip(),
+        "end": request.args.get("end", "").strip(),
+        "name": request.args.get("name", "").strip(),
+    }
+    search["active"] = any(search.values())
+
+    # 初めて開いたとき (検索していないとき) の期間は、その年度の4/1から今日まで
+    if not request.args:
+        today = date_cls.today()
+        year = today.year if today >= date_cls(today.year, 4, 1) else today.year - 1
+        search["start"] = date_cls(year, 4, 1).isoformat()
+        search["end"] = today.isoformat()
+
+    try:
+        start_date = date_cls.fromisoformat(search["start"]) if search["start"] else None
+        end_date = date_cls.fromisoformat(search["end"]) if search["end"] else None
+    except ValueError:
+        start_date = end_date = None
+
+    # 生徒名は「山田太郎」でも「山田 太郎」でも一致するよう、空白を除いて比べる
+    def _no_space(text):
+        return text.replace(" ", "").replace("　", "")
+
+    keyword = _no_space(search["name"])
+
+    reservations = [
+        r for r in reservations
+        if (start_date is None or r.slot.date >= start_date)
+        and (end_date is None or r.slot.date <= end_date)
+        and keyword in _no_space(r.student.display_name)
+    ]
+
+    return render_template("Counselor/care_history.html", reservations=reservations, search=search)
 
 
 # =========================
@@ -641,6 +697,11 @@ def care_chadel():
             flash("対象の面談可能日時が見つかりません。")
             return redirect(url_for("care_chadel"))
 
+        # 削除ポップアップを開いている間に生徒の予約が入った場合は、削除せずにメッセージを出す
+        if action == "delete" and slot.is_booked:
+            flash("既に予約が登録されています")
+            return redirect(url_for("care_reseva_top"))
+
         # 予約済み・当日の枠は一覧で「予約済み」と表示しているので、メッセージは出さずに戻す
         if _is_locked_slot(slot):
             return redirect(url_for("care_reseva_top"))
@@ -649,9 +710,11 @@ def care_chadel():
         if action == "select":
             return render_template("Counselor/care_chadel.html", edit_slot=slot)
 
+        # care_reseva_top の削除ポップアップで「はい」を押したとき: その場で削除して一覧に戻る
         if action == "delete":
-            session["pending_chadel"] = {"action": "delete", "slot_id": slot_id}
-            return redirect(url_for("care_chadel_check"))
+            db.session.delete(slot)
+            db.session.commit()
+            return redirect(url_for("care_reseva_top"))
 
         if action == "edit":
             values, error = _parse_slot_form(request.form)

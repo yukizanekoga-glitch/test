@@ -1,0 +1,621 @@
+
+/* ==============================
+   全体設定
+============================== */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    color: #17284c;
+    background: #fff;
+    font-size: 13px;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* =========================
+   ヘッダー
+========================= */
+.top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100%;
+    height: 51px;
+    padding: 0 21px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #fff;
+    border-bottom: 1px solid #e1e7ef;
+}
+
+.site-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.user-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #293a52;
+}
+
+.user-name .bi {
+    font-size: 18px;
+}
+
+.header-divider {
+    height: 21px;
+    margin: 0 5px;
+    border-left: 1px solid #d8dee7;
+}
+
+.logout-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #075bd4;
+    font-weight: 600;
+}
+
+.logout-link .bi {
+    font-size: 16px;
+}
+
+.logout-link:hover {
+    color: #003e9e;
+}
+
+/* =========================
+   左側サイドバー
+========================= */
+.sidebar {
+    position: fixed;
+    top: 35px;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+
+    width: 185px;
+    padding-top: 16px;
+
+    background: linear-gradient(135deg, #f8fbff, #f5f9fe);
+    border-right: 1px solid #e0e7f0;
+
+    overflow-y: auto;
+}
+
+.sidebar a {
+    min-height: 44px;
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    border-left: 3px solid transparent;
+    color: #172943;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    transition: background 0.2s;
+}
+
+.sidebar a .bi {
+    width: 22px;
+    flex-shrink: 0;
+    color: #3e4e63;
+    font-size: 19px;
+    text-align: center;
+}
+
+.sidebar a:hover {
+    background: #edf4ff;
+}
+
+.sidebar a.active {
+    color: #075bd4;
+    background: #dfecff;
+    border-left-color: #1876f2;
+}
+
+.sidebar a.active .bi {
+    color: #075bd4;
+}
+
+/* ==============================
+   全体レイアウト
+============================== */
+.layout {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 51px;
+}
+
+.main-content {
+    width: calc(100% - 185px);
+    min-width: 0;
+    min-height: calc(100vh - 51px);
+    margin-left: 185px;
+    padding: 20px 22px 10px;
+}
+
+/* ==============================
+   タイトル・説明
+============================== */
+.page-heading {
+    padding: 7px 0px 0px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 4px solid #0875f9;
+}
+
+.page-heading h1 {
+    margin: 0 0 5px;
+    color: #101d3d;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.page-heading p {
+    margin: 0;
+    color: #536887;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* ==============================
+   検索エリア
+============================== */
+.search-panel {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+
+    width: 100%;
+    min-height: 105px;
+    margin-bottom: 12px;
+    padding: 13px 17px;
+
+    background: #fff;
+    border: 1px solid #dce6f4;
+    border-radius: 7px;
+}
+
+.search-fields {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+    min-width: 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    color: #17284c;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.date-range {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.date-range input {
+    width: 170px;
+    height: 42px;
+    padding: 0 10px;
+
+    color: #233858;
+    font-family: inherit;
+    font-size: 12px;
+
+    background: #fff;
+    border: 1px solid #d4dfef;
+    border-radius: 7px;
+    outline: none;
+}
+
+.date-range input:focus,
+.name-input-wrap input:focus {
+    border-color: #1680ff;
+    box-shadow: 0 0 0 2px #e6f1ff;
+}
+
+.range-mark {
+    color: #263a5b;
+    font-size: 14px;
+}
+
+.student-group {
+    width: 240px;
+}
+
+.name-input-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.name-input-wrap input {
+    width: 100%;
+    height: 42px;
+    padding: 0 38px 0 12px;
+
+    color: #233858;
+    font-family: inherit;
+    font-size: 12px;
+
+    border: 1px solid #d4dfef;
+    border-radius: 7px;
+    outline: none;
+}
+
+.name-input-wrap input::placeholder {
+    color: #9aacc5;
+}
+
+.name-input-wrap .bi {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+
+    color: #405878;
+    font-size: 17px;
+    pointer-events: none;
+}
+
+.search-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    width: 135px;
+    min-width: 110px;
+    height: 42px;
+    flex-shrink: 0;
+
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+
+    background: #0875f9;
+    border: 1px solid #0875f9;
+    border-radius: 7px;
+    cursor: pointer;
+
+    transition: background 0.2s;
+}
+
+.search-button .bi {
+    font-size: 16px;
+}
+
+.search-button:hover {
+    background: #005bd3;
+}
+
+/* ==============================
+   面談履歴一覧
+============================== */
+.history-panel {
+    width: 100%;
+    overflow: hidden;
+
+    border: 1px solid #dce6f4;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.table-heading {
+    display: flex;
+    align-items: center;
+
+    min-height: 40px;
+    padding: 0 17px;
+
+    color: #17284c;
+    font-size: 16px;
+    font-weight: 800;
+
+    background: #eef5fd;
+}
+
+/* 表の横幅 */
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.history-table thead {
+    background: #f5f8fc;
+}
+
+.history-table th {
+    height: 39px;
+    padding: 7px 20px;
+
+    color: #536887;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: left;
+
+    border-bottom: 1px solid #dce6f4;
+}
+
+.history-table td {
+    height: 39px;
+    padding: 7px 20px;
+
+    color: #172b4d;
+    font-size: 12px;
+
+    border-bottom: 1px solid #e3eaf4;
+}
+
+.history-table th:nth-child(1),
+.history-table td:nth-child(1) {
+    width: 34%;
+}
+
+.history-table th:nth-child(2),
+.history-table td:nth-child(2) {
+    width: 36%;
+}
+
+.history-table th:nth-child(3),
+.history-table td:nth-child(3) {
+    width: 30%;
+}
+
+.history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.history-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+/* ==============================
+   ページネーション
+============================== */
+/* 戻るボタン */
+.btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    padding: 5px 10px;
+    margin-right: auto; /* 左側に配置する */
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    background: #fff;
+    color: #475569;
+    font-family: inherit;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-back:hover {
+    background: #f1f5f9;
+    border-color: #b8c4d4;
+    color: #263248;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+
+    min-height: 62px;
+    padding: 8px 13px;
+}
+
+.page-arrow,
+.page-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 35px;
+    height: 36px;
+
+    color: #203858;
+    font-family: inherit;
+    font-size: 12px;
+
+    background: transparent;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.page-arrow {
+    color: #6e83a3;
+    font-size: 15px;
+}
+
+.page-arrow:hover,
+.page-number:hover {
+    background: #edf4ff;
+}
+
+.page-number.current {
+    color: #fff;
+    background: #0875f9;
+    font-weight: 800;
+}
+
+.page-number.current:hover {
+    background: #005bd3;
+}
+
+/* ==============================
+   横幅が狭い画面
+============================== */
+@media (max-width: 1250px) {
+    .main-content {
+        padding-right: 14px;
+        padding-left: 14px;
+    }
+
+    .search-panel {
+        gap: 12px;
+        padding: 13px 12px;
+    }
+
+    .search-fields {
+        gap: 14px;
+    }
+
+    .date-range input {
+        width: 145px;
+    }
+
+    .student-group {
+        width: 200px;
+    }
+
+    .search-button {
+        width: 110px;
+    }
+}
+
+/* ==============================
+   高さが小さい画面
+============================== */
+@media (max-height: 800px) {
+    .main-content {
+        padding-top: 15px;
+        padding-bottom: 8px;
+    }
+
+    .page-heading {
+        margin-bottom: 10px;
+    }
+
+    .page-heading h1 {
+        margin-bottom: 4px;
+        font-size: 21px;
+    }
+
+    .search-panel {
+        min-height: 90px;
+        margin-bottom: 10px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .date-range input,
+    .name-input-wrap input,
+    .search-button {
+        height: 38px;
+    }
+
+    .table-heading {
+        min-height: 36px;
+    }
+
+    .history-table th,
+    .history-table td {
+        height: 35px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .pagination {
+        min-height: 50px;
+    }
+}
+
+
+/* ==============================
+   履歴がない場合
+============================== */
+.empty-history {
+    min-height: 300px;
+    padding: 45px 20px;
+    border-top: 1px solid #dce6f4;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    background: #f9fcff;
+}
+
+.empty-history .empty-icon {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 16px;
+
+    color: #46658e;
+}
+
+.empty-history .empty-message {
+    margin: 0;
+
+    color: #17284c;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+@media (max-width: 767px) {
+    .empty-history {
+        min-height: 240px;
+        padding: 32px 15px;
+    }
+
+    .empty-history .empty-message {
+        font-size: 15px;
+    }
+}
