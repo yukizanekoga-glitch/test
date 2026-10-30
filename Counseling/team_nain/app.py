@@ -158,7 +158,7 @@ def reserva():
 
     today = date_cls.today()
     monday = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
-    week_dates = [monday + timedelta(days=i) for i in range(5)]  # 月～金
+    week_dates = [monday + timedelta(days=i) for i in range(7)]  # 月～日
 
     # まだ予約が入っていない、今週表示分の面談可能日時
     query = (
