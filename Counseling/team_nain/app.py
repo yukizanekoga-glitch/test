@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import date as date_cls, datetime, time as time_cls, timedelta
 from functools import wraps
 
@@ -9,7 +10,7 @@ import subprocess
 from threading import Timer
 ########################
 
-from models import db, User, AvailableSlot, Reservation
+from models import db, User, Class, AvailableSlot, Reservation
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -1066,10 +1067,90 @@ def manage_caredel_complete():
 
 
 
-@app.route("/teacher_student_top")
+@app.route("/teacher_student_top", methods=["GET", "POST"])
 @role_required(User.ROLE_TEACHER)
 def teacher_student_top():
-    return render_template("Teacher/teacher_student_top.html")
+    # クラスは画面からは受け取らず、ログイン時にsessionへ保存した情報で判別する
+    school_class = None
+    class_name = session.get("class_name")
+    if class_name:
+        school_class = Class.query.filter_by(name=class_name).first()
+    if school_class is None:
+        # sessionにクラスがない場合は、担任として登録されているクラスを使う
+        school_class = Class.query.filter_by(
+            homeroom_teacher_id=session["user_id"]
+        ).first()
+
+    # パスワード変更ポップアップの「変更する」: 担当クラスの生徒のパスワードを変更する
+    if request.method == "POST":
+        student_id = request.form.get("student_id", type=int)
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        student = None
+        if school_class is not None and student_id is not None:
+            student = User.query.filter_by(
+                id=student_id, role=User.ROLE_STUDENT, class_id=school_class.id
+            ).first()
+
+        if student is None:
+            flash("対象の生徒が見つかりません。", "error")
+        elif len(new_password) < 8:
+            flash("パスワードは八文字以上にしてください。", "error")
+        elif not re.fullmatch(r"[A-Za-z0-9]+", new_password):
+            flash("パスワードは半角英数字で入力してください。", "error")
+        elif new_password != confirm_password:
+            flash("パスワードが間違っています。", "error")
+        else:
+            student.set_password(new_password)
+            db.session.commit()
+            flash(f"{student.display_name}さんのパスワードを変更しました。", "success")
+
+        return redirect(url_for("teacher_student_top"))
+
+    rows = []
+    if school_class is not None:
+        students = (
+            User.query
+            .filter_by(role=User.ROLE_STUDENT, class_id=school_class.id)
+            .order_by(User.username)
+            .all()
+        )
+
+        # 生徒ごとの、これからの面談予約のうち一番早いもの
+        next_slot = {}
+        if students:
+            reservations = (
+                Reservation.query
+                .join(AvailableSlot, Reservation.slot_id == AvailableSlot.id)
+                .filter(
+                    Reservation.student_id.in_([s.id for s in students]),
+                    Reservation.status == Reservation.STATUS_CONFIRMED,
+                    AvailableSlot.date >= date_cls.today(),
+                )
+                .order_by(AvailableSlot.date, AvailableSlot.start_time)
+                .all()
+            )
+            for r in reservations:
+                next_slot.setdefault(r.student_id, r.slot)
+
+        for no, s in enumerate(students, start=1):
+            slot = next_slot.get(s.id)
+            if slot:
+                schedule = "{}（{}） {}".format(
+                    slot.date.strftime("%Y/%m/%d"),
+                    "月火水木金土日"[slot.date.weekday()],
+                    slot.start_time.strftime("%H:%M"),
+                )
+            else:
+                schedule = "未定"
+            rows.append({"no": no, "id": s.id, "name": s.display_name, "schedule": schedule})
+
+    return render_template(
+        "Teacher/teacher_student_top.html",
+        class_name=school_class.name if school_class else "",
+        rows=rows,
+    )
 
 @app.route("/teacher_caretime")
 @role_required(User.ROLE_TEACHER)
