@@ -1,0 +1,144 @@
+body {
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    color: #101d3d;
+    background: #f5f7fb;
+}
+
+/* ==============================
+   ヘッダー・サイドバー
+============================== */
+.navbar {
+    background: #ffffff;
+    border-bottom: 1px solid #d9e3ee;
+    box-shadow: 0 1px 2px rgba(16, 29, 61, 0.05);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: #101d3d;
+}
+
+.sidebar {
+    min-height: calc(100vh - 56px);
+    padding-top: 20px;
+    background: #ffffff;
+    border-right: 1px solid #d9e3ee;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 18px;
+    margin-bottom: 4px;
+
+    border-left: 4px solid transparent;
+    color: #586580;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.sidebar a:hover {
+    background: #edf3ff;
+    color: #1769e8;
+}
+
+.sidebar a.active {
+    border-left-color: #1769e8;
+    background: #eaf2ff;
+    color: #1769e8;
+    font-weight: 600;
+}
+
+/* ==============================
+   タイトル
+============================== */
+.page-banner {
+    margin-bottom: 20px;
+}
+
+.page-banner h1 {
+    margin: 0 0 6px;
+    font-size: 26px;
+    font-weight: 800;
+}
+
+.page-banner p {
+    color: #586580;
+    font-size: 14px;
+}
+
+.flash-message {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+
+    border: 1px solid #f3c6c6;
+    border-radius: 8px;
+    background: #fdecec;
+    color: #b42318;
+    font-size: 13px;
+}
+
+/* ==============================
+   内容ボックス
+============================== */
+.content-box {
+    padding: 20px;
+    margin-bottom: 20px;
+
+    border: 1px solid #d9e3ee;
+    border-radius: 10px;
+
+    background: #ffffff;
+}
+
+.section-heading {
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.detail-table th,
+.detail-table td {
+    font-size: 14px;
+}
+
+.detail-table th {
+    width: 1%;
+    white-space: nowrap;
+    color: #586580;
+    font-weight: 600;
+}
+
+/* ==============================
+   ボタン
+============================== */
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn-back {
+    min-width: 140px;
+    border: 1px solid #c4cedc;
+    color: #42608d;
+    background: #ffffff;
+}
+
+.btn-back:hover {
+    background: #eef1f6;
+    color: #42608d;
+}
+
+.btn-confirm {
+    min-width: 200px;
+    background: #1769e8;
+    border-color: #1769e8;
+}
+
+.btn-confirm:hover {
+    background: #1456c2;
+    border-color: #1456c2;
+}

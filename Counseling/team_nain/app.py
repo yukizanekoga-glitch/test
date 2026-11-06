@@ -10,7 +10,7 @@ import subprocess
 from threading import Timer
 ########################
 
-from models import db, User, Class, AvailableSlot, Reservation
+from models import db, User, Class, AvailableSlot, Reservation, SurveyResponse
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -287,30 +287,184 @@ def reserva_done():
 # 予約一覧画面
 # =========================
 
+def _get_student_reservation():
+    """ログイン中の生徒の今後の予約（常に1件のみ）を返す。なければ None。"""
+    return (
+        Reservation.query
+        .join(AvailableSlot)
+        .filter(Reservation.student_id == session["user_id"])
+        .filter(AvailableSlot.date >= date_cls.today())
+        .order_by(AvailableSlot.date, AvailableSlot.start_time)
+        .first()
+    )
+
+
+def _is_locked_reservation(reservation):
+    """面談日の前日を過ぎると変更・削除できない。"""
+    return reservation.slot.date <= date_cls.today()
+
+
 @app.route("/schedule")
 @role_required(User.ROLE_STUDENT)
 def schedule():
-    return render_template("Student/schedule.html")
+    reservation = _get_student_reservation()
+    return render_template(
+        "Student/schedule.html",
+        reservation=reservation,
+        is_locked=_is_locked_reservation(reservation) if reservation else False,
+    )
 
 
 # =========================
-# 予約取消画面
+# 予約削除
 # =========================
 
-@app.route("/reserva_delete")
+@app.route("/reserva_delete", methods=["POST"])
 @role_required(User.ROLE_STUDENT)
 def reserva_delete():
-    return render_template("Student/reserva_delete.html")
+    reservation_id = request.form.get("reservation_id", type=int)
+    reservation = _get_student_reservation()
+
+    if reservation is None or reservation.id != reservation_id:
+        flash("対象の予約が見つかりません。")
+    elif _is_locked_reservation(reservation):
+        flash("変更・削除の期限を過ぎているため削除できません。")
+    else:
+        db.session.delete(reservation)
+        db.session.commit()
+        flash("予約を削除しました。")
+
+    return redirect(url_for("schedule"))
 
 
 # =========================
-# 予約取消完了画面
+# 面談予約の変更画面
 # =========================
 
-@app.route("/reserva_delete_complete")
+@app.route("/reserva_change", methods=["GET", "POST"])
 @role_required(User.ROLE_STUDENT)
-def reserva_delete_complete():
-    return render_template("Student/reserva_delete_complete.html")
+def reserva_change():
+    reservation = _get_student_reservation()
+    if reservation is None:
+        flash("変更する予約が見つかりません。")
+        return redirect(url_for("schedule"))
+    if _is_locked_reservation(reservation):
+        flash("変更・削除の期限を過ぎているため変更できません。")
+        return redirect(url_for("schedule"))
+
+    counselors = (
+        User.query
+        .filter_by(role=User.ROLE_COUNSELOR)
+        .order_by(User.display_name)
+        .all()
+    )
+
+    raw_counselor_id = request.args.get("counselor_id", "").strip()
+    selected_counselor_id = None
+    if raw_counselor_id:
+        try:
+            selected_counselor_id = int(raw_counselor_id)
+        except ValueError:
+            selected_counselor_id = None
+        if not any(c.id == selected_counselor_id for c in counselors):
+            selected_counselor_id = None
+
+    if request.method == "POST":
+        raw_slot_id = request.form.get("slot_id", "").strip()
+        try:
+            slot_id = int(raw_slot_id)
+        except ValueError:
+            flash("変更後の面談日時を選択してください。")
+            return redirect(url_for("reserva_change"))
+
+        slot = db.session.get(AvailableSlot, slot_id)
+        if slot is None or slot.is_booked or slot.date < date_cls.today():
+            flash("選択した日時はすでに予約できません。もう一度お選びください。")
+            return redirect(url_for("reserva_change"))
+
+        session["pending_change_slot_id"] = slot_id
+        return redirect(url_for("reserva_change_check"))
+
+    available_slots = (
+        AvailableSlot.query
+        .outerjoin(Reservation, Reservation.slot_id == AvailableSlot.id)
+        .filter(Reservation.id.is_(None))
+        .filter(AvailableSlot.date >= date_cls.today())
+    )
+    if selected_counselor_id is not None:
+        available_slots = available_slots.filter(AvailableSlot.counselor_id == selected_counselor_id)
+    available_slots = available_slots.order_by(AvailableSlot.date, AvailableSlot.start_time).all()
+
+    return render_template(
+        "Student/reserva_change.html",
+        current_reservation=reservation,
+        counselors=counselors,
+        selected_counselor_id=selected_counselor_id,
+        available_slots=available_slots,
+    )
+
+
+# =========================
+# 面談予約の変更確認画面
+# =========================
+
+@app.route("/reserva_change_check", methods=["GET", "POST"])
+@role_required(User.ROLE_STUDENT)
+def reserva_change_check():
+    slot_id = session.get("pending_change_slot_id")
+    slot = db.session.get(AvailableSlot, slot_id) if slot_id else None
+    if slot is None or slot.is_booked or slot.date < date_cls.today():
+        flash("選択した日時が見つかりません。もう一度お選びください。")
+        session.pop("pending_change_slot_id", None)
+        return redirect(url_for("reserva_change"))
+
+    if request.method == "POST":
+        reservation = _get_student_reservation()
+        if reservation is None or _is_locked_reservation(reservation):
+            session.pop("pending_change_slot_id", None)
+            flash("変更・削除の期限を過ぎているため変更できません。")
+            return redirect(url_for("schedule"))
+
+        db.session.delete(reservation)
+        db.session.add(Reservation(slot_id=slot.id, student_id=session["user_id"]))
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash("その日時はすでに他の人が予約しています。別の日時をお選びください。")
+            session.pop("pending_change_slot_id", None)
+            return redirect(url_for("reserva_change"))
+
+        session.pop("pending_change_slot_id", None)
+        session["change_result"] = {
+            "counselor_name": f"{slot.counselor.display_name} 先生",
+            "interview_datetime": _format_slot_datetime(slot),
+        }
+        return redirect(url_for("reserva_change_complete"))
+
+    return render_template(
+        "Student/reserva_change_check.html",
+        counselor_name=f"{slot.counselor.display_name} 先生",
+        interview_datetime=_format_slot_datetime(slot),
+    )
+
+
+# =========================
+# 面談予約の変更完了画面
+# =========================
+
+@app.route("/reserva_change_complete")
+@role_required(User.ROLE_STUDENT)
+def reserva_change_complete():
+    result = session.get("change_result")
+    if not result:
+        return redirect(url_for("schedule"))
+
+    return render_template(
+        "Student/reserva_change_complete.html",
+        counselor_name=result["counselor_name"],
+        interview_datetime=result["interview_datetime"],
+    )
 
 
 # =========================
@@ -330,6 +484,35 @@ def history():
         .all()
     )
     return render_template("Student/history.html", reservations=reservations)
+
+
+# =========================
+# 今週のアンケート
+# =========================
+
+SURVEY_QUESTION_KEYS = [f"q{i}" for i in range(1, 11)]
+
+
+@app.route("/student_survey", methods=["GET", "POST"])
+@role_required(User.ROLE_STUDENT)
+def student_survey():
+    if request.method == "POST":
+        answers = {key: request.form.get(key, "").strip() for key in SURVEY_QUESTION_KEYS}
+        if not all(answers.values()):
+            flash("すべての質問に回答してください。")
+            return render_template("Student/student_survey.html")
+
+        db.session.add(SurveyResponse(student_id=session["user_id"], **answers))
+        db.session.commit()
+        return redirect(url_for("student_survey_complete"))
+
+    return render_template("Student/student_survey.html")
+
+
+@app.route("/student_survey_complete")
+@role_required(User.ROLE_STUDENT)
+def student_survey_complete():
+    return render_template("Student/student_survey_complete.html")
 
 
 # =========================

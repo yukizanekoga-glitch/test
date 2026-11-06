@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アンケート回答完了</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/Student_survey_complete.css') }}">
+</head>
+<body>
+
+    <!-- ==============================
+         ヘッダー
+    ============================== -->
+    <header class="top-header">
+        <div class="site-title">スクールカウンセラー相談予約システム</div>
+
+        <div class="user-area">
+            <span class="user-name">
+                <i class="bi bi-person"></i>
+                {{ session.class_name }} {{ session.display_name }}さん
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('login') }}" class="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <!-- ==============================
+         サイドバー
+    ============================== -->
+    <aside class="sidebar">
+        <a href="{{ url_for('top') }}" class="active">
+            <i class="bi bi-house-door"></i>
+            <span>ホーム</span>
+        </a>
+
+        <a href="{{ url_for('reserva') }}">
+            <i class="bi bi-calendar3"></i>
+            <span>面談予約</span>
+        </a>
+
+        <a href="{{ url_for('schedule') }}" >
+            <i class="bi bi-file-earmark-text"></i>
+            <span>予約確認</span>
+        </a>
+
+        <a href="{{ url_for('history') }}">
+            <i class="bi bi-clock-history"></i>
+            <span>面談履歴</span>
+        </a>
+    </aside>
+
+    <!-- ==============================
+         メインコンテンツ
+    ============================== -->
+    <main class="main-content">
+
+        <section class="complete-panel">
+
+            <!-- ページタイトル -->
+            <div class="panel-heading">
+                <h1>アンケート回答完了</h1>
+            </div>
+
+            <!-- 完了メッセージ -->
+            <div class="complete-content">
+
+                <!-- 緑色の完了アイコン -->
+                <div class="success-icon">
+                    <span class="success-ray ray-1"></span>
+                    <span class="success-ray ray-2"></span>
+                    <span class="success-ray ray-3"></span>
+                    <span class="success-ray ray-4"></span>
+                    <span class="success-ray ray-5"></span>
+                    <span class="success-ray ray-6"></span>
+
+                    <div class="success-circle">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                </div>
+
+                <h2>アンケートの回答が完了しました。</h2>
+
+                <p class="thanks-message">
+                    ご協力ありがとうございました。
+                </p>
+
+                <!-- 説明メッセージ -->
+                <div class="information-box">
+                    <i class="bi bi-info-circle info-icon"></i>
+
+                    <p>
+                        このアンケートは、スクールカウンセラーが<br>
+                        よりよい支援を行うために使用します。<br>
+                        引き続き、学校生活を送る中で気になることがあれば、<br>
+                        いつでも面談の予約をしてください。
+                    </p>
+                </div>
+
+                <!-- トップ画面に戻る -->
+                <a href="{{ url_for('top') }}" class="btn-home">
+                    <i class="bi bi-house-door"></i>
+                    <span>トップ画面に戻る</span>
+                </a>
+
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>

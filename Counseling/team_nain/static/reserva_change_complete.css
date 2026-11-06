@@ -1,0 +1,123 @@
+body {
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    color: #101d3d;
+    background: #f5f7fb;
+}
+
+/* ==============================
+   ヘッダー・サイドバー
+============================== */
+.navbar {
+    background: #ffffff;
+    border-bottom: 1px solid #d9e3ee;
+    box-shadow: 0 1px 2px rgba(16, 29, 61, 0.05);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: #101d3d;
+}
+
+.sidebar {
+    min-height: calc(100vh - 56px);
+    padding-top: 20px;
+    background: #ffffff;
+    border-right: 1px solid #d9e3ee;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 18px;
+    margin-bottom: 4px;
+
+    border-left: 4px solid transparent;
+    color: #586580;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.sidebar a:hover {
+    background: #edf3ff;
+    color: #1769e8;
+}
+
+.sidebar a.active {
+    border-left-color: #1769e8;
+    background: #eaf2ff;
+    color: #1769e8;
+    font-weight: 600;
+}
+
+/* ==============================
+   完了ボックス
+============================== */
+.complete-box {
+    max-width: 480px;
+    margin: 40px auto 0;
+    padding: 40px 36px;
+
+    border: 1px solid #d9e3ee;
+    border-radius: 14px;
+    background: #ffffff;
+
+    text-align: center;
+}
+
+.complete-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 16px;
+
+    border-radius: 50%;
+    background: #22c55e;
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.complete-box h1 {
+    margin: 0 0 8px;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.complete-message {
+    margin: 0 0 20px;
+    color: #586580;
+    font-size: 14px;
+}
+
+.detail-box {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.detail-table th,
+.detail-table td {
+    font-size: 14px;
+}
+
+.detail-table th {
+    width: 1%;
+    white-space: nowrap;
+    color: #586580;
+    font-weight: 600;
+}
+
+.btn-return {
+    min-width: 200px;
+    background: #1769e8;
+    border-color: #1769e8;
+}
+
+.btn-return:hover {
+    background: #1456c2;
+    border-color: #1456c2;
+}

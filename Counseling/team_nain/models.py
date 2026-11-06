@@ -94,3 +94,27 @@ class Reservation(db.Model):
 
     def __repr__(self):
         return f"<Reservation slot={self.slot_id} student={self.student_id}>"
+
+
+class SurveyResponse(db.Model):
+    """生徒による「今週のアンケート」の回答。"""
+    __tablename__ = 'survey_responses'
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    q1 = db.Column(db.String(50), nullable=False)
+    q2 = db.Column(db.String(50), nullable=False)
+    q3 = db.Column(db.String(50), nullable=False)
+    q4 = db.Column(db.String(50), nullable=False)
+    q5 = db.Column(db.String(50), nullable=False)
+    q6 = db.Column(db.String(50), nullable=False)
+    q7 = db.Column(db.String(50), nullable=False)
+    q8 = db.Column(db.String(50), nullable=False)
+    q9 = db.Column(db.String(50), nullable=False)
+    q10 = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    student = db.relationship('User', foreign_keys=[student_id])
+
+    def __repr__(self):
+        return f"<SurveyResponse student={self.student_id}>"

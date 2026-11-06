@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アンケート回答</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/Student_survey.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+    <!-- 上部ヘッダー -->
+    <header class="top-header">
+        <div class="site-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="user-area">
+            <span class="user-name">
+                <i class="bi bi-person"></i>
+                {{ session.class_name }} {{ session.display_name }}さん
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('login') }}" class="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- 左側メニュー -->
+        <aside class="sidebar">
+
+            <a href="{{ url_for('top') }}" class="active">
+                <i class="bi bi-house-door"></i>
+                <span>ホーム</span>
+            </a>
+
+            <a href="{{ url_for('reserva') }}">
+                <i class="bi bi-calendar3"></i>
+                <span>面談予約</span>
+            </a>
+
+            <a href="{{ url_for('schedule') }}">
+                <i class="bi bi-calendar-check"></i>
+                <span>予約確認</span>
+            </a>
+
+            <a href="{{ url_for('history') }}">
+                <i class="bi bi-clock-history"></i>
+                <span>面談履歴</span>
+            </a>
+
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- 説明エリア -->
+            <section class="intro-panel">
+                <h1>アンケート回答</h1>
+                <p>
+                    現在の学校生活や心の状態について、以下の質問に回答してください。
+                </p>
+                <p>
+                    このアンケートは、スクールカウンセラーがよりよい支援を行うために使用します。
+                </p>
+            </section>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- アンケート -->
+            <form class="survey-form"
+                  action="{{ url_for('student_survey') }}"
+                  method="post">
+
+                <div class="survey-table">
+
+                    <!-- Q1 -->
+                    <div class="question-row">
+                        <div class="question-number">Q1</div>
+                        <div class="question-text">
+                            <span>現在の気分はどうですか？</span>
+                            <span class="required">必須</span>
+                        </div>
+                        <div class="answer-options">
+                            <label><input type="radio" name="q1" value="とても良い" required><span>とても良い</span></label>
+                            <label><input type="radio" name="q1" value="良い"><span>良い</span></label>
+                            <label><input type="radio" name="q1" value="普通"><span>普通</span></label>
+                            <label><input type="radio" name="q1" value="あまり良くない"><span>あまり良くない</span></label>
+                            <label><input type="radio" name="q1" value="良くない"><span>良くない</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="question-row">
+                        <div class="question-number">Q2</div>
+                        <div class="question-text">
+                            <span>学校生活は充実していますか？</span>
+                            <span class="required">必須</span>
+                        </div>
+                        <div class="answer-options">
+                            <label><input type="radio" name="q2" value="とても充実している" required><span>とても充実している</span></label>
+                            <label><input type="radio" name="q2" value="充実している"><span>充実している</span></label>
+                            <label><input type="radio" name="q2" value="どちらともいえない"><span>どちらともいえない</span></label>
+                            <label><input type="radio" name="q2" value="あまり充実していない"><span>あまり充実していない</span></label>
+                            <label><input type="radio" name="q2" value="充実していない"><span>充実していない</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="question-row">
+                        <div class="question-number">Q3</div>
+                        <div class="question-text">
+                            <span>勉強について、どのように感じていますか？</span>
+                            <span class="required">必須</span>
+                        </div>
+                        <div class="answer-options">
+                            <label><input type="radio" name="q3" value="とても順調" required><span>とても順調</span></label>
+                            <label><input type="radio" name="q3" value="順調"><span>順調</span></label>
+                            <label><input type="radio" name="q3" value="どちらともいえない"><span>どちらともいえない</span></label>
+                            <label><input type="radio" name="q3" value="やや不安"><span>やや不安</span></label>
+                            <label><input type="radio" name="q3" value="とても不安"><span>とても不安</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="question-row">
+                        <div class="question-number">Q4</div>
+                        <div class="question-text">
+                            <span>友人関係について、どのように感じていますか？</span>
+                            <span class="required">必須</span>
+                        </div>
+                        <div class="answer-options">
+                            <label><input type="radio" name="q4" value="とても良い" required><span>とても良い</span></label>
+                            <label><input type="radio" name="q4" value="良い"><span>良い</span></label>
+                            <label><input type="radio" name="q4" value="どちらともいえない"><span>どちらともいえない</span></label>
+                            <label><input type="radio" name="q4" value="あまり良くない"><span>あまり良くない</span></label>
+                            <label><input type="radio" name="q4" value="良くない"><span>良くない</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="question-row">
+                        <div class="question-number">Q5</div>
+                        <div class="question-text">
+                            <span>先生との関係について、どのように感じていますか？</span>
+                            <span class="required">必須</span>
+                        </div>
+                        <div class="answer-options">
+                            <label><input type="radio" name="q5" value="とても良い" required><span>とても良い</span></label>
+                            <label><input type="radio" name="q5" value="良い"><span>良い</span></label>
+                            <label><input type="radio" name="q5" value="どちらともいえない"><span>どちらともいえない</span></label>
+                            <label><input type="radio" name="q5" value="あまり良くない"><span>あまり良くない</span></label>
+                            <label><input type="radio" name="q5" value="良くない"><span>良くない</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Q6 -->
+                    <div class="question-row">
+                        <div class="question-number">Q6</div>
+                        <div class="question-text">
+                            <span>家族との関係について、どのように感じていますか？</span>
+                            <span class="required">必須</span>
+                        </div>
+                        <div class="answer-options">
+                            <label><input type="radio" name="q6" value="とても良い" required><span>とても良い</span></label>
+                            <label><input type="radio" name="q6" value="良い"><span>良い</span></label>
+                            <label><input type="radio" name="q6" value="どちらともいえない"><span>どちらともいえない</span></label>
+                            <label><input type="radio" name="q6" value="あまり良くない"><span>あまり良くない</span></label>
+                            <label><input type="radio" name="q6" value="良くない"><span>良くない</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Q7 -->
+                    <div class="question-row">
+                        <div class="question-number">Q7</div>
+                        <div class="question-text">
+                            <span>学校に行くことについて、どのように感じていますか？</span>
+                            <span class="required">必須</span>
+                        </div>
+                        <div class="answer-options">
+                            <label><input type="radio" name="q7" value="とても楽しい" required><span>とても楽しい</span></label>
+                            <label><input type="radio" name="q7" value="楽しい"><span>楽しい</span></label>
+                            <label><input type="radio" name="q7" value="どちらともいえない"><span>どちらともいえない</span></label>
+                            <label><input type="radio" name="q7" value="ややつらい"><span>ややつらい</span></label>
+                            <label><input type="radio" name="q7" value="とてもつらい"><span>とてもつらい</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Q8 -->
+                    <div class="question-row">
+                        <div class="question-number">Q8</div>
+                        <div class="question-text">
+                            <span>最近、次のようなことはありますか？</span>
+                            <span class="required">必須</span>
+                        </div>
+                        <div class="answer-options q8-options">
+                            <label><input type="radio" name="q8" value="よくある" required><span>よくある</span></label>
+                            <label><input type="radio" name="q8" value="ときどきある"><span>ときどきある</span></label>
+                            <label><input type="radio" name="q8" value="ほとんどない"><span>ほとんどない</span></label>
+                            <label><input type="radio" name="q8" value="まったくない"><span>まったくない</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Q9 -->
+                    <div class="question-row">
+                        <div class="question-number">Q9</div>
+                        <div class="question-text">
+                            <span>自分自身について、どのように感じていますか？</span>
+                            <span class="required">必須</span>
+                        </div>
+                        <div class="answer-options">
+                            <label><input type="radio" name="q9" value="とても好き" required><span>とても好き</span></label>
+                            <label><input type="radio" name="q9" value="好き"><span>好き</span></label>
+                            <label><input type="radio" name="q9" value="どちらともいえない"><span>どちらともいえない</span></label>
+                            <label><input type="radio" name="q9" value="あまり好きではない"><span>あまり好きではない</span></label>
+                            <label><input type="radio" name="q9" value="好きではない"><span>好きではない</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Q10 -->
+                    <div class="question-row question-row-last">
+                        <div class="question-number">Q10</div>
+                        <div class="question-text">
+                            <span>今後、スクールカウンセラーに相談したいことはありますか？</span>
+                            <span class="required">必須</span>
+                        </div>
+                        <div class="answer-options q10-options">
+                            <label><input type="radio" name="q10" value="ある" required><span>ある</span></label>
+                            <label><input type="radio" name="q10" value="今はない"><span>今はない</span></label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ボタン -->
+                <div class="button-area">
+                    <button type="button"
+                            class="btn-back"
+                            onclick="history.back()">
+                        戻る
+                    </button>
+
+                    <button type="submit" class="btn-confirm">
+                        送信
+                    </button>
+                </div>
+
+            </form>
+        </main>
+    </div>
+
+</body>
+</html>

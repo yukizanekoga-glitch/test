@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>面談予約の変更</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='reserva_change.css') }}">
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <nav class="navbar navbar-expand">
+        <div class="container-fluid">
+            <span class="navbar-brand">スクールカウンセラー相談予約システム</span>
+
+            <span class="ms-auto me-3">♙ {{ session.class_name }} {{ session.display_name }}さん</span>
+
+            <a href="{{ url_for('logout') }}"
+               class="btn btn-outline-primary btn-sm">
+                ログアウト
+            </a>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- サイドバー -->
+            <aside class="col-md-2 sidebar">
+                <a href="{{ url_for('top') }}">⌂ ホーム</a>
+                <a href="{{ url_for('reserva') }}">▦ 面談予約</a>
+                <a href="{{ url_for('schedule') }}" class="active">☑ 予約確認</a>
+                <a href="{{ url_for('history') }}">◷ 面談履歴</a>
+            </aside>
+
+            <!-- メイン画面 -->
+            <main class="col-md-10 p-4">
+
+                <!-- タイトル -->
+                <div class="page-banner">
+                    <h1>面談予約の変更</h1>
+                    <p class="mb-0">
+                        現在の予約内容を変更します。変更後の内容を選択してください。
+                    </p>
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- 現在の予約内容 -->
+                <section class="content-box mb-4">
+                    <h2 class="section-heading">現在の予約内容</h2>
+
+                    <table class="table current-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>面談日時</th>
+                                <th>スクールカウンセラー</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    {{ current_reservation.slot.date.strftime('%Y/%m/%d') }}（{{ '月火水木金土日'[current_reservation.slot.date.weekday()] }}）
+                                    {{ current_reservation.slot.start_time.strftime('%H:%M') }} ～ {{ current_reservation.slot.end_time.strftime('%H:%M') }}
+                                </td>
+                                <td>{{ current_reservation.slot.counselor.display_name }} 先生</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 変更後の予約内容 -->
+                <section class="content-box">
+                    <h2 class="section-heading">変更後の予約内容</h2>
+
+                    <!-- カウンセラーで絞り込み -->
+                    <form id="filterForm" method="get" action="{{ url_for('reserva_change') }}" class="mb-3">
+                        <label for="counselor_id" class="form-label-custom">
+                            スクールカウンセラーで絞り込む
+                        </label>
+
+                        <select id="counselor_id"
+                                name="counselor_id"
+                                class="form-select counselor-select"
+                                onchange="document.getElementById('filterForm').submit()">
+                            <option value="" {% if selected_counselor_id is none %}selected{% endif %}>
+                                指定なし（空いているカウンセラー）
+                            </option>
+                            {% for counselor in counselors %}
+                            <option value="{{ counselor.id }}" {% if counselor.id == selected_counselor_id %}selected{% endif %}>
+                                {{ counselor.display_name }} 先生
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+
+                    <!-- 変更先の日時選択 -->
+                    <form id="change-form" method="post" action="{{ url_for('reserva_change') }}">
+
+                        <div class="form-area">
+                            <div class="form-row">
+                                <label for="slot_id" class="form-label-custom">
+                                    面談日時 <span class="required-badge">必須</span>
+                                </label>
+
+                                {% if available_slots %}
+                                <select id="slot_id"
+                                        name="slot_id"
+                                        class="form-select"
+                                        required>
+                                    <option value="" selected disabled>選択してください</option>
+                                    {% for slot in available_slots %}
+                                    <option value="{{ slot.id }}">
+                                        {{ slot.date.strftime('%Y/%m/%d') }}（{{ '月火水木金土日'[slot.date.weekday()] }}）
+                                        {{ slot.start_time.strftime('%H:%M') }} ～ {{ slot.end_time.strftime('%H:%M') }}
+                                        － {{ slot.counselor.display_name }} 先生
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                {% else %}
+                                <p class="help-text">変更可能な日時が見つかりません。別のカウンセラーをお試しください。</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- ボタン -->
+                        <div class="action-buttons">
+                            <a href="{{ url_for('schedule') }}"
+                               class="btn btn-back">
+                                戻る
+                            </a>
+
+                            {% if available_slots %}
+                            <button type="submit" class="btn btn-confirm">
+                                変更内容を確認する
+                            </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+</body>
+</html>
