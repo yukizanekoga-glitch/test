@@ -29,7 +29,7 @@
 
             <span class="header-divider"></span>
 
-            <a href="{{ url_for('login') }}" class="logout-link">
+            <a href="{{ url_for('logout') }}" class="logout-link">
                 <i class="bi bi-box-arrow-right"></i>
                 ログアウト
             </a>
@@ -119,5 +119,7 @@
 
     </main>
 
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

@@ -1,46 +1,92 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>生徒一括登録完了</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- ページのタイトル -->
-  <title>生徒登録完了 管理者</title>
+    <!-- 共通レイアウト -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='management_top.css') }}">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- この画面専用CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='manage_sturec_complete.css') }}">
 </head>
 
 <body>
 
-  <!-- ナビゲーションバー -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー 生徒登録</span>
+    <!-- ヘッダー -->
+    <header class="top-header">
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="header-right">
+            <span>♙ {{ session.display_name }}（管理者）</span>
+            <a href="{{ url_for('logout') }}">⇥ ログアウト</a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <a href="{{ url_for('management_top') }}">
+                <span>⌂</span> ホーム
+            </a>
+
+            <a href="{{ url_for('manage_student') }}" class="active">
+                <span>♙</span> 生徒管理
+            </a>
+
+            <a href="{{ url_for('manage_teacher') }}">
+                <span>♙</span> 先生管理
+            </a>
+
+            <a href="{{ url_for('manage_care') }}">
+                <span>▦</span> カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}">
+                <span>▤</span> クラス管理
+            </a>
+
+            <a href="{{ url_for('management_survey') }}">
+                <span>▥</span> アンケート結果
+            </a>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <div class="complete-container">
+
+                <div class="complete-icon">
+                    ✓
+                </div>
+
+                <h1 class="complete-title">
+                    生徒の一括登録が完了しました。
+                </h1>
+
+                <div class="complete-info-box">
+                    <div class="info-row">
+                        <div class="info-label">登録件数</div>
+                        <div class="info-value">：5件</div>
+                    </div>
+                </div>
+
+                <div class="complete-button-area">
+                    <a href="{{ url_for('manage_student') }}" class="back-student-btn">
+                        生徒一覧に戻る
+                    </a>
+                </div>
+
+            </div>
+        </main>
     </div>
-  </nav>
 
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
-
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
-
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
-
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">登録が完了しました</h2>
-
-        <a href="{{ url_for('management_top') }}" class="btn btn-secondary">戻る</a>
-
-      </div>
-    </div>
-  </div>
-  
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

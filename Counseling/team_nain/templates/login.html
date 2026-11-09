@@ -53,7 +53,9 @@
         {% endwith %}
 
         <!-- ログインフォーム -->
-        <form action="{{ url_for('login') }}" method="post">
+        <!-- ブラウザに保存されたID・パスワードが自動で入らないよう、
+             入力欄は最初は readonly にしておき、触ったときに入力できるようにする -->
+        <form action="{{ url_for('login') }}" method="post" autocomplete="off">
 
             <!-- ユーザー名 -->
             <div class="form-item">
@@ -66,8 +68,11 @@
                         type="text"
                         id="username"
                         name="username"
+                        value="{{ username or '' }}"
                         placeholder="ユーザー名を入力してください"
-                        autocomplete="username"
+                        autocomplete="off"
+                        readonly
+                        class="login-input"
                         required>
                 </div>
             </div>
@@ -84,7 +89,9 @@
                         id="password"
                         name="password"
                         placeholder="パスワードを入力してください"
-                        autocomplete="current-password"
+                        autocomplete="off"
+                        readonly
+                        class="login-input"
                         required>
 
                     <button
@@ -107,6 +114,25 @@
         </form>
 
     </main>
+
+    <!-- 入力欄を触ったら入力できるようにする (自動入力対策の readonly を外す) -->
+    <script>
+        document.querySelectorAll(".login-input").forEach(function (input) {
+            function enable() {
+                input.removeAttribute("readonly");
+            }
+            input.addEventListener("focus", enable);
+            input.addEventListener("pointerdown", enable);
+        });
+
+        // ログインに失敗して戻ってきたときは、パスワード欄にすぐ入力できるようにする
+        const usernameInput = document.getElementById("username");
+        if (usernameInput.value) {
+            const passwordInput = document.getElementById("password");
+            passwordInput.removeAttribute("readonly");
+            passwordInput.focus();
+        }
+    </script>
 
     <!-- パスワード表示切り替え -->
     <script>

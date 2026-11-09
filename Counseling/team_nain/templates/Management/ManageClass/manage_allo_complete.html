@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>クラスの割り当て完了 | スクールカウンセラー相談予約システム</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/manage_stuallo_complete.css') }}">
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="top-header">
+
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="header-right">
+
+            <span class="admin-name">
+                <i class="bi bi-person-fill"></i>
+                {{ session.display_name }}（管理者）
+                <i class="bi bi-chevron-down"></i>
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+
+        </div>
+
+    </header>
+
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+
+            <a href="/manage_top" class="active">
+                <span>
+                    <i class="bi bi-house-door"></i>
+                </span>
+                ホーム
+            </a>
+
+            <a href="/manage_student">
+                <span>
+                    <i class="bi bi-people"></i>
+                </span>
+                生徒管理
+            </a>
+
+            <a href="/manage_teacher">
+            <span><i class="bi bi-person-badge"></i></span>
+                先生管理
+            </a>
+
+            <a href="/manage_counselor">
+                <span>
+                    <i class="bi bi-calendar3"></i>
+                </span>
+                カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}">
+                <span>
+                    <i class="bi bi-file-earmark-text"></i>
+                </span>
+                クラス管理
+            </a>
+
+            <a href="/manage_survey">
+                <span>
+                    <i class="bi bi-bar-chart-line"></i>
+                </span>
+                アンケート結果
+            </a>
+
+        </aside>
+
+        <!-- メイン -->
+        <main class="main-content">
+
+            <!-- パンくずリスト -->
+            <div class="breadcrumb">
+
+                <a href="{{ url_for('manage_class') }}">
+                    クラス管理
+                </a>
+
+                <i class="bi bi-chevron-right"></i>
+
+                <span class="breadcrumb-link">
+                    クラスの割り当て
+                </span>
+
+                <i class="bi bi-chevron-right"></i>
+
+                <span>完了</span>
+
+            </div>
+
+            <!-- ページタイトル -->
+            <section class="page-heading">
+
+                <h1>クラスの割り当てが完了しました</h1>
+
+                <p>
+                    クラスの割り当てを登録しました。
+                </p>
+
+            </section>
+
+            <!-- 完了パネル -->
+            <section class="complete-panel">
+
+                <!-- チェックマーク -->
+                <div class="complete-icon">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+
+                <!-- 完了メッセージ -->
+                <h2>
+                    クラスの割り当てが完了しました。
+                </h2>
+
+                <p class="complete-message">
+                    以下の内容で登録しました。
+                </p>
+
+                <!-- 登録内容 -->
+                <div class="result-table-wrapper">
+
+                    <table class="result-table">
+
+                        <tbody>
+
+                            <tr>
+                                <th>クラス名</th>
+                                <td>
+                                    <strong>1年1組</strong>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>担任の先生</th>
+                                <td>佐藤 太郎 先生</td>
+                            </tr>
+
+                            <tr>
+                                <th>追加した生徒</th>
+                                <td>5 人</td>
+                            </tr>
+
+                            <tr>
+                                <th>削除した生徒</th>
+                                <td>2 人</td>
+                            </tr>
+
+                            <tr>
+                                <th>変更後の生徒数</th>
+                                <td>
+                                    32 人
+                                    <i class="bi bi-arrow-right count-arrow"></i>
+                                    <strong class="new-count">
+                                        35 人
+                                    </strong>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+            <!-- 下部ボタン -->
+            <div class="bottom-actions">
+
+                <a href="{{ url_for('manage_class') }}"
+                   class="btn-back">
+
+                    クラス管理に戻る
+
+                </a>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
+</body>
+</html>

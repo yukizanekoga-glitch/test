@@ -1,49 +1,160 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>生徒の一括登録（CSV）</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- ページのタイトル -->
-  <title>生徒登録 管理者</title>
+    <!-- management_top と同じ共通レイアウト -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='management_top.css') }}">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- この画面専用CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='manage_sturec.css') }}">
 </head>
 
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー 生徒登録</span>
+
+    <!-- ヘッダー -->
+    <header class="top-header">
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="header-right">
+            <span>♙ {{ session.display_name }}（管理者）</span>
+            <a href="{{ url_for('logout') }}">⇥ ログアウト</a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <a href="{{ url_for('management_top') }}">
+                <span>⌂</span> ホーム
+            </a>
+
+            <a href="{{ url_for('manage_student') }}" class="active">
+                <span>♙</span> 生徒管理
+            </a>
+
+            <a href="{{ url_for('manage_teacher') }}">
+                <span>♙</span> 先生管理
+            </a>
+
+            <a href="{{ url_for('manage_care') }}">
+                <span>▦</span> カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}">
+                <span>▤</span> クラス管理
+            </a>
+
+            <a href="{{ url_for('management_survey') }}">
+                <span>▥</span> アンケート結果
+            </a>
+        </aside>
+
+        <!-- メイン -->
+        <main class="main-content">
+
+            <!-- タイトル -->
+            <div class="page-heading">
+                <h1>生徒の一括登録（CSV）</h1>
+                <p>
+                    CSVファイルを使用して、複数の生徒を一括で登録できます。<br>
+                    CSVには「生徒名」のみを記載してください。パスワードは自動で生成されます。
+                </p>
+            </div>
+
+            <!-- CSVアップロードエリア -->
+            <section class="upload-area">
+                <div class="upload-icon">📄</div>
+
+                <p class="upload-main-text">
+                    ここにCSVファイルをドラッグ＆ドロップ
+                </p>
+
+                <p class="upload-sub-text">または</p>
+
+                <label for="csvFile" class="file-select-btn">
+                    ファイルを選択
+                </label>
+
+                <input type="file" id="csvFile" accept=".csv" hidden>
+
+                <p class="selected-file" id="selectedFileName">
+                    選択されていません
+                </p>
+            </section>
+
+            <!-- 下部エリア -->
+            <div class="csv-bottom-layout">
+
+                <!-- 左側 -->
+                <div class="csv-left-content">
+                    <section class="csv-format-box">
+                        <h2>CSVファイルの形式</h2>
+
+                        <ul>
+                            <li>1列目に「生徒名」を記載してください</li>
+                            <li>1行に1人の生徒名を記載してください</li>
+                            <li>先頭行の見出しは不要です</li>
+                            <li>拡張子は「.csv」を使用してください（文字コード：UTF-8）</li>
+                        </ul>
+
+                        <a href="javascript:void(0)" class="sample-download-link">
+                            ⬇ サンプルCSVをダウンロード
+                        </a>
+                    </section>
+                </div>
+
+                <!-- 右側 -->
+                <div class="csv-right-content">
+                    <div class="sample-box">
+                        <h3>【入力例】</h3>
+                        <p>
+                            山田 太郎<br>
+                            佐藤 花子<br>
+                            鈴木 一郎<br>
+                            田中 美咲<br>
+                            …
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ボタン -->
+            <div class="action-buttons">
+                <a href="{{ url_for('manage_student') }}" class="btn-cancel">
+                    キャンセル
+                </a>
+
+                <a href="{{ url_for('manage_sturec_complete') }}"
+                   class="btn btn-primary btn-register">
+                    登録する
+                </a>
+            </div>
+
+        </main>
     </div>
-  </nav>
 
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
+    <script>
+        const csvFileInput = document.getElementById("csvFile");
+        const selectedFileName = document.getElementById("selectedFileName");
 
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
+        csvFileInput.addEventListener("change", function () {
+            if (this.files.length > 0) {
+                selectedFileName.textContent = "選択中: " + this.files[0].name;
+            } else {
+                selectedFileName.textContent = "選択されていません";
+            }
+        });
+    </script>
 
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
-
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">生徒</h2>
-        <h3 class="text-center mb-4">生徒登録</h3>
-        <h3 class="text-center mb-4">生徒情報入力</h3>
-
-        <textarea rows="5" cols="40" placeholder="ここにテキストを入力"></textarea>
-        <!-- 戻るボタン -->
-        <a href="{{ url_for('manage_student') }}" class="btn btn-secondary">戻る</a>
-        <!-- 確認ボタン -->
-        <a href="{{ url_for('manage_sturec_check') }}" class="btn btn-primary">次へ</a>
-      </div>
-    </div>
-  </div>
-
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

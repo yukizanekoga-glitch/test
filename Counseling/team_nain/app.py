@@ -75,7 +75,8 @@ def login():
 
         if user is None or not user.check_password(password):
             flash("ユーザー名またはパスワードが正しくありません。")
-            return render_template("login.html")
+            # 打ったユーザー名だけ残し、パスワードは空にする
+            return render_template("login.html", username=username)
 
         session.clear()
         session["user_id"] = user.id
@@ -766,7 +767,12 @@ def care_reseva():
         .order_by(AvailableSlot.date, AvailableSlot.start_time)
         .all()
     )
-    return render_template("Counselor/care_reseva.html", slots=slots)
+    # 登録済みの枠 (画面で「登録済み」と表示してチェックできないようにする)
+    registered = [
+        [s.date.isoformat(), s.start_time.strftime("%H:%M"), s.end_time.strftime("%H:%M")]
+        for s in slots
+    ]
+    return render_template("Counselor/care_reseva.html", slots=slots, registered=registered)
 
 
 # =========================
@@ -1364,6 +1370,51 @@ def manage_carepass_complete():
 @role_required(User.ROLE_ADMIN)
 def manage_class():
     return render_template("Management/ManageClass/manage_class.html")
+
+@app.route("/manage_allo")
+@role_required(User.ROLE_ADMIN)
+def manage_allo():
+    return render_template("Management/ManageClass/manage_allo.html")
+
+@app.route("/manage_allo_check")
+@role_required(User.ROLE_ADMIN)
+def manage_allo_check():
+    return render_template("Management/ManageClass/manage_allo_check.html")
+
+@app.route("/manage_allo_complete")
+@role_required(User.ROLE_ADMIN)
+def manage_allo_complete():
+    return render_template("Management/ManageClass/manage_allo_complete.html")
+
+@app.route("/manage_clarec")
+@role_required(User.ROLE_ADMIN)
+def manage_clarec():
+    return render_template("Management/ManageClass/manage_clarec.html")
+
+@app.route("/manage_clarec_check")
+@role_required(User.ROLE_ADMIN)
+def manage_clarec_check():
+    return render_template("Management/ManageClass/manage_clarec_check.html")
+
+@app.route("/manage_clarec_complete")
+@role_required(User.ROLE_ADMIN)
+def manage_clarec_complete():
+    return render_template("Management/ManageClass/manage_clarec_complete.html")
+
+@app.route("/management_survey")
+@role_required(User.ROLE_ADMIN)
+def management_survey():
+    return render_template("Management/ManageSurvey/management_survey.html")
+
+@app.route("/management_graph")
+@role_required(User.ROLE_ADMIN)
+def management_graph():
+    return render_template("Management/ManageSurvey/management_graph.html")
+
+@app.route("/management_warning")
+@role_required(User.ROLE_ADMIN)
+def management_warning():
+    return render_template("Management/ManageSurvey/management_warning.html")
 
 @app.route("/manage_stuallo")
 @role_required(User.ROLE_ADMIN)

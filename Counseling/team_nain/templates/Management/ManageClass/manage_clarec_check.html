@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>クラスの新規登録（確認） | スクールカウンセラー相談予約システム</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/manage_clarec_check.css') }}">
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="top-header">
+
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="header-right">
+
+            <span class="admin-name">
+                <i class="bi bi-person-fill"></i>
+                {{ session.display_name }}（管理者）
+                <i class="bi bi-chevron-down"></i>
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+
+            <a href="/management_top">
+                <span><i class="bi bi-house-door"></i></span>
+                ホーム
+            </a>
+
+            <a href="/manage_student">
+                <span><i class="bi bi-people"></i></span>
+                生徒管理
+            </a>
+
+            <a href="/manage_teacher">
+                <span><i class="bi bi-person-badge"></i></span>
+                先生管理
+            </a>
+
+            <a href="/manage_care">
+                <span><i class="bi bi-calendar3"></i></span>
+                カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}" class="active">
+                <span><i class="bi bi-file-earmark-text"></i></span>
+                クラス管理
+            </a>
+
+            <a href="/manage_survey">
+                <span><i class="bi bi-bar-chart-line"></i></span>
+                アンケート結果
+            </a>
+
+        </aside>
+
+        <!-- メイン -->
+        <main class="main-content">
+
+            <!-- パンくず -->
+            <div class="breadcrumb">
+                <a href="/manage_top">ホーム</a>
+                <i class="bi bi-chevron-right"></i>
+
+                <a href="{{ url_for('manage_class') }}">クラス管理</a>
+                <i class="bi bi-chevron-right"></i>
+
+                <span>クラスの新規登録</span>
+                <i class="bi bi-chevron-right"></i>
+
+                <span>確認</span>
+            </div>
+
+            <!-- ページタイトル -->
+            <div class="page-heading">
+                <h1>クラスの新規登録（確認）</h1>
+                <p>
+                    以下の内容で登録します。内容に間違いがないか確認してください。
+                </p>
+            </div>
+
+            <!-- 確認カード -->
+            <div class="confirm-card">
+
+                <!-- 1 クラス情報 -->
+                <section class="confirm-section">
+
+                    <div class="section-heading">
+                        <span class="step-number">1</span>
+                        <h2>クラス情報</h2>
+                    </div>
+
+                    <table class="info-table">
+                        <tbody>
+                            <tr>
+                                <th>学年</th>
+                                <td>1年</td>
+                            </tr>
+
+                            <tr>
+                                <th>クラス</th>
+                                <td>1組</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </section>
+
+                <!-- 2 担任の先生 -->
+                <section class="confirm-section">
+
+                    <div class="section-heading">
+                        <span class="step-number">2</span>
+                        <h2>担任の先生</h2>
+                    </div>
+
+                    <table class="info-table">
+                        <tbody>
+                            <tr>
+                                <th>担任の先生</th>
+                                <td>山田 花子</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </section>
+
+                <!-- 3 生徒の割り当て -->
+                <section class="confirm-section">
+
+                    <div class="section-heading">
+                        <span class="step-number">3</span>
+                        <h2>割り当てる生徒（30名）</h2>
+                    </div>
+
+                    <div class="student-scroll">
+
+                        <table class="student-table">
+                            <thead>
+                                <tr>
+                                    <th>生徒名</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr><td>佐藤 太郎</td></tr>
+                                <tr><td>田中 美咲</td></tr>
+                                <tr><td>鈴木 さくら</td></tr>
+                                <tr><td>高橋 蓮</td></tr>
+                                <tr><td>伊藤 さやか</td></tr>
+                                <tr><td>加藤 陽菜</td></tr>
+                                <tr><td>中村 翔</td></tr>
+                                <tr><td>渡辺 大和</td></tr>
+                                <tr><td>小林 結衣</td></tr>
+                                <tr><td>山本 悠斗</td></tr>
+                                <tr><td>吉田 美月</td></tr>
+                                <tr><td>山田 陽翔</td></tr>
+                                <tr><td>佐々木 葵</td></tr>
+                                <tr><td>山口 結菜</td></tr>
+                                <tr><td>松本 悠真</td></tr>
+                                <tr><td>井上 咲良</td></tr>
+                                <tr><td>木村 健一</td></tr>
+                                <tr><td>林 颯太</td></tr>
+                                <tr><td>清水 莉子</td></tr>
+                                <tr><td>斎藤 蓮斗</td></tr>
+                                <tr><td>池田 美咲</td></tr>
+                                <tr><td>橋本 翔太</td></tr>
+                                <tr><td>石川 結衣</td></tr>
+                                <tr><td>前田 陽菜</td></tr>
+                                <tr><td>藤田 悠斗</td></tr>
+                                <tr><td>岡田 さくら</td></tr>
+                                <tr><td>後藤 大翔</td></tr>
+                                <tr><td>長谷川 葵</td></tr>
+                                <tr><td>村上 美月</td></tr>
+                                <tr><td>近藤 蓮</td></tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </section>
+
+                <!-- 下部ボタン -->
+                <div class="form-actions">
+
+                    <a href="/manage_clarec" class="back-btn">
+                        <i class="bi bi-chevron-left"></i>
+                        戻る
+                    </a>
+
+                    <form action="manage_clarec_complete" class="register-form">
+                        <button type="submit" class="register-btn">
+                            登録する
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
+</body>
+</html>

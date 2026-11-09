@@ -1,0 +1,262 @@
+/* =========================
+   一括登録完了画面
+========================= */
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 24px 30px;
+}
+
+.complete-container {
+    width: 100%;
+    max-width: 900px;
+    text-align: center;
+}
+
+.complete-icon {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 26px;
+    border-radius: 50%;
+    background: #dff5e5;
+    color: #19b85a;
+    font-size: 88px;
+    font-weight: bold;
+    line-height: 150px;
+}
+
+.complete-title {
+    margin: 0 0 28px;
+    color: #172b4d;
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.complete-info-box {
+    max-width: 760px;
+    margin: 0 auto 36px;
+    padding: 34px 40px;
+    background: #f5faff;
+    border-radius: 10px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    font-size: 28px;
+    color: #344d70;
+    font-weight: 600;
+}
+
+.info-label {
+    min-width: 160px;
+    text-align: left;
+}
+
+.info-value {
+    min-width: 140px;
+    text-align: left;
+}
+
+.complete-button-area {
+    text-align: center;
+}
+
+.back-student-btn {
+    display: inline-block;
+    min-width: 420px;
+    padding: 22px 30px;
+    border-radius: 10px;
+    background: #0d6efd;
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.back-student-btn:hover {
+    background: #0b5ed7;
+    color: #ffffff;
+}
+
+/* =========================
+   画面を少しコンパクトに
+========================= */
+@media (max-width: 1200px) {
+    .main-content {
+        padding: 28px 20px 24px;
+    }
+
+    .complete-icon {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 20px;
+        font-size: 70px;
+        line-height: 120px;
+    }
+
+    .complete-title {
+        font-size: 30px;
+        margin-bottom: 22px;
+    }
+
+    .complete-info-box {
+        max-width: 680px;
+        padding: 24px 28px;
+        margin-bottom: 28px;
+    }
+
+    .info-row {
+        font-size: 24px;
+    }
+
+    .back-student-btn {
+        min-width: 340px;
+        padding: 18px 24px;
+        font-size: 22px;
+    }
+}
+
+/* =========================
+   スマホ・タブレット対応
+========================= */
+@media (max-width: 850px) {
+    .main-content {
+        padding: 20px 14px;
+    }
+
+    .complete-icon {
+        width: 90px;
+        height: 90px;
+        font-size: 50px;
+        line-height: 90px;
+        margin-bottom: 16px;
+    }
+
+    .complete-title {
+        font-size: 24px;
+        line-height: 1.5;
+        margin-bottom: 18px;
+    }
+
+    .complete-info-box {
+        padding: 18px 16px;
+        margin-bottom: 20px;
+    }
+
+    .info-row {
+        flex-direction: column;
+        gap: 8px;
+        font-size: 18px;
+    }
+
+    .info-label,
+    .info-value {
+        min-width: 0;
+        text-align: center;
+    }
+
+    .back-student-btn {
+        width: 100%;
+        min-width: 0;
+        padding: 16px 20px;
+        font-size: 18px;
+    }
+}
+
+/* =========================
+   完了画面のサイズ調整
+   ヘッダー・サイドバーは変更しない
+========================= */
+
+/* メインエリア */
+.main-content {
+    padding: 32px 24px;
+}
+
+/* 中央コンテンツ */
+.complete-container {
+    max-width: 800px;
+}
+
+/* 完了アイコン */
+.complete-icon {
+    width: 110px;
+    height: 110px;
+    margin-bottom: 22px;
+    font-size: 65px;
+    line-height: 110px;
+}
+
+/* 完了メッセージ */
+.complete-title {
+    font-size: 28px;
+    margin-bottom: 24px;
+}
+
+/* 登録件数の表示枠 */
+.complete-info-box {
+    max-width: 620px;
+    padding: 22px 30px;
+    margin-bottom: 28px;
+}
+
+/* 登録件数の文字 */
+.info-row {
+    gap: 16px;
+    font-size: 21px;
+}
+
+.info-label {
+    min-width: 120px;
+}
+
+.info-value {
+    min-width: 100px;
+}
+
+/* 生徒一覧に戻るボタン */
+.back-student-btn {
+    min-width: 300px;
+    padding: 14px 28px;
+    border-radius: 7px;
+    font-size: 19px;
+}
+
+/* スマートフォン対応 */
+@media (max-width: 850px) {
+    .main-content {
+        padding: 24px 16px;
+    }
+
+    .complete-icon {
+        width: 90px;
+        height: 90px;
+        font-size: 52px;
+        line-height: 90px;
+    }
+
+    .complete-title {
+        font-size: 23px;
+    }
+
+    .complete-info-box {
+        padding: 18px 20px;
+    }
+
+    .info-row {
+        font-size: 18px;
+    }
+
+    .back-student-btn {
+        width: 100%;
+        min-width: 0;
+        padding: 13px 20px;
+        font-size: 17px;
+    }
+}

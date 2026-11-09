@@ -1,0 +1,675 @@
+
+/* =========================
+   全体設定
+========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    background: #f3f6fb;
+    color: #172b55;
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 13px;
+}
+
+/* =========================
+   ヘッダー（昨日と同じ）
+========================= */
+
+.top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 55px;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #24364b;
+    color: #fff;
+    z-index: 1000;
+}
+
+.system-title {
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 15px;
+}
+
+.admin-name {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.admin-name .bi-person-fill {
+    font-size: 22px;
+}
+
+.admin-name .bi-chevron-down {
+    font-size: 12px;
+}
+
+
+/* =========================
+   全体レイアウト
+========================= */
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 55px;
+}
+
+
+/* =========================
+   サイドバー（昨日と同じ）
+========================= */
+
+.sidebar {
+    width: 215px;
+    min-width: 215px;
+    background-color: #f7fbff;
+    border-right: 1px solid #dce5f0;
+    padding-top: 0px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: #344d70;
+    font-size: 12px;
+    font-weight: bold;
+    border-left: 5px solid transparent;
+}
+
+.sidebar a span {
+    font-size: 25px;
+    width: 30px;
+    text-align: center;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    border-left-color: #0d6efd;
+}
+
+/* =========================
+   メインコンテンツ
+========================= */
+
+.main-content {
+    width: calc(100% - 215px);
+    min-width: 0;
+    margin-left: 0px;
+    padding: 13px 20px 18px;
+}
+
+
+/* =========================
+   パンくずリスト
+========================= */
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: #172b55;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.breadcrumb .bi-house-fill {
+    color: #0874f9;
+    font-size: 16px;
+}
+
+.breadcrumb .bi-chevron-right {
+    color: #8ba2c3;
+    font-size: 10px;
+}
+
+
+/* =========================
+   ページタイトル
+========================= */
+
+.page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 9px;
+}
+
+.page-heading h1 {
+    position: relative;
+    margin: 0 0 4px;
+    padding-left: 21px;
+    font-size: 23px;
+    font-weight: bold;
+    color: #142653;
+}
+
+.page-heading h1::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 8px;
+    height: 30px;
+    border-radius: 6px;
+    background: #0868f5;
+}
+
+.page-heading p {
+    margin: 0;
+    font-size: 13px;
+    font-weight: bold;
+    color: #253b65;
+}
+
+
+/* 戻るボタン */
+
+.back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 220px;
+    height: 42px;
+    padding: 0 15px;
+    border: 2px solid #c8d8f1;
+    border-radius: 10px;
+    background: #fff;
+    color: #142653;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.back-button i {
+    font-size: 19px;
+}
+
+.back-button:hover {
+    background: #edf5ff;
+}
+
+
+/* =========================
+   生徒情報カード
+========================= */
+
+.student-card {
+    min-height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 14px 9px 20px;
+    margin-bottom: 12px;
+    background: #fff;
+    border: 1px solid #d7e6fc;
+    border-radius: 14px;
+}
+
+.student-information {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.student-icon {
+    width: 76px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e5f2ff;
+    color: #0875f5;
+    flex-shrink: 0;
+}
+
+.student-icon i {
+    font-size: 51px;
+}
+
+.student-text h2 {
+    margin: 0 0 4px;
+    font-size: 23px;
+    color: #142653;
+}
+
+.student-subinfo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.vertical-line {
+    width: 1px;
+    height: 18px;
+    background: #8799b6;
+}
+
+
+/* 要確認表示 */
+
+.warning-status {
+    min-width: 285px;
+    min-height: 53px;
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border-radius: 11px;
+    background: #ffebef;
+    color: #bd161b;
+    font-size: 19px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.warning-icon {
+    width: 39px;
+    height: 39px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ffd5dc;
+    font-size: 28px;
+}
+
+
+/* =========================
+   アンケート履歴カード
+========================= */
+
+.history-card {
+    padding: 0 14px 13px;
+    margin-bottom: 12px;
+    background: #fff;
+    border: 1px solid #d3e4fc;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.section-title {
+    margin: 0 -14px 9px;
+    padding: 8px 18px;
+    background: #edf5ff;
+    color: #142653;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+/* =========================
+   回答履歴テーブル
+========================= */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    border: 1px solid #cbdcf5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.history-table th,
+.history-table td {
+    height: 35px;
+    padding: 4px 6px;
+    border-right: 1px solid #d0e0f5;
+    border-bottom: 1px solid #d0e0f5;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.history-table th {
+    height: 38px;
+    background: #e5f1ff;
+    color: #142653;
+    font-size: 15px;
+    white-space: nowrap;
+}
+
+.history-table td {
+    background: #fff;
+    color: #142653;
+}
+
+.history-table tr:last-child td {
+    border-bottom: none;
+}
+
+.history-table th:last-child,
+.history-table td:last-child {
+    border-right: none;
+}
+
+
+/* 列幅 */
+
+.history-table .number-column {
+    width: 4.5%;
+}
+
+.history-table .question-column {
+    width: 39%;
+}
+
+.history-table th:not(:first-child):not(:nth-child(2)) {
+    width: 14.125%;
+}
+
+
+/* 質問項目 */
+
+.history-table td.question {
+    padding-left: 14px;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+
+/* 低い評価 */
+
+.history-table td.low-score {
+    background: #ffe4e8;
+    color: #bd171b;
+    font-size: 18px;
+}
+
+
+/* 相談希望 */
+
+.history-table td.answer-text {
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+
+/* =========================
+   判定理由
+========================= */
+
+.judgment-box {
+    min-height: 49px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 15px;
+    padding: 6px 13px;
+    border-radius: 10px;
+    background: #ffedf1;
+    color: #182b53;
+}
+
+.judgment-icon {
+    width: 37px;
+    height: 37px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ffd6de;
+    color: #ed1c24;
+    font-size: 27px;
+}
+
+.judgment-box strong {
+    color: #a9151a;
+    font-size: 17px;
+    white-space: nowrap;
+}
+
+.judgment-divider {
+    width: 2px;
+    height: 25px;
+    margin: 0 7px;
+    background: #8798b5;
+}
+
+.judgment-box p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+/* =========================
+   下部エリア
+========================= */
+
+.bottom-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    margin-top: 9px;
+}
+
+
+/* =========================
+   評価点数の説明
+========================= */
+
+.evaluation-box {
+    flex: 1;
+    min-width: 0;
+    padding: 9px 11px;
+    background: #f9fbff;
+    border: 1px solid #d4e4fc;
+    border-radius: 10px;
+}
+
+.evaluation-box h3 {
+    margin: 0 0 5px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #142653;
+}
+
+.evaluation-box p {
+    margin: 0;
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 1.7;
+    color: #172b55;
+}
+
+
+/* =========================
+   操作ボタン
+========================= */
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.detail-button,
+.send-button {
+    height: 46px;
+    min-width: 0;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.detail-button {
+    width: 190px;
+    background: #fff;
+    border: 2px solid #c8d8f1;
+    color: #142653;
+}
+
+.detail-button i {
+    font-size: 18px;
+}
+
+.detail-button:hover {
+    background: #edf5ff;
+}
+
+.send-button {
+    width: 195px;
+    background: #0750f5;
+    border: 2px solid #0750f5;
+    color: #fff;
+}
+
+.send-button i {
+    font-size: 18px;
+}
+
+.send-button:hover {
+    background: #003dcc;
+}
+
+
+/* =========================
+   画面幅への対応
+========================= */
+
+@media screen and (max-width: 1200px) {
+
+    .bottom-area {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .evaluation-box {
+        width: 100%;
+    }
+
+    .action-buttons {
+        justify-content: flex-end;
+    }
+
+}
+
+@media screen and (max-width: 800px) {
+
+    .sidebar {
+        width: 170px;
+    }
+
+    .main-content {
+        width: calc(100% - 170px);
+        margin-left: 170px;
+    }
+
+    .page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .student-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .warning-status {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+
+    .detail-button,
+    .send-button {
+        flex: 1;
+        width: auto;
+    }
+
+}
+
+/* =========================
+   ヘッダーの区切り線・ログアウト
+   (management_survey.css と同じ見た目)
+========================= */
+.header-divider {
+    width: 1px;
+    height: 25px;
+    background: #66778b;
+}
+
+.logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    color: white;
+}
+
+.logout i {
+    font-size: 21px;
+}
+
+.header-right a {
+    color: white;
+    text-decoration: none;
+}
+
+.header-right a:hover {
+    color: #b8d5ff;
+}

@@ -1,0 +1,411 @@
+
+/* =========================
+   全体設定
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    background: #ffffff;
+    color: #09194b;
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 14px;
+}
+
+/* =========================
+   ヘッダー（前回と同じ）
+========================= */
+.top-header {
+    height: 55px;
+    background-color: #24364b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    color: white;
+}
+
+.system-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 15px;
+}
+
+.header-right a {
+    color: white;
+    text-decoration: none;
+}
+
+.header-right a:hover {
+    color: #b8d5ff;
+}
+
+.admin-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.admin-name .bi-person-fill {
+    font-size: 20px;
+}
+
+.admin-name .bi-chevron-down {
+    font-size: 12px;
+}
+
+.header-divider {
+    width: 1px;
+    height: 25px;
+    background: #66778b;
+}
+
+.logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    color: white;
+}
+
+.logout i {
+    font-size: 21px;
+}
+
+/* =========================
+   レイアウト（前回と同じ）
+========================= */
+.layout {
+    display: flex;
+    min-height: calc(100vh - 55px);
+}
+
+/* =========================
+   サイドバー（前回と同じ）
+========================= */
+.sidebar {
+    width: 215px;
+    min-width: 215px;
+    background-color: #f7fbff;
+    border-right: 1px solid #dce5f0;
+    padding-top: 0;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: #344d70;
+    font-size: 12px;
+    font-weight: bold;
+    border-left: 5px solid transparent;
+    text-decoration: none;
+}
+
+.sidebar a span {
+    font-size: 25px;
+    width: 30px;
+    text-align: center;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    border-left-color: #0d6efd;
+}
+
+/* =========================
+   メイン
+========================= */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 22px 20px;
+}
+
+/* =========================
+   パンくず
+========================= */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.breadcrumb a {
+    color: #006aff;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb i {
+    font-size: 11px;
+    color: #8495b3;
+}
+
+/* =========================
+   ページタイトル
+========================= */
+.page-heading {
+    border-left: 4px solid #006aff;
+    padding-left: 16px;
+    margin-bottom: 15px;
+}
+
+.page-heading h1 {
+    margin: 0 0 5px;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.page-heading p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* =========================
+   確認カード
+========================= */
+.confirm-card {
+    border: 1px solid #d6e3f5;
+    border-radius: 5px;
+    background: #ffffff;
+    padding: 9px 10px 14px;
+}
+
+.confirm-section {
+    margin-bottom: 13px;
+}
+
+/* =========================
+   セクション見出し
+========================= */
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 44px;
+    padding: 0 10px;
+    background: #eef5ff;
+    border-radius: 5px;
+    margin-bottom: 9px;
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #006aff;
+    color: #ffffff;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.section-heading h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+/* =========================
+   クラス情報・担任テーブル
+========================= */
+.info-table {
+    width: calc(100% - 20px);
+    margin: 0 10px;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #d6e3f5;
+    border-radius: 4px;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+.info-table th,
+.info-table td {
+    height: 36px;
+    padding: 7px 22px;
+    border-bottom: 1px solid #dce5f0;
+}
+
+.info-table tr:last-child th,
+.info-table tr:last-child td {
+    border-bottom: none;
+}
+
+.info-table th {
+    width: 27%;
+    text-align: left;
+    font-weight: 700;
+    background: #f0f5fb;
+    border-right: 1px solid #dce5f0;
+}
+
+.info-table td {
+    background: #ffffff;
+}
+
+/* =========================
+   生徒一覧
+========================= */
+.student-scroll {
+    height: 260px;
+    margin: 0 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid #d6e3f5;
+    border-radius: 4px;
+}
+
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.student-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.student-table th {
+    height: 30px;
+    padding: 5px 38px;
+    text-align: left;
+    font-weight: 700;
+    background: #edf3fa;
+    border-bottom: 1px solid #dce5f0;
+}
+
+.student-table td {
+    height: 29px;
+    padding: 5px 38px;
+    background: #ffffff;
+    border-bottom: 1px solid #dce5f0;
+}
+
+.student-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* スクロールバー */
+.student-scroll::-webkit-scrollbar {
+    width: 12px;
+}
+
+.student-scroll::-webkit-scrollbar-track {
+    background: #f3f5f8;
+}
+
+.student-scroll::-webkit-scrollbar-thumb {
+    background: #aaaaaa;
+    border-radius: 6px;
+    border: 2px solid #f3f5f8;
+}
+
+/* =========================
+   下部ボタン
+========================= */
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 5px 6px 0;
+}
+
+.back-btn,
+.register-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    height: 51px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.back-btn {
+    width: 200px;
+    background: #ffffff;
+    color: #09194b;
+    border: 1px solid #aabbd6;
+}
+
+.back-btn:hover {
+    background: #f1f5fb;
+}
+
+.register-form {
+    margin: 0;
+}
+
+.register-btn {
+    width: 255px;
+    background: #006aff;
+    color: #ffffff;
+    border: 1px solid #006aff;
+}
+
+.register-btn:hover {
+    background: #0057d8;
+}
+
+.back-btn i,
+.register-btn i {
+    font-size: 17px;
+}
+
+/* =========================
+   画面サイズ調整
+========================= */
+@media (max-width: 1000px) {
+    .page-heading h1 {
+        font-size: 23px;
+    }
+
+    .main-content {
+        padding: 14px 15px;
+    }
+
+    .info-table th {
+        width: 30%;
+    }
+}
+
+@media (max-width: 700px) {
+    .main-content {
+        min-width: 550px;
+    }
+}

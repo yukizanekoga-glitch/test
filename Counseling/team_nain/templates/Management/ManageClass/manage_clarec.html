@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>クラスの新規登録 | スクールカウンセラー相談予約システム</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/manage_clarec.css') }}">
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="top-header">
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="header-right">
+            <span class="admin-name">
+                <i class="bi bi-person-fill"></i>
+                {{ session.display_name }}（管理者）
+                <i class="bi bi-chevron-down"></i>
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+
+            <a href="/management_top">
+                <span><i class="bi bi-house-door"></i></span>
+                ホーム
+            </a>
+
+            <a href="/manage_student">
+                <span><i class="bi bi-people"></i></span>
+                生徒管理
+            </a>
+
+            <a href="/manage_teacher">
+                <span><i class="bi bi-person-badge"></i></span>
+                先生管理
+            </a>
+
+            <a href="/manage_care">
+                <span><i class="bi bi-calendar3"></i></span>
+                カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}" class="active">
+                <span><i class="bi bi-file-earmark-text"></i></span>
+                クラス管理
+            </a>
+
+            <a href="/manage_survey">
+                <span><i class="bi bi-bar-chart-line"></i></span>
+                アンケート結果
+            </a>
+
+        </aside>
+
+        <!-- メイン -->
+        <main class="main-content">
+
+            <!-- パンくず -->
+            <div class="breadcrumb">
+                <a href="/manage_top">ホーム</a>
+                <i class="bi bi-chevron-right"></i>
+                <a href="{{ url_for('manage_class') }}">クラス管理</a>
+                <i class="bi bi-chevron-right"></i>
+                <span>クラスの新規登録</span>
+            </div>
+
+            <!-- ページタイトル -->
+            <div class="page-heading">
+                <h1>クラスの新規登録</h1>
+                <p>クラス情報を入力し、担任の先生と生徒を割り当ててください。</p>
+            </div>
+
+            <!-- 登録フォーム -->
+            <form action="#" method="post" class="register-card">
+
+                <!-- 1 クラス情報 -->
+                <section class="form-section">
+
+                    <div class="section-heading">
+                        <span class="step-number">1</span>
+                        <h2>クラス情報</h2>
+                    </div>
+
+                    <div class="class-fields">
+
+                        <label for="grade">学年</label>
+                        <span class="required">必須</span>
+
+                        <input
+                            type="number"
+                            id="grade"
+                            name="grade"
+                            min="1"
+                            max="6"
+                            placeholder="例）1"
+                            required
+                        >
+                        <span class="unit">年</span>
+
+                        <label for="class_name">クラス</label>
+                        <span class="required">必須</span>
+
+                        <input
+                            type="text"
+                            id="class_name"
+                            name="class_name"
+                            placeholder="例）1"
+                            required
+                        >
+                        <span class="unit">組</span>
+
+                    </div>
+                </section>
+
+                <!-- 2 担任の先生 -->
+                <section class="form-section">
+
+                    <div class="section-heading">
+                        <span class="step-number">2</span>
+                        <h2>担任の先生の選択</h2>
+                    </div>
+
+                    <div class="teacher-fields">
+
+                        <label for="teacher">担任の先生</label>
+                        <span class="required">必須</span>
+
+                        <select id="teacher" name="teacher" required>
+                            <option value="" selected disabled>
+                                先生を選択してください
+                            </option>
+                            <option value="1">山田 花子</option>
+                            <option value="2">佐藤 太郎</option>
+                            <option value="3">田中 一郎</option>
+                        </select>
+
+                    </div>
+                </section>
+
+                <!-- 3 生徒の割り当て -->
+                <section class="form-section">
+
+                    <div class="section-heading">
+                        <span class="step-number">3</span>
+                        <h2>生徒の割り当て</h2>
+                    </div>
+
+                    <p class="section-description">
+                        このクラスに所属する生徒を選択してください。
+                        選択した生徒は右側の一覧に追加されます。
+                    </p>
+
+                    <div class="student-panels">
+
+                        <!-- 未所属の生徒 -->
+                        <div class="student-panel">
+
+                            <h3>未所属の生徒</h3>
+
+                            <div class="search-box">
+                                <i class="bi bi-search"></i>
+                                <input
+                                    type="search"
+                                    placeholder="生徒名で検索"
+                                    aria-label="生徒名で検索"
+                                >
+                            </div>
+
+                            <table class="student-table">
+                                <thead>
+                                    <tr>
+                                        <th class="check-column">選択</th>
+                                        <th>生徒名</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr>
+                                        <td><input type="checkbox" name="students" value="1"></td>
+                                        <td>佐藤 太郎</td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="students" value="2"></td>
+                                        <td>田中 美咲</td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="students" value="3"></td>
+                                        <td>鈴木 さくら</td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="students" value="4"></td>
+                                        <td>高橋 蓮</td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="students" value="5"></td>
+                                        <td>伊藤 さやか</td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="students" value="6"></td>
+                                        <td>加藤 陽菜</td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="students" value="7"></td>
+                                        <td>中村 翔</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <!-- 選択済みの生徒 -->
+                        <div class="student-panel">
+
+                            <div class="selected-header">
+                                <h3>選択済みの生徒（3名）</h3>
+
+                                <button type="button" class="clear-btn">
+                                    すべて削除
+                                </button>
+                            </div>
+
+                            <table class="student-table selected-table">
+                                <thead>
+                                    <tr>
+                                        <th>生徒名</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr>
+                                        <td>木村 健一</td>
+                                        <td>
+                                            <button type="button" class="delete-btn">
+                                                削除
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>加藤 陽菜</td>
+                                        <td>
+                                            <button type="button" class="delete-btn">
+                                                削除
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>中村 翔</td>
+                                        <td>
+                                            <button type="button" class="delete-btn">
+                                                削除
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- 下部ボタン -->
+                <div class="form-actions">
+
+                    <a href="{{ url_for('manage_class') }}" class="back-btn">
+                        <i class="bi bi-chevron-left"></i>
+                        クラス管理に戻る
+                    </a>
+
+                    <a href="{{ url_for('manage_clarec_check') }}" type="submit" class="confirm-btn">
+                        確認画面へ
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+
+                </div>
+
+            </form>
+
+        </main>
+    </div>
+
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
+</body>
+</html>

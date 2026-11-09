@@ -379,6 +379,17 @@
             });
         });
 
+        // 新しいパスワード (確認用も同じ値なので含める) はコピー・切り取り・ドラッグで持ち出せないようにする
+        // (表示切替で文字が見えている状態でも Ctrl+C / 右クリックのコピーは効かない)
+        ["newPassword", "confirmPassword"].forEach(function(id) {
+            const input = document.getElementById(id);
+            ["copy", "cut", "dragstart"].forEach(function(type) {
+                input.addEventListener(type, function(event) {
+                    event.preventDefault();
+                });
+            });
+        });
+
         // 氏名検索: 入力した文字を氏名に含む生徒だけを表示する (空欄なら全員)
         // 「山田太郎」でも「山田 太郎」でも一致するよう、空白を除いて比べる
         const nameSearch = document.getElementById("nameSearch");
@@ -404,5 +415,7 @@
         });
     </script>
 
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

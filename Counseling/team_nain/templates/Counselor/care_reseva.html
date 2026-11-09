@@ -69,6 +69,20 @@
             font-size: 14px;
         }
 
+        /* 登録済みの枠 (チェックできない) */
+        .schedule-table tr.selected-row td.registered-cell {
+            background: #eef0f3;
+        }
+
+        .registered-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #8a94a6;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
         .page-arrow:disabled {
             opacity: 0.35;
             cursor: default;
@@ -287,6 +301,23 @@
             // 登録対象から外された枠 ("日付|時間帯") を覚えておく
             const excluded = new Set();
 
+            // すでに登録済みの枠 [日付, 開始, 終了] (DBの available_slot から)
+            const registeredSlots = {{ registered | tojson }};
+
+            // "09:00 ～ 09:30" → ["09:00", "09:30"]
+            function splitTime(time) {
+                return time.split("～").map(function (t) { return t.trim(); });
+            }
+
+            // その日付・時間帯が、登録済みの枠と重なっているか
+            function isRegistered(date, time) {
+                const dateKey = toKey(date);
+                const [startTime, endTime] = splitTime(time);
+                return registeredSlots.some(function (s) {
+                    return s[0] === dateKey && s[1] < endTime && s[2] > startTime;
+                });
+            }
+
             // "YYYY-MM-DD" を、その日の0時(ローカル時間)の Date にする
             function parseDate(value) {
                 if (!value) return null;
@@ -431,6 +462,17 @@
                     dates.forEach(function (d) {
                         const key = toKey(d) + "|" + time;
                         const td = row.insertCell();
+
+                        // 登録済みの枠は「登録済み」と表示し、チェックできないようにする
+                        if (isRegistered(d, time)) {
+                            td.className = "registered-cell";
+                            const lock = document.createElement("span");
+                            lock.className = "registered-label";
+                            lock.innerHTML = '<i class="fa-solid fa-lock"></i> 登録済み';
+                            td.appendChild(lock);
+                            return;
+                        }
+
                         const label = document.createElement("label");
                         const check = document.createElement("input");
                         check.type = "checkbox";
@@ -513,8 +555,11 @@
                     currentTimes.forEach(function (time) {
                         if (excluded.has(toKey(d) + "|" + time)) return;
 
+                        // 登録済みの枠は送らない
+                        if (isRegistered(d, time)) return;
+
                         // "09:00 ～ 09:30" → 開始 "09:00" / 終了 "09:30"
-                        const [startTime, endTime] = time.split("～").map(function (t) { return t.trim(); });
+                        const [startTime, endTime] = splitTime(time);
                         const input = document.createElement("input");
                         input.type = "hidden";
                         input.name = "slot";
@@ -534,5 +579,7 @@
         })();
     </script>
 
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

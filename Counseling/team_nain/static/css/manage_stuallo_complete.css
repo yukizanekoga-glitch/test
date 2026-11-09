@@ -1,0 +1,391 @@
+
+/* =========================
+   全体設定
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    background: #f7fbff;
+    color: #172f52;
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 14px;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* =========================
+   ヘッダー（指定どおり）
+========================= */
+.top-header {
+    height: 55px;
+    background-color: #24364b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    color: white;
+}
+
+.system-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 15px;
+}
+
+.header-right a {
+    color: white;
+}
+
+.header-right a:hover {
+    color: #b8d5ff;
+}
+
+/* ヘッダー内アイコン */
+.system-title i {
+    margin-right: 12px;
+    font-size: 25px;
+}
+
+.admin-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.admin-name .bi-person-fill {
+    font-size: 20px;
+}
+
+.admin-name .bi-chevron-down {
+    font-size: 12px;
+}
+
+.header-divider {
+    width: 1px;
+    height: 25px;
+    background: #66778b;
+}
+
+.logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.logout i {
+    font-size: 21px;
+}
+
+/* =========================
+   レイアウト
+========================= */
+.layout {
+    display: flex;
+    min-height: calc(100vh - 72px);
+}
+
+/* =========================
+   サイドバー（指定どおり）
+========================= */
+.sidebar {
+    width: 215px;
+    min-width: 215px;
+    background-color: #f7fbff;
+    border-right: 1px solid #dce5f0;
+    padding-top: 0px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: #344d70;
+    font-size: 12px;
+    font-weight: bold;
+    border-left: 5px solid transparent;
+}
+
+.sidebar a span {
+    font-size: 25px;
+    width: 30px;
+    text-align: center;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    border-left-color: #0d6efd;
+}
+
+/* =========================
+   メインコンテンツ
+========================= */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 15px 22px 22px;
+}
+
+/* =========================
+   パンくずリスト
+========================= */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-left: 15px;
+    border-left: 3px solid #0d6efd;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.breadcrumb a,
+.breadcrumb-link {
+    color: #0d6efd;
+}
+
+.breadcrumb i {
+    font-size: 11px;
+    color: #344d70;
+}
+
+.breadcrumb span:last-child {
+    color: #172f52;
+}
+
+/* =========================
+   ページタイトル
+========================= */
+.page-heading {
+    border-left: 4px solid #0d6efd;
+    padding-left: 16px;
+    margin-bottom: 16px;
+}
+
+.page-heading h1 {
+    margin: 0 0 4px;
+    color: #102b4d;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.page-heading p {
+    margin: 0;
+    color: #526586;
+    font-size: 13px;
+}
+
+/* =========================
+   完了パネル
+========================= */
+.complete-panel {
+    background: #f7fffb;
+    border: 1px solid #d3f3e3;
+    border-radius: 8px;
+    padding: 20px 20px 18px;
+    text-align: center;
+}
+
+/* =========================
+   チェックマーク
+========================= */
+.complete-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: #dcfae9;
+    color: #00a65a;
+}
+
+.complete-icon i {
+    font-size: 48px;
+    font-weight: bold;
+}
+
+/* =========================
+   完了メッセージ
+========================= */
+.complete-panel h2 {
+    margin: 0 0 7px;
+    color: #006b48;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.complete-message {
+    margin: 0 0 18px;
+    color: #526586;
+    font-size: 14px;
+}
+
+/* =========================
+   登録結果テーブル
+========================= */
+.result-table-wrapper {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #dce7f3;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.result-table th {
+    width: 20%;
+    height: 49px;
+    padding: 12px 20px;
+    background: #edf4fb;
+    color: #172f52;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.result-table td {
+    height: 49px;
+    padding: 12px 20px;
+    background: #fff;
+    color: #172f52;
+    font-size: 15px;
+}
+
+.result-table th,
+.result-table td {
+    border-bottom: 1px solid #e0e9f3;
+}
+
+.result-table tr:last-child th,
+.result-table tr:last-child td {
+    border-bottom: none;
+}
+
+.result-table td strong {
+    font-size: 17px;
+}
+
+/* =========================
+   変更後の生徒数
+========================= */
+.count-arrow {
+    margin: 0 12px;
+    color: #344d70;
+    font-size: 17px;
+}
+
+.result-table td .new-count {
+    color: #0d6efd;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* =========================
+   下部ボタン
+========================= */
+.bottom-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 20px;
+}
+
+/* 戻る */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 250px;
+    height: 48px;
+    border: 1px solid #aab9d2;
+    border-radius: 6px;
+    background: #fff;
+    color: #253d68;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.btn-back:hover {
+    background: #edf4ff;
+    border-color: #0d6efd;
+}
+
+/* 詳細 */
+.btn-detail {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    width: 275px;
+    height: 48px;
+    border-radius: 6px;
+    background: #0d6efd;
+    color: #fff;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.btn-detail:hover {
+    background: #005bd5;
+}
+
+.btn-detail i {
+    font-size: 19px;
+}
+
+/* =========================
+   小さい画面
+========================= */
+@media (max-width: 1100px) {
+    .main-content {
+        padding: 12px;
+    }
+
+    .complete-panel {
+        padding: 15px;
+    }
+
+    .result-table th {
+        width: 28%;
+    }
+}
+
+@media (max-width: 800px) {
+    .bottom-actions {
+        flex-wrap: wrap;
+    }
+
+    .btn-back,
+    .btn-detail {
+        width: 220px;
+    }
+}

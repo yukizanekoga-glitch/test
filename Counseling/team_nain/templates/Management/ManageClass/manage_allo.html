@@ -1,0 +1,519 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>クラスの割り当て | スクールカウンセラー相談予約システム</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/manage_allo.css') }}">
+</head>
+
+<body>
+
+    <!-- =========================
+         ヘッダー
+    ========================= -->
+    <header class="top-header">
+
+        <div class="header-title">
+            <span>スクールカウンセラー相談予約システム</span>
+        </div>
+
+        <div class="header-right">
+
+            <span class="admin-name">
+                <i class="bi bi-person-fill"></i>
+                {{ session.display_name }}（管理者）
+                <i class="bi bi-chevron-down"></i>
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+
+        </div>
+
+    </header>
+
+    <div class="layout">
+
+        <!-- =========================
+             サイドバー
+        ========================= -->
+        <aside class="sidebar">
+
+            <a href="/manage_top">
+                <span><i class="bi bi-house-door"></i></span>
+                ホーム
+            </a>
+
+            <a href="/manage_student">
+                <span><i class="bi bi-people"></i></span>
+                生徒管理
+            </a>
+
+            <a href="/manage_teacher">
+                <span><i class="bi bi-person-badge"></i></span>
+                先生管理
+            </a>
+
+            <a href="/manage_counselor">
+                <span><i class="bi bi-calendar3"></i></span>
+                カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}" class="active">
+                <span><i class="bi bi-file-earmark-text"></i></span>
+                クラス管理
+            </a>
+
+            <a href="/manage_survey">
+                <span><i class="bi bi-bar-chart-line"></i></span>
+                アンケート結果
+            </a>
+
+        </aside>
+
+        <!-- =========================
+             メイン
+        ========================= -->
+        <main class="main-content">
+
+            <!-- パンくず -->
+            <div class="breadcrumb">
+                <a href="{{ url_for('manage_class') }}">
+                    クラス管理
+                </a>
+
+                <i class="bi bi-chevron-right"></i>
+
+                <span>クラスの割り当て</span>
+            </div>
+
+            <!-- ページタイトル -->
+            <section class="page-heading">
+
+                <h1>クラスの割り当て</h1>
+
+                <p>
+                    クラスの担任の先生と、生徒の割り当てを行います。
+                </p>
+
+            </section>
+
+            <!-- =========================
+                 割り当てパネル
+            ========================= -->
+            <section class="assign-panel">
+
+                <!-- クラス名 -->
+                <div class="class-name-bar">
+
+                    <span>クラス名</span>
+
+                    <strong>1年1組</strong>
+
+                </div>
+
+                <!-- 担任選択 -->
+                <div class="teacher-section">
+
+                    <label for="teacher" class="section-label">
+                        担任の先生
+                        <span class="required">必須</span>
+                    </label>
+
+                    <select id="teacher"
+                            name="teacher_id"
+                            form="confirm-form"
+                            required>
+                        <option value="1" selected>
+                            佐藤 太郎 先生
+                        </option>
+                        <option value="2">
+                            田中 美咲 先生
+                        </option>
+                        <option value="3">
+                            山本 健一 先生
+                        </option>
+                        <option value="4">
+                            鈴木 さくら 先生
+                        </option>
+                    </select>
+
+                </div>
+
+                <!-- =========================
+                     生徒割り当て
+                ========================= -->
+                <div class="assignment-area">
+
+                    <!-- 未所属の生徒 -->
+                    <section class="student-panel">
+
+                        <div class="student-panel-header">
+
+                            <h2>未所属の生徒</h2>
+
+                            <form class="student-search"
+                                  action="{{ url_for('manage_class') }}"
+                                  method="GET">
+
+                                <i class="bi bi-search"></i>
+
+                                <input type="search"
+                                       name="q"
+                                       placeholder="生徒名で検索">
+
+                            </form>
+
+                        </div>
+
+                        <div class="student-table-wrapper">
+
+                            <table class="student-table">
+
+                                <thead>
+                                    <tr>
+                                        <th class="check-col">
+                                            <input type="checkbox"
+                                                   aria-label="全員選択（表示のみ）"
+                                                   disabled>
+                                        </th>
+                                        <th>生徒名</th>
+                                        <th>学年</th>
+                                        <th>現在のクラス</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="add_students"
+                                                   value="1"
+                                                   form="add-form">
+                                        </td>
+                                        <td>高橋 蓮</td>
+                                        <td>1年</td>
+                                        <td>未所属</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="add_students"
+                                                   value="2"
+                                                   form="add-form">
+                                        </td>
+                                        <td>渡辺 陽菜</td>
+                                        <td>1年</td>
+                                        <td>未所属</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="add_students"
+                                                   value="3"
+                                                   form="add-form">
+                                        </td>
+                                        <td>小林 直樹</td>
+                                        <td>1年</td>
+                                        <td>未所属</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="add_students"
+                                                   value="4"
+                                                   form="add-form">
+                                        </td>
+                                        <td>加藤 美月</td>
+                                        <td>1年</td>
+                                        <td>未所属</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="add_students"
+                                                   value="5"
+                                                   form="add-form">
+                                        </td>
+                                        <td>中村 悠真</td>
+                                        <td>1年</td>
+                                        <td>未所属</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="add_students"
+                                                   value="6"
+                                                   form="add-form">
+                                        </td>
+                                        <td>山口 凛</td>
+                                        <td>1年</td>
+                                        <td>未所属</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="add_students"
+                                                   value="7"
+                                                   form="add-form">
+                                        </td>
+                                        <td>松本 翔太</td>
+                                        <td>1年</td>
+                                        <td>未所属</td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <div class="table-footer">
+
+                            <span>全 15 件中 1-7 件を表示</span>
+
+                            <div class="pagination">
+                                <span class="page-btn">
+                                    <i class="bi bi-chevron-left"></i>
+                                </span>
+                                <span class="page-btn current">1</span>
+                                <span class="page-btn">2</span>
+                                <span class="page-btn">3</span>
+                                <span class="page-btn">
+                                    <i class="bi bi-chevron-right"></i>
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!-- 追加・削除ボタン -->
+                    <div class="move-buttons">
+
+                        <button type="submit"
+                                form="add-form"
+                                class="btn-add">
+                            追加
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+
+                        <button type="submit"
+                                form="remove-form"
+                                class="btn-remove">
+                            <i class="bi bi-chevron-left"></i>
+                            削除
+                        </button>
+
+                    </div>
+
+                    <!-- このクラスの生徒 -->
+                    <section class="student-panel">
+
+                        <div class="student-panel-header">
+
+                            <h2>このクラスの生徒</h2>
+
+                            <div class="student-search">
+                                <i class="bi bi-search"></i>
+                                <input type="search"
+                                       placeholder="生徒名で検索"
+                                       aria-label="このクラスの生徒を検索">
+                            </div>
+
+                        </div>
+
+                        <div class="student-table-wrapper">
+
+                            <table class="student-table">
+
+                                <thead>
+                                    <tr>
+                                        <th class="check-col">
+                                            <input type="checkbox"
+                                                   aria-label="全員選択（表示のみ）"
+                                                   disabled>
+                                        </th>
+                                        <th>生徒名</th>
+                                        <th>学年</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="remove_students"
+                                                   value="101"
+                                                   form="remove-form"
+                                                   >
+                                        </td>
+                                        <td>佐藤 太郎</td>
+                                        <td>1年</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="remove_students"
+                                                   value="102"
+                                                   form="remove-form"
+                                                   >
+                                        </td>
+                                        <td>鈴木 さくら</td>
+                                        <td>1年</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="remove_students"
+                                                   value="103"
+                                                   form="remove-form"
+                                                   >
+                                        </td>
+                                        <td>田中 美咲</td>
+                                        <td>1年</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="remove_students"
+                                                   value="104"
+                                                   form="remove-form"
+                                                   >
+                                        </td>
+                                        <td>伊藤 健太</td>
+                                        <td>1年</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="remove_students"
+                                                   value="105"
+                                                   form="remove-form"
+                                                   >
+                                        </td>
+                                        <td>山田 花子</td>
+                                        <td>1年</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="remove_students"
+                                                   value="106"
+                                                   form="remove-form"
+                                                   >
+                                        </td>
+                                        <td>木村 一郎</td>
+                                        <td>1年</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="remove_students"
+                                                   value="107"
+                                                   form="remove-form"
+                                                   >
+                                        </td>
+                                        <td>吉田 優</td>
+                                        <td>1年</td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <div class="table-footer">
+
+                            <span>全 32 件中 1-7 件を表示</span>
+
+                            <div class="pagination">
+                                <span class="page-btn">
+                                    <i class="bi bi-chevron-left"></i>
+                                </span>
+                                <span class="page-btn current">1</span>
+                                <span class="page-btn">2</span>
+                                <span class="page-btn">3</span>
+                                <span class="page-btn">4</span>
+                                <span class="page-btn">5</span>
+                                <span class="page-btn">
+                                    <i class="bi bi-chevron-right"></i>
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+            </section>
+
+            <!-- フォーム送信先は既存のFlaskルートに合わせて設定 -->
+            <form id="add-form"
+                  action=""
+                  method="POST"></form>
+
+            <form id="remove-form"
+                  action=""
+                  method="POST"></form>
+
+            <form id="confirm-form"
+                  action=""
+                  method="POST"></form>
+
+            <!-- 下部ボタン -->
+            <div class="bottom-actions">
+
+                <a href="{{ url_for('manage_class') }}"
+                   class="btn-cancel">
+                    キャンセル
+                </a>
+
+                <a type="submit"
+                        form="confirm-form"
+                        href="{{ url_for('manage_allo_check') }}"
+                        class="btn-confirm">
+                    確認画面へ
+                    <i class="bi bi-chevron-right"></i>
+            </a>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
+</body>
+</html>
