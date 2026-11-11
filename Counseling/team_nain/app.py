@@ -1577,20 +1577,159 @@ def manage_allo_check():
 def manage_allo_complete():
     return render_template("Management/ManageClass/manage_allo_complete.html")
 
+# =========================
+# クラスの新規登録 (入力 → 確認 → 完了)
+# 入力内容は確認画面に進むときに session["clarec"] に保存し、登録で DB に反映する
+# =========================
+
+def _unassigned_students():
+    """クラスに所属していない (class_id が空の) 生徒"""
+    return (
+        User.query
+        .filter_by(role=User.ROLE_STUDENT, class_id=None)
+        .order_by(User.username)
+        .all()
+    )
+
+
+def _render_clarec(form_values, errors=None):
+    teachers = User.query.filter_by(role=User.ROLE_TEACHER).order_by(User.username).all()
+    students = [{"id": s.id, "name": s.display_name} for s in _unassigned_students()]
+    return render_template(
+        "Management/ManageClass/manage_clarec.html",
+        teachers=teachers,
+        students=students,
+        form=form_values,
+        errors=errors or {},
+    )
+
+
 @app.route("/manage_clarec")
 @role_required(User.ROLE_ADMIN)
 def manage_clarec():
-    return render_template("Management/ManageClass/manage_clarec.html")
+    # 確認画面の「戻る」からは、入力した内容を残したまま表示する
+    if request.args.get("back") and session.get("clarec"):
+        return _render_clarec(session["clarec"])
+    session.pop("clarec", None)
+    return _render_clarec({"grade": "", "section": "", "teacher_id": "", "student_ids": []})
 
-@app.route("/manage_clarec_check")
+
+@app.route("/manage_clarec_check", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_clarec_check():
-    return render_template("Management/ManageClass/manage_clarec_check.html")
+    if request.method == "GET":
+        data = session.get("clarec")
+        if not data:
+            return redirect(url_for("manage_clarec"))
+    else:
+        # 入力画面の「確認画面へ」: 入力チェックをして session に保存する
+        grade = request.form.get("grade", "").strip()
+        section = request.form.get("section", "").strip()
+        teacher_id = request.form.get("teacher_id", "").strip()
+        student_ids = [int(v) for v in request.form.getlist("student_ids") if v.isdigit()]
+        form_values = {"grade": grade, "section": section, "teacher_id": teacher_id, "student_ids": student_ids}
 
-@app.route("/manage_clarec_complete")
+        # 「組」まで入力されていたら取り除く (例: 「A組」→「A」)
+        if section.endswith("組"):
+            section = section[:-1].strip()
+            form_values["section"] = section
+
+        errors = {}
+        if not grade:
+            errors["grade"] = "学年を入力してください。"
+        elif not grade.isdigit() or not 1 <= int(grade) <= 6:
+            errors["grade"] = "学年は1〜6の数字で入力してください。"
+
+        if not section:
+            errors["section"] = "クラスを入力してください。"
+
+        teacher = None
+        if not teacher_id:
+            errors["teacher_id"] = "担任の先生を選択してください。"
+        else:
+            teacher = User.query.filter_by(id=teacher_id, role=User.ROLE_TEACHER).first() if teacher_id.isdigit() else None
+            if teacher is None:
+                errors["teacher_id"] = "担任の先生を選択してください。"
+
+        if not errors and Class.query.filter_by(name=f"{int(grade)}年{section}組").first():
+            errors["section"] = f"{int(grade)}年{section}組 はすでに登録されています。"
+
+        if errors:
+            return _render_clarec(form_values, errors)
+
+        data = dict(form_values, grade=str(int(grade)))
+        session["clarec"] = data
+
+    teacher = db.session.get(User, int(data["teacher_id"]))
+    students = (
+        User.query.filter(User.id.in_(data["student_ids"])).order_by(User.username).all()
+        if data["student_ids"] else []
+    )
+    return render_template(
+        "Management/ManageClass/manage_clarec_check.html",
+        data=data,
+        teacher=teacher,
+        students=students,
+    )
+
+
+@app.route("/manage_clarec_complete", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_clarec_complete():
-    return render_template("Management/ManageClass/manage_clarec_complete.html")
+    if request.method == "POST":
+        # 確認画面の「登録する」: クラスを作り、選んだ生徒をそのクラスに所属させる
+        data = session.get("clarec")
+        if not data:
+            return redirect(url_for("manage_clarec"))
+
+        grade = int(data["grade"])
+        section = data["section"]
+        name = f"{grade}年{section}組"
+
+        if Class.query.filter_by(name=name).first():
+            session["clarec"] = data
+            flash(f"{name} はすでに登録されています。")
+            return redirect(url_for("manage_clarec", back=1))
+
+        new_class = Class(name=name, grade=grade, section=section,
+                          homeroom_teacher_id=int(data["teacher_id"]))
+        db.session.add(new_class)
+        db.session.flush()
+
+        # 確認中に他のクラスへ割り当てられた生徒は除く
+        students = []
+        if data["student_ids"]:
+            students = (
+                User.query
+                .filter(User.id.in_(data["student_ids"]),
+                        User.role == User.ROLE_STUDENT,
+                        User.class_id.is_(None))
+                .all()
+            )
+        for s in students:
+            s.class_id = new_class.id
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash(f"{name} はすでに登録されています。")
+            return redirect(url_for("manage_clarec", back=1))
+
+        session.pop("clarec", None)
+        teacher = db.session.get(User, new_class.homeroom_teacher_id)
+        session["clarec_done"] = {
+            "grade": grade,
+            "section": section,
+            "teacher": teacher.display_name if teacher else "",
+            "student_count": len(students),
+        }
+        return redirect(url_for("manage_clarec_complete"))
+
+    done = session.get("clarec_done")
+    if not done:
+        return redirect(url_for("manage_class"))
+    return render_template("Management/ManageClass/manage_clarec_complete.html", done=done)
 
 @app.route("/management_survey")
 @role_required(User.ROLE_ADMIN)

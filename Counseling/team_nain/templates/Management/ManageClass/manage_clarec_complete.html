@@ -127,22 +127,22 @@
                         <tbody>
                             <tr>
                                 <th>学年</th>
-                                <td>1年</td>
+                                <td>{{ done.grade }}年</td>
                             </tr>
 
                             <tr>
                                 <th>クラス</th>
-                                <td>1組</td>
+                                <td>{{ done.section }}組</td>
                             </tr>
 
                             <tr>
                                 <th>担任の先生</th>
-                                <td>山田 花子</td>
+                                <td>{{ done.teacher }}</td>
                             </tr>
 
                             <tr>
                                 <th>割り当てた生徒数</th>
-                                <td>30名</td>
+                                <td>{{ done.student_count }}名</td>
                             </tr>
                         </tbody>
                     </table>

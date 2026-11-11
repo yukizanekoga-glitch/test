@@ -120,12 +120,12 @@
                         <tbody>
                             <tr>
                                 <th>学年</th>
-                                <td>1年</td>
+                                <td>{{ data.grade }}年</td>
                             </tr>
 
                             <tr>
                                 <th>クラス</th>
-                                <td>1組</td>
+                                <td>{{ data.section }}組</td>
                             </tr>
                         </tbody>
                     </table>
@@ -144,7 +144,7 @@
                         <tbody>
                             <tr>
                                 <th>担任の先生</th>
-                                <td>山田 花子</td>
+                                <td>{{ teacher.display_name if teacher else "" }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -156,7 +156,7 @@
 
                     <div class="section-heading">
                         <span class="step-number">3</span>
-                        <h2>割り当てる生徒（30名）</h2>
+                        <h2>割り当てる生徒（{{ students|length }}名）</h2>
                     </div>
 
                     <div class="student-scroll">
@@ -169,36 +169,11 @@
                             </thead>
 
                             <tbody>
-                                <tr><td>佐藤 太郎</td></tr>
-                                <tr><td>田中 美咲</td></tr>
-                                <tr><td>鈴木 さくら</td></tr>
-                                <tr><td>高橋 蓮</td></tr>
-                                <tr><td>伊藤 さやか</td></tr>
-                                <tr><td>加藤 陽菜</td></tr>
-                                <tr><td>中村 翔</td></tr>
-                                <tr><td>渡辺 大和</td></tr>
-                                <tr><td>小林 結衣</td></tr>
-                                <tr><td>山本 悠斗</td></tr>
-                                <tr><td>吉田 美月</td></tr>
-                                <tr><td>山田 陽翔</td></tr>
-                                <tr><td>佐々木 葵</td></tr>
-                                <tr><td>山口 結菜</td></tr>
-                                <tr><td>松本 悠真</td></tr>
-                                <tr><td>井上 咲良</td></tr>
-                                <tr><td>木村 健一</td></tr>
-                                <tr><td>林 颯太</td></tr>
-                                <tr><td>清水 莉子</td></tr>
-                                <tr><td>斎藤 蓮斗</td></tr>
-                                <tr><td>池田 美咲</td></tr>
-                                <tr><td>橋本 翔太</td></tr>
-                                <tr><td>石川 結衣</td></tr>
-                                <tr><td>前田 陽菜</td></tr>
-                                <tr><td>藤田 悠斗</td></tr>
-                                <tr><td>岡田 さくら</td></tr>
-                                <tr><td>後藤 大翔</td></tr>
-                                <tr><td>長谷川 葵</td></tr>
-                                <tr><td>村上 美月</td></tr>
-                                <tr><td>近藤 蓮</td></tr>
+                                {% for s in students %}
+                                <tr><td>{{ s.display_name }}</td></tr>
+                                {% else %}
+                                <tr><td>割り当てる生徒はいません。</td></tr>
+                                {% endfor %}
                             </tbody>
                         </table>
 
@@ -209,12 +184,12 @@
                 <!-- 下部ボタン -->
                 <div class="form-actions">
 
-                    <a href="/manage_clarec" class="back-btn">
+                    <a href="{{ url_for('manage_clarec', back=1) }}" class="back-btn">
                         <i class="bi bi-chevron-left"></i>
                         戻る
                     </a>
 
-                    <form action="manage_clarec_complete" class="register-form">
+                    <form action="{{ url_for('manage_clarec_complete') }}" method="post" class="register-form">
                         <button type="submit" class="register-btn">
                             登録する
                             <i class="bi bi-chevron-right"></i>

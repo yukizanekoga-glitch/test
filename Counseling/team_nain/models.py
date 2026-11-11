@@ -25,6 +25,7 @@ class User(db.Model):
     display_name = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(20), nullable=False)
     class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=True)
+    class_number = db.Column(db.Integer, nullable=True)  # 出席番号 (重複あり)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     school_class = db.relationship('Class', foreign_keys=[class_id], back_populates='students')

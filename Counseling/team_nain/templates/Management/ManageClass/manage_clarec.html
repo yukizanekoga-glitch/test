@@ -14,6 +14,25 @@
     <!-- CSS -->
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/manage_clarec.css') }}">
+
+    <style>
+        /* 未入力などのエラーメッセージ */
+        .field-error {
+            margin: 6px 24px 0;
+            color: #d93025;
+            font-size: 13px;
+        }
+
+        .field-error.page-error {
+            margin: 0 0 12px;
+        }
+
+        /* 一覧が空のとき */
+        .student-table td.empty-cell {
+            color: #8a94a6;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -96,7 +115,14 @@
             </div>
 
             <!-- 登録フォーム -->
-            <form action="#" method="post" class="register-card">
+            {% with messages = get_flashed_messages() %}
+                {% for message in messages %}
+                    <p class="field-error page-error">{{ message }}</p>
+                {% endfor %}
+            {% endwith %}
+
+            <!-- 登録フォーム (未入力のエラーは画面に表示するため、ブラウザの入力チェックは使わない) -->
+            <form action="{{ url_for('manage_clarec_check') }}" method="post" class="register-card" id="clarecForm" novalidate>
 
                 <!-- 1 クラス情報 -->
                 <section class="form-section">
@@ -118,7 +144,7 @@
                             min="1"
                             max="6"
                             placeholder="例）1"
-                            required
+                            value="{{ form.grade }}"
                         >
                         <span class="unit">年</span>
 
@@ -128,13 +154,16 @@
                         <input
                             type="text"
                             id="class_name"
-                            name="class_name"
+                            name="section"
                             placeholder="例）1"
-                            required
+                            value="{{ form.section }}"
                         >
                         <span class="unit">組</span>
 
                     </div>
+
+                    {% if errors.grade %}<p class="field-error">{{ errors.grade }}</p>{% endif %}
+                    {% if errors.section %}<p class="field-error">{{ errors.section }}</p>{% endif %}
                 </section>
 
                 <!-- 2 担任の先生 -->
@@ -150,16 +179,18 @@
                         <label for="teacher">担任の先生</label>
                         <span class="required">必須</span>
 
-                        <select id="teacher" name="teacher" required>
-                            <option value="" selected disabled>
+                        <select id="teacher" name="teacher_id">
+                            <option value="" {% if not form.teacher_id %}selected{% endif %} disabled>
                                 先生を選択してください
                             </option>
-                            <option value="1">山田 花子</option>
-                            <option value="2">佐藤 太郎</option>
-                            <option value="3">田中 一郎</option>
+                            {% for t in teachers %}
+                            <option value="{{ t.id }}" {% if form.teacher_id|string == t.id|string %}selected{% endif %}>{{ t.display_name }}</option>
+                            {% endfor %}
                         </select>
 
                     </div>
+
+                    {% if errors.teacher_id %}<p class="field-error">{{ errors.teacher_id }}</p>{% endif %}
                 </section>
 
                 <!-- 3 生徒の割り当て -->
@@ -177,7 +208,7 @@
 
                     <div class="student-panels">
 
-                        <!-- 未所属の生徒 -->
+                        <!-- 未所属の生徒 (class_id が空の生徒。中身はJavaScriptで作成します) -->
                         <div class="student-panel">
 
                             <h3>未所属の生徒</h3>
@@ -186,8 +217,10 @@
                                 <i class="bi bi-search"></i>
                                 <input
                                     type="search"
+                                    id="studentSearch"
                                     placeholder="生徒名で検索"
                                     aria-label="生徒名で検索"
+                                    autocomplete="off"
                                 >
                             </div>
 
@@ -199,47 +232,18 @@
                                     </tr>
                                 </thead>
 
-                                <tbody>
-                                    <tr>
-                                        <td><input type="checkbox" name="students" value="1"></td>
-                                        <td>佐藤 太郎</td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="checkbox" name="students" value="2"></td>
-                                        <td>田中 美咲</td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="checkbox" name="students" value="3"></td>
-                                        <td>鈴木 さくら</td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="checkbox" name="students" value="4"></td>
-                                        <td>高橋 蓮</td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="checkbox" name="students" value="5"></td>
-                                        <td>伊藤 さやか</td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="checkbox" name="students" value="6"></td>
-                                        <td>加藤 陽菜</td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="checkbox" name="students" value="7"></td>
-                                        <td>中村 翔</td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="unassignedBody"></tbody>
                             </table>
 
                         </div>
 
-                        <!-- 選択済みの生徒 -->
+                        <!-- 選択済みの生徒 (中身はJavaScriptで作成します) -->
                         <div class="student-panel">
 
                             <div class="selected-header">
-                                <h3>選択済みの生徒（3名）</h3>
+                                <h3>選択済みの生徒（<span id="selectedCount">0</span>名）</h3>
 
-                                <button type="button" class="clear-btn">
+                                <button type="button" class="clear-btn" id="clearAll">
                                     すべて削除
                                 </button>
                             </div>
@@ -252,37 +256,15 @@
                                     </tr>
                                 </thead>
 
-                                <tbody>
-                                    <tr>
-                                        <td>木村 健一</td>
-                                        <td>
-                                            <button type="button" class="delete-btn">
-                                                削除
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>加藤 陽菜</td>
-                                        <td>
-                                            <button type="button" class="delete-btn">
-                                                削除
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>中村 翔</td>
-                                        <td>
-                                            <button type="button" class="delete-btn">
-                                                削除
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="selectedBody"></tbody>
                             </table>
 
                         </div>
 
                     </div>
+
+                    <!-- 選択済みの生徒を送信する欄 (JavaScriptで作成します) -->
+                    <div id="selectedInputs" hidden></div>
                 </section>
 
                 <!-- 下部ボタン -->
@@ -293,10 +275,10 @@
                         クラス管理に戻る
                     </a>
 
-                    <a href="{{ url_for('manage_clarec_check') }}" type="submit" class="confirm-btn">
+                    <button type="submit" class="confirm-btn">
                         確認画面へ
                         <i class="bi bi-chevron-right"></i>
-                    </a>
+                    </button>
 
                 </div>
 
@@ -304,6 +286,138 @@
 
         </main>
     </div>
+
+    <!-- 生徒の割り当て
+         未所属の生徒にチェックを入れると、その場で「選択済みの生徒」に移る。
+         「削除」「すべて削除」で「未所属の生徒」に戻る。
+         どの生徒を選んだかは selectedIds だけで管理し、表示は render() で毎回作り直す
+         (あとでドラッグ&ドロップなどを足すときも、selectedIds を変えて render() を呼べばよい) -->
+    <script>
+        (function () {
+            // 未所属の生徒 [{id, name}] (DBの users から)
+            const students = {{ students | tojson }};
+
+            // 選択済みの生徒の id (選んだ順)
+            const selectedIds = {{ form.student_ids | tojson }}.filter(function (id) {
+                return students.some(function (s) { return s.id === id; });
+            });
+
+            const unassignedBody = document.getElementById("unassignedBody");
+            const selectedBody = document.getElementById("selectedBody");
+            const selectedCount = document.getElementById("selectedCount");
+            const selectedInputs = document.getElementById("selectedInputs");
+            const studentSearch = document.getElementById("studentSearch");
+            const clearAll = document.getElementById("clearAll");
+
+            function removeSpaces(text) {
+                return text.replace(/[\s　]/g, "");
+            }
+
+            function findStudent(id) {
+                return students.find(function (s) { return s.id === id; });
+            }
+
+            function emptyRow(colspan, text) {
+                const row = document.createElement("tr");
+                const td = document.createElement("td");
+                td.colSpan = colspan;
+                td.className = "empty-cell";
+                td.textContent = text;
+                row.appendChild(td);
+                return row;
+            }
+
+            function select(id) {
+                if (!selectedIds.includes(id)) selectedIds.push(id);
+                render();
+            }
+
+            function unselect(id) {
+                const index = selectedIds.indexOf(id);
+                if (index >= 0) selectedIds.splice(index, 1);
+                render();
+            }
+
+            function render() {
+                // 未所属の生徒 (選択済みと検索に合わない生徒は出さない)
+                const keyword = removeSpaces(studentSearch.value);
+                const unassigned = students.filter(function (s) {
+                    return !selectedIds.includes(s.id) && removeSpaces(s.name).includes(keyword);
+                });
+
+                unassignedBody.replaceChildren();
+                unassigned.forEach(function (s) {
+                    const row = document.createElement("tr");
+                    row.dataset.studentId = s.id;
+
+                    const checkCell = row.insertCell();
+                    const check = document.createElement("input");
+                    check.type = "checkbox";
+                    check.setAttribute("aria-label", s.name + "を選択");
+                    check.addEventListener("change", function () { select(s.id); });
+                    checkCell.appendChild(check);
+
+                    row.insertCell().textContent = s.name;
+                    unassignedBody.appendChild(row);
+                });
+
+                if (unassigned.length === 0) {
+                    let text = "未所属の生徒はいません。";
+                    if (keyword && students.length > selectedIds.length) text = "該当する生徒はいません。";
+                    unassignedBody.appendChild(emptyRow(2, text));
+                }
+
+                // 選択済みの生徒
+                selectedBody.replaceChildren();
+                selectedInputs.replaceChildren();
+                selectedIds.forEach(function (id) {
+                    const s = findStudent(id);
+                    const row = document.createElement("tr");
+                    row.dataset.studentId = id;
+
+                    row.insertCell().textContent = s.name;
+
+                    const actionCell = row.insertCell();
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "delete-btn";
+                    button.textContent = "削除";
+                    button.addEventListener("click", function () { unselect(id); });
+                    actionCell.appendChild(button);
+
+                    selectedBody.appendChild(row);
+
+                    // 確認画面に送る値
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "student_ids";
+                    input.value = id;
+                    selectedInputs.appendChild(input);
+                });
+
+                if (selectedIds.length === 0) {
+                    selectedBody.appendChild(emptyRow(2, "選択された生徒はいません。"));
+                }
+
+                selectedCount.textContent = selectedIds.length;
+                clearAll.disabled = selectedIds.length === 0;
+            }
+
+            clearAll.addEventListener("click", function () {
+                selectedIds.length = 0;
+                render();
+            });
+
+            studentSearch.addEventListener("input", render);
+
+            // 検索欄で Enter を押してもフォームを送信しない
+            studentSearch.addEventListener("keydown", function (event) {
+                if (event.key === "Enter") event.preventDefault();
+            });
+
+            render();
+        })();
+    </script>
 
     <!-- ログアウトの確認ポップアップ (全画面共通) -->
     <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
