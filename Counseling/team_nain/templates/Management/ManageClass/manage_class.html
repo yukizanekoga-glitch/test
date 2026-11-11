@@ -102,16 +102,18 @@
                 <!-- 検索・新規登録 -->
                 <div class="toolbar">
 
+                    <!-- 入力に合わせてクラス名をその場で絞り込む (送信はしない) -->
                     <form class="search-box"
+                          id="classSearchForm"
                           action="{{ url_for('manage_class') }}"
                         >
 
                         <i class="bi bi-search"></i>
 
                         <input type="search"
-                               name="q"
+                               id="classSearch"
                                placeholder="クラス名で検索"
-                               value="{{ request.args.get('q', '') }}">
+                               autocomplete="off">
 
                         <button type="submit" class="search-submit">
                             検索
@@ -143,62 +145,15 @@
 
                         <tbody>
 
-                            <tr>
-                                <td>1年1組</td>
-                                <td>佐藤 太郎 先生</td>
-                                <td>32 人</td>
-                                <td>
-                                    <a href="{{ url_for('manage_allo') }}"
-                                       class="btn-assign">
-                                        <i class="bi bi-people-fill"></i>
-                                        割り当て
-                                    </a>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>1年2組</td>
-                                <td>田中 美咲 先生</td>
-                                <td>30 人</td>
-                                <td>
-                                    <a href="{{ url_for('manage_allo') }}"
-                                       class="btn-assign">
-                                        <i class="bi bi-people-fill"></i>
-                                        割り当て
-                                    </a>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>1年3組</td>
-                                <td>山本 健一 先生</td>
-                                <td>28 人</td>
-                                <td>
-                                    <a href="{{ url_for('manage_allo') }}"
-                                       class="btn-assign">
-                                        <i class="bi bi-people-fill"></i>
-                                        割り当て
-                                    </a>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>2年1組</td>
-                                <td>鈴木 さくら 先生</td>
-                                <td>31 人</td>
-                                <td>
-                                    <a href="{{ url_for('manage_allo') }}"
-                                       class="btn-assign">
-                                        <i class="bi bi-people-fill"></i>
-                                        割り当て
-                                    </a>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>2年2組</td>
+                            {% for row in rows %}
+                            <tr class="class-row" data-name="{{ row.name }}">
+                                <td>{{ row.name }}</td>
+                                {% if row.teacher %}
+                                <td>{{ row.teacher }} 先生</td>
+                                {% else %}
                                 <td class="not-set">未設定</td>
-                                <td>0 人</td>
+                                {% endif %}
+                                <td>{{ row.student_count }} 人</td>
                                 <td>
                                     <a href="{{ url_for('manage_allo') }}"
                                        class="btn-assign">
@@ -207,44 +162,15 @@
                                     </a>
                                 </td>
                             </tr>
-
+                            {% else %}
                             <tr>
-                                <td>3年1組</td>
-                                <td>伊藤 さやか 先生</td>
-                                <td>29 人</td>
-                                <td>
-                                    <a href="{{ url_for('manage_allo') }}"
-                                       class="btn-assign">
-                                        <i class="bi bi-people-fill"></i>
-                                        割り当て
-                                    </a>
-                                </td>
+                                <td colspan="4">登録されているクラスはありません。</td>
                             </tr>
+                            {% endfor %}
 
-                            <tr>
-                                <td>3年2組</td>
-                                <td>高橋 蓮 先生</td>
-                                <td>27 人</td>
-                                <td>
-                                    <a href="{{ url_for('manage_allo') }}"
-                                       class="btn-assign">
-                                        <i class="bi bi-people-fill"></i>
-                                        割り当て
-                                    </a>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>3年3組</td>
-                                <td>木村 花子 先生</td>
-                                <td>25 人</td>
-                                <td>
-                                    <a href="{{ url_for('manage_allo') }}"
-                                       class="btn-assign">
-                                        <i class="bi bi-people-fill"></i>
-                                        割り当て
-                                    </a>
-                                </td>
+                            <!-- 検索に一致するクラスがないとき -->
+                            <tr id="noMatchRow" hidden>
+                                <td colspan="4">該当するクラスはありません。</td>
                             </tr>
 
                         </tbody>
@@ -268,6 +194,39 @@
         </main>
 
     </div>
+
+    <!-- クラス名の絞り込み (先生の生徒一覧画面と同じく、入力するたびに絞り込む) -->
+    <script>
+        const classSearchForm = document.getElementById("classSearchForm");
+        const classSearch = document.getElementById("classSearch");
+        const classRows = document.querySelectorAll(".class-row");
+        const noMatchRow = document.getElementById("noMatchRow");
+
+        function removeSpaces(text) {
+            return text.replace(/[\s　]/g, "");
+        }
+
+        function filterClasses() {
+            const keyword = removeSpaces(classSearch.value);
+            let shown = 0;
+
+            classRows.forEach(function(row) {
+                const match = removeSpaces(row.dataset.name).includes(keyword);
+                row.hidden = !match;
+                if (match) shown++;
+            });
+
+            noMatchRow.hidden = classRows.length === 0 || shown > 0;
+        }
+
+        classSearch.addEventListener("input", filterClasses);
+
+        // 検索ボタン・Enter では画面を送信せず、その場で絞り込む
+        classSearchForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            filterClasses();
+        });
+    </script>
 
     <!-- ログアウトの確認ポップアップ (全画面共通) -->
     <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>

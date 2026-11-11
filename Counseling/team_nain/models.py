@@ -45,6 +45,8 @@ class Class(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
+    grade = db.Column(db.Integer, nullable=True)        # 年 (例: 1年A組 → 1)
+    section = db.Column(db.String(20), nullable=True)   # 組 (例: 1年A組 → A)
     homeroom_teacher_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

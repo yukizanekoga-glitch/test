@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>面談可能日時の登録内容の確認 | スクールカウンセラー相談予約システム</title>
+    <title>面談可能日時の変更内容の確認 | スクールカウンセラー相談予約システム</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/care_chadel_check.css') }}">
@@ -77,17 +77,17 @@
             <!-- タイトル -->
             <div class="page-heading">
                 <span class="heading-line"></span>
-                <h1>面談可能日時の登録内容の確認</h1>
+                <h1>面談可能日時の変更内容の確認</h1>
             </div>
 
             <p class="description">
-                以下の内容でよろしければ、「登録する」ボタンを押してください。
+                以下の内容でよろしければ、「確定する」ボタンを押してください。
             </p>
 
-            <!-- 登録内容パネル -->
+            <!-- 変更内容パネル -->
             <section class="content-panel information-panel">
 
-                <h2 class="section-title">登録内容</h2>
+                <h2 class="section-title">変更内容</h2>
 
                 <table class="info-table">
                     <tbody>
@@ -108,7 +108,7 @@
             <section class="content-panel schedule-panel">
 
                 <h2 class="section-title">
-                    下記の時間で登録します。
+                    下記の時間で確定します。
                 </h2>
 
                 <div class="table-wrapper">
@@ -142,7 +142,7 @@
 
                 <form method="post" action="{{ url_for('care_chadel_check') }}">
                     <button type="submit" class="btn btn-register">
-                        登録する
+                        確定する
                     </button>
                 </form>
 

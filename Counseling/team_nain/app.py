@@ -1041,7 +1041,30 @@ def _slot_view(values):
 @app.route("/management_top")
 @role_required(User.ROLE_ADMIN)
 def management_top():
-    return render_template("Management/management_top.html")
+    # 件数カード: ロールごとのユーザー数とクラス数
+    counts = {
+        "student": User.query.filter_by(role=User.ROLE_STUDENT).count(),
+        "teacher": User.query.filter_by(role=User.ROLE_TEACHER).count(),
+        "counselor": User.query.filter_by(role=User.ROLE_COUNSELOR).count(),
+        "class": Class.query.count(),
+    }
+
+    # 近日の面談予定: これからの確定済み予約を日時の早い順に最大5件
+    now = datetime.now()
+    upcoming = (
+        Reservation.query
+        .join(AvailableSlot)
+        .filter(Reservation.status == Reservation.STATUS_CONFIRMED)
+        .filter(
+            (AvailableSlot.date > now.date())
+            | ((AvailableSlot.date == now.date()) & (AvailableSlot.start_time >= now.time()))
+        )
+        .order_by(AvailableSlot.date, AvailableSlot.start_time)
+        .limit(5)
+        .all()
+    )
+
+    return render_template("Management/management_top.html", counts=counts, upcoming=upcoming)
 
 
 # =========================
@@ -1369,7 +1392,19 @@ def manage_carepass_complete():
 @app.route("/manage_class")
 @role_required(User.ROLE_ADMIN)
 def manage_class():
-    return render_template("Management/ManageClass/manage_class.html")
+    # クラス一覧: classes を参照して、クラス名・担任・生徒数を表示する
+    # (クラス名の検索は画面側で入力に合わせて絞り込む)
+    classes = Class.query.order_by(Class.name).all()
+
+    rows = [
+        {
+            "name": c.name,
+            "teacher": c.homeroom_teacher.display_name if c.homeroom_teacher else None,
+            "student_count": sum(1 for s in c.students if s.role == User.ROLE_STUDENT),
+        }
+        for c in classes
+    ]
+    return render_template("Management/ManageClass/manage_class.html", rows=rows)
 
 @app.route("/manage_allo")
 @role_required(User.ROLE_ADMIN)

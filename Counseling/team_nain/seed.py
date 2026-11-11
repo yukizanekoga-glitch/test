@@ -63,7 +63,7 @@ def run():
         teacher = User.query.filter_by(username='teacher01').first()
 
         if teacher and not Class.query.filter_by(name='1年A組').first():
-            school_class = Class(name='1年A組', homeroom_teacher_id=teacher.id)
+            school_class = Class(name='1年A組', grade=1, section='A', homeroom_teacher_id=teacher.id)
             db.session.add(school_class)
             db.session.flush()
 
