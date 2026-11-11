@@ -85,26 +85,40 @@
 
             </div>
 
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             <!-- 検索・一括削除 -->
-            <div class="student-toolbar">
+            <form method="get" action="{{ url_for('manage_student') }}" class="student-toolbar">
 
                 <div class="student-search">
-                    <input type="text"
-                           class="form-control"
-                           placeholder="生徒名で検索"
-                           aria-label="生徒名で検索">
+                    <div class="input-group">
+                        <input type="text"
+                               name="q"
+                               value="{{ q }}"
+                               class="form-control"
+                               placeholder="生徒名で検索"
+                               aria-label="生徒名で検索">
+                        <button type="submit" class="btn btn-outline-secondary">検索</button>
+                    </div>
                 </div>
 
                 <div class="class-search">
                     <label for="classFilter">クラス</label>
 
-                    <select id="classFilter" class="form-select">
-                        <option>すべて</option>
-                        <option>1年1組</option>
-                        <option>1年2組</option>
-                        <option>2年4組</option>
-                        <option>2年8組</option>
-                        <option>3年1組</option>
+                    <select id="classFilter" name="class_id" class="form-select" onchange="this.form.submit()">
+                        <option value="" {{ "selected" if not selected_class_id }}>すべて</option>
+                        <option value="none" {{ "selected" if selected_class_id == "none" }}>未設定（-）</option>
+                        {% for school_class in classes %}
+                        <option value="{{ school_class.id }}" {{ "selected" if selected_class_id == school_class.id|string }}>
+                            {{ school_class.name }}
+                        </option>
+                        {% endfor %}
                     </select>
                 </div>
 
@@ -115,21 +129,7 @@
                     一括削除
                 </button>
 
-            </div>
-
-            <!-- 仮の生徒データ -->
-            {% set students = [
-                ("1001", "青木 太郎", "1年1組"),
-                ("1002", "伊藤 花子", "未設定（-）"),
-                ("1003", "加藤 大輔", "3年1組"),
-                ("1004", "佐藤 美咲", "未設定（-）"),
-                ("1005", "鈴木 健太", "1年2組"),
-                ("1006", "高橋 蓮", "未設定（-）"),
-                ("1007", "田中 一郎", "未設定（-）"),
-                ("1008", "中村 さくら", "2年4組"),
-                ("1009", "林 美月", "未設定（-）"),
-                ("1010", "山本 翔太", "2年8組")
-            ] %}
+            </form>
 
             <!-- 生徒一覧 -->
             <div class="table-responsive student-table-box">
@@ -148,11 +148,11 @@
                     <tbody>
                         {% for student in students %}
                         <tr>
-                            <td>{{ student[0] }}</td>
+                            <td>{{ student.id }}</td>
 
-                            <td>{{ student[1] }}</td>
+                            <td>{{ student.display_name }}</td>
 
-                            <td>{{ student[2] }}</td>
+                            <td>{{ student.school_class.name if student.school_class else "未設定（-）" }}</td>
 
                             <td>
                                 <div class="student-actions">
@@ -162,22 +162,31 @@
                                             class="btn btn-edit"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editModal"
-                                            data-number="{{ student[0] }}"
-                                            data-name="{{ student[1] }}"
-                                            data-class="{{ student[2] }}">
+                                            data-id="{{ student.id }}"
+                                            data-name="{{ student.display_name }}"
+                                            data-class="{{ student.class_id or '' }}">
                                         編集
                                     </button>
 
                                     <!-- 一括削除用チェックボックス -->
                                     <input type="checkbox"
                                            class="form-check-input student-checkbox"
-                                           value="{{ student[0] }}"
-                                           aria-label="{{ student[1] }}を選択">
+                                           name="student_ids"
+                                           value="{{ student.id }}"
+                                           form="bulkDeleteForm"
+                                           aria-label="{{ student.display_name }}を選択">
 
                                 </div>
                             </td>
                         </tr>
                         {% endfor %}
+                        {% if not students %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                該当する生徒が見つかりません。
+                            </td>
+                        </tr>
+                        {% endif %}
                     </tbody>
 
                 </table>
@@ -193,21 +202,27 @@
                 </a>
 
                 <div class="pagination-area">
-                    <button type="button" class="page-btn">‹</button>
-                    <button type="button" class="page-btn active">1</button>
-                    <button type="button" class="page-btn">2</button>
-                    <button type="button" class="page-btn">3</button>
-                    <button type="button" class="page-btn">4</button>
-                    <button type="button" class="page-btn">5</button>
-                    <span>…</span>
-                    <button type="button" class="page-btn">32</button>
-                    <button type="button" class="page-btn">›</button>
+                    {% if page > 1 %}
+                    <a href="{{ url_for('manage_student', q=q, class_id=selected_class_id, page=page-1) }}" class="page-btn">‹</a>
+                    {% endif %}
+
+                    {% for p in range(1, total_pages + 1) %}
+                    <a href="{{ url_for('manage_student', q=q, class_id=selected_class_id, page=p) }}"
+                       class="page-btn {{ 'active' if p == page else '' }}">{{ p }}</a>
+                    {% endfor %}
+
+                    {% if page < total_pages %}
+                    <a href="{{ url_for('manage_student', q=q, class_id=selected_class_id, page=page+1) }}" class="page-btn">›</a>
+                    {% endif %}
                 </div>
 
             </div>
 
         </main>
     </div>
+
+    <!-- 一括削除フォーム（チェックボックスとモーダルを紐付ける） -->
+    <form id="bulkDeleteForm" method="post" action="{{ url_for('manage_student_bulk_delete') }}"></form>
 
     <!-- 生徒情報編集ポップアップ -->
     <div class="modal fade"
@@ -218,6 +233,8 @@
 
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
+
+                <form method="post" action="{{ url_for('manage_student_edit') }}">
 
                 <div class="modal-header">
                     <h2 class="modal-title" id="editModalLabel">
@@ -231,6 +248,8 @@
                 </div>
 
                 <div class="modal-body">
+
+                    <input type="hidden" id="editStudentId" name="student_id">
 
                     <!-- 学籍番号 -->
                     <div class="edit-row">
@@ -253,6 +272,7 @@
 
                         <input type="text"
                                id="editStudentName"
+                               name="display_name"
                                class="form-control">
                     </div>
 
@@ -264,17 +284,16 @@
 
                         <div class="edit-input-area">
                             <select id="editStudentClass"
+                                    name="class_id"
                                     class="form-select">
 
-                                <option value="未設定（-）">
+                                <option value="">
                                     未設定（-）
                                 </option>
 
-                                <option value="1年1組">1年1組</option>
-                                <option value="1年2組">1年2組</option>
-                                <option value="2年4組">2年4組</option>
-                                <option value="2年8組">2年8組</option>
-                                <option value="3年1組">3年1組</option>
+                                {% for school_class in classes %}
+                                <option value="{{ school_class.id }}">{{ school_class.name }}</option>
+                                {% endfor %}
 
                             </select>
 
@@ -304,6 +323,7 @@
                         <div class="password-field">
                             <input type="password"
                                    id="newPassword"
+                                   name="new_password"
                                    class="form-control"
                                    placeholder="新しいパスワードを入力">
 
@@ -323,6 +343,7 @@
                         <div class="password-field">
                             <input type="password"
                                    id="confirmPassword"
+                                   name="confirm_password"
                                    class="form-control"
                                    placeholder="新しいパスワードを再入力">
 
@@ -343,12 +364,13 @@
                         キャンセル
                     </button>
 
-                    <button type="button"
-                            class="btn btn-save"
-                            data-bs-dismiss="modal">
+                    <button type="submit"
+                            class="btn btn-save">
                         保存する
                     </button>
                 </div>
+
+                </form>
 
             </div>
         </div>
@@ -387,10 +409,6 @@
                         <strong id="selectedCount">0</strong> 件
                     </p>
 
-                    <p class="delete-note">
-                        この画面では実際の削除処理は行いません。
-                    </p>
-
                 </div>
 
                 <div class="modal-footer">
@@ -401,9 +419,9 @@
                         キャンセル
                     </button>
 
-                    <button type="button"
+                    <button type="submit"
                             class="btn btn-delete-confirm"
-                            data-bs-dismiss="modal">
+                            form="bulkDeleteForm">
                         削除
                     </button>
 
@@ -423,8 +441,11 @@
         editModal.addEventListener("show.bs.modal", function(event) {
             const button = event.relatedTarget;
 
+            document.getElementById("editStudentId").value =
+                button.dataset.id;
+
             document.getElementById("editStudentNumber").value =
-                button.dataset.number;
+                button.dataset.id;
 
             document.getElementById("editStudentName").value =
                 button.dataset.name;
@@ -459,8 +480,6 @@
 
             document.getElementById("selectedCount").textContent = count;
         });
-
-        // 実際の編集・削除処理は行わない
     </script>
 
     <!-- ログアウトの確認ポップアップ (全画面共通) -->

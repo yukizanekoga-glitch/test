@@ -1,5 +1,9 @@
+import csv
+import io
 import os
 import re
+import secrets
+import string
 from datetime import date as date_cls, datetime, time as time_cls, timedelta
 from functools import wraps
 
@@ -1068,13 +1072,113 @@ def management_top():
 
 
 # =========================
-# 生徒一覧画面 (管理者機能: 一覧・詳細・登録・編集・削除は今回は未対応)
+# 生徒一覧画面
 # =========================
+
+STUDENTS_PER_PAGE = 10
+
 
 @app.route("/manage_student")
 @role_required(User.ROLE_ADMIN)
 def manage_student():
-    return render_template("Management/ManageStudent/manage_student.html")
+    q = request.args.get("q", "").strip()
+    class_id = request.args.get("class_id", "")
+    page = request.args.get("page", 1, type=int) or 1
+
+    query = User.query.filter_by(role=User.ROLE_STUDENT)
+    if q:
+        query = query.filter(User.display_name.contains(q))
+    if class_id == "none":
+        query = query.filter(User.class_id.is_(None))
+    elif class_id:
+        query = query.filter(User.class_id == int(class_id))
+    query = query.order_by(User.id)
+
+    total = query.count()
+    total_pages = max(1, (total + STUDENTS_PER_PAGE - 1) // STUDENTS_PER_PAGE)
+    page = min(max(page, 1), total_pages)
+    students = query.offset((page - 1) * STUDENTS_PER_PAGE).limit(STUDENTS_PER_PAGE).all()
+
+    classes = Class.query.order_by(Class.name).all()
+
+    return render_template(
+        "Management/ManageStudent/manage_student.html",
+        students=students,
+        classes=classes,
+        q=q,
+        selected_class_id=class_id,
+        page=page,
+        total_pages=total_pages,
+    )
+
+
+@app.route("/manage_student_edit", methods=["POST"])
+@role_required(User.ROLE_ADMIN)
+def manage_student_edit():
+    student_id = request.form.get("student_id", type=int)
+    display_name = request.form.get("display_name", "").strip()
+    class_id = request.form.get("class_id", "")
+    new_password = request.form.get("new_password", "")
+    confirm_password = request.form.get("confirm_password", "")
+
+    student = User.query.filter_by(id=student_id, role=User.ROLE_STUDENT).first()
+
+    if student is None:
+        flash("対象の生徒が見つかりません。")
+    elif not display_name:
+        flash("生徒名を入力してください。")
+    elif new_password and len(new_password) < 8:
+        flash("パスワードは八文字以上にしてください。")
+    elif new_password and not re.fullmatch(r"[A-Za-z0-9]+", new_password):
+        flash("パスワードは半角英数字で入力してください。")
+    elif new_password and new_password != confirm_password:
+        flash("パスワードが一致しません。")
+    else:
+        student.display_name = display_name
+        student.class_id = int(class_id) if class_id else None
+        if new_password:
+            student.set_password(new_password)
+        db.session.commit()
+        flash(f"{display_name}さんの情報を更新しました。")
+
+    return redirect(url_for("manage_student"))
+
+
+@app.route("/manage_student_bulk_delete", methods=["POST"])
+@role_required(User.ROLE_ADMIN)
+def manage_student_bulk_delete():
+    student_ids = request.form.getlist("student_ids", type=int)
+    students = User.query.filter(
+        User.id.in_(student_ids), User.role == User.ROLE_STUDENT
+    ).all() if student_ids else []
+
+    if not students:
+        flash("削除する生徒を選択してください。")
+        return redirect(url_for("manage_student"))
+
+    ids = [s.id for s in students]
+    Reservation.query.filter(Reservation.student_id.in_(ids)).delete(synchronize_session=False)
+    SurveyResponse.query.filter(SurveyResponse.student_id.in_(ids)).delete(synchronize_session=False)
+    for student in students:
+        db.session.delete(student)
+    db.session.commit()
+
+    flash(f"{len(students)}件の生徒を削除しました。")
+    return redirect(url_for("manage_student"))
+
+
+def _generate_student_password():
+    """自動登録される生徒の初期パスワードを生成する"""
+    alphabet = string.ascii_letters + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(10))
+
+
+def _generate_unique_student_username():
+    """自動登録される生徒のログインユーザー名を、重複しないように生成する"""
+    while True:
+        candidate = "student" + "".join(secrets.choice(string.digits) for _ in range(6))
+        if not User.query.filter_by(username=candidate).first():
+            return candidate
 
 
 # =========================
@@ -1091,9 +1195,54 @@ def manage_student_check():
 # 生徒新規登録画面
 # =========================
 
-@app.route("/manage_sturec")
+@app.route("/manage_sturec", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_sturec():
+    if request.method == "POST":
+        csv_file = request.files.get("csv_file")
+
+        if csv_file is None or csv_file.filename == "":
+            flash("CSVファイルを選択してください。")
+            return redirect(url_for("manage_sturec"))
+
+        if not csv_file.filename.lower().endswith(".csv"):
+            flash("拡張子が「.csv」のファイルを選択してください。")
+            return redirect(url_for("manage_sturec"))
+
+        try:
+            text = csv_file.read().decode("utf-8")
+        except UnicodeDecodeError:
+            flash("CSVファイルの文字コードはUTF-8にしてください。")
+            return redirect(url_for("manage_sturec"))
+
+        names = []
+        for row in csv.reader(io.StringIO(text)):
+            if row and row[0].strip():
+                names.append(row[0].strip())
+
+        if not names:
+            flash("有効な生徒名がCSVファイルに見つかりませんでした。")
+            return redirect(url_for("manage_sturec"))
+
+        created = []
+        for name in names:
+            username = _generate_unique_student_username()
+            raw_password = _generate_student_password()
+            student = User(username=username, display_name=name, role=User.ROLE_STUDENT)
+            student.set_password(raw_password)
+            db.session.add(student)
+            db.session.flush()
+            created.append({
+                "id": student.id,
+                "username": student.username,
+                "display_name": student.display_name,
+                "password": raw_password,
+            })
+        db.session.commit()
+
+        session["bulk_register_result"] = created
+        return redirect(url_for("manage_sturec_complete"))
+
     return render_template("Management/ManageStudent/manage_sturec.html")
 
 
@@ -1114,7 +1263,14 @@ def manage_sturec_check():
 @app.route("/manage_sturec_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_sturec_complete():
-    return render_template("Management/ManageStudent/manage_sturec_complete.html")
+    created = session.get("bulk_register_result")
+    if not created:
+        return redirect(url_for("manage_student"))
+
+    return render_template(
+        "Management/ManageStudent/manage_sturec_complete.html",
+        created=created,
+    )
 
 
 # =========================

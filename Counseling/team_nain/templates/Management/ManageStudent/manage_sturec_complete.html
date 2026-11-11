@@ -72,9 +72,36 @@
                 <div class="complete-info-box">
                     <div class="info-row">
                         <div class="info-label">登録件数</div>
-                        <div class="info-value">：5件</div>
+                        <div class="info-value">：{{ created|length }}件</div>
                     </div>
                 </div>
+
+                <div class="table-responsive credential-table-box mb-4">
+                    <table class="table credential-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>学籍番号</th>
+                                <th>生徒名</th>
+                                <th>ユーザー名</th>
+                                <th>初期パスワード</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in created %}
+                            <tr>
+                                <td>{{ row.id }}</td>
+                                <td>{{ row.display_name }}</td>
+                                <td>{{ row.username }}</td>
+                                <td>{{ row.password }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="text-center text-muted mb-4">
+                    このユーザー名とパスワードを、各生徒に伝えてください。
+                </p>
 
                 <div class="complete-button-area">
                     <a href="{{ url_for('manage_student') }}" class="back-student-btn">

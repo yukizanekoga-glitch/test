@@ -66,6 +66,36 @@
     text-align: center;
 }
 
+.credential-table-box {
+    max-width: 760px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #dce5f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.credential-table {
+    width: 100%;
+    text-align: center;
+}
+
+.credential-table thead th {
+    padding: 11px 15px;
+    background-color: #f1f5f9;
+    color: #172b4d;
+    border-color: #e1e8f0;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.credential-table tbody td {
+    padding: 8px 15px;
+    border-color: #e1e8f0;
+    color: #172b4d;
+    font-size: 15px;
+}
+
 .back-student-btn {
     display: inline-block;
     min-width: 420px;

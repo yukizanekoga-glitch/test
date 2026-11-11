@@ -69,6 +69,16 @@
                 </p>
             </div>
 
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="post" enctype="multipart/form-data">
+
             <!-- CSVアップロードエリア -->
             <section class="upload-area">
                 <div class="upload-icon">📄</div>
@@ -83,7 +93,7 @@
                     ファイルを選択
                 </label>
 
-                <input type="file" id="csvFile" accept=".csv" hidden>
+                <input type="file" id="csvFile" name="csv_file" accept=".csv" hidden>
 
                 <p class="selected-file" id="selectedFileName">
                     選択されていません
@@ -105,7 +115,9 @@
                             <li>拡張子は「.csv」を使用してください（文字コード：UTF-8）</li>
                         </ul>
 
-                        <a href="javascript:void(0)" class="sample-download-link">
+                        <a href="{{ url_for('static', filename='sample_students.csv') }}"
+                           download="sample_students.csv"
+                           class="sample-download-link">
                             ⬇ サンプルCSVをダウンロード
                         </a>
                     </section>
@@ -132,11 +144,12 @@
                     キャンセル
                 </a>
 
-                <a href="{{ url_for('manage_sturec_complete') }}"
-                   class="btn btn-primary btn-register">
+                <button type="submit" class="btn btn-primary btn-register">
                     登録する
-                </a>
+                </button>
             </div>
+
+            </form>
 
         </main>
     </div>
