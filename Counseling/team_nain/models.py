@@ -58,6 +58,27 @@ class Class(db.Model):
         return f"<Class {self.name}>"
 
 
+class CounselorProfile(db.Model):
+    """カウンセラーのプロフィール (画像・ふりがな・性別・年齢・コメント)。
+
+    主キーはカウンセラー本人の users.id。カウンセラー1人につき1行。
+    """
+    __tablename__ = 'counselor_profiles'
+
+    counselor_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    image = db.Column(db.String(255), nullable=True)    # 画像のファイル名 (static 以下のパスなど)
+    kana = db.Column(db.String(100), nullable=True)     # ふりがな
+    gender = db.Column(db.String(10), nullable=True)    # 性別 (例: 女性 / 男性)
+    age = db.Column(db.Integer, nullable=True)          # 年齢
+    comment = db.Column(db.Text, nullable=True)         # コメント
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    counselor = db.relationship('User', backref=db.backref('counselor_profile', uselist=False))
+
+    def __repr__(self):
+        return f"<CounselorProfile counselor={self.counselor_id}>"
+
+
 class AvailableSlot(db.Model):
     """スクールカウンセラーが登録する面談可能日時。"""
     __tablename__ = 'available_slots'
