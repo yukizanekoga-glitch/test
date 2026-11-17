@@ -1,4 +1,3 @@
-
 /* =========================
    全体設定
 ========================= */
@@ -10,6 +9,7 @@
 html,
 body {
     margin: 0;
+    padding: 0;
     min-height: 100%;
 }
 
@@ -21,28 +21,22 @@ body {
 }
 
 /* =========================
-   ヘッダー（昨日と同じ）
+   ヘッダー（変更なし）
 ========================= */
 
 .top-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
     height: 55px;
-    padding: 0 30px;
+    background-color: #24364b;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #24364b;
-    color: #fff;
-    z-index: 1000;
+    padding: 0 30px;
+    color: white;
 }
 
 .system-title {
     font-size: 18px;
     font-weight: bold;
-    letter-spacing: 0.3px;
 }
 
 .header-right {
@@ -52,22 +46,47 @@ body {
     font-size: 15px;
 }
 
+.header-right a {
+    color: white;
+}
+
+.header-right a:hover {
+    color: #b8d5ff;
+}
+
 .admin-name {
     display: flex;
     align-items: center;
-    gap: 9px;
-    font-weight: bold;
-    cursor: pointer;
+    gap: 10px;
+    white-space: nowrap;
 }
 
 .admin-name .bi-person-fill {
-    font-size: 22px;
+    font-size: 20px;
 }
 
 .admin-name .bi-chevron-down {
     font-size: 12px;
 }
 
+.header-divider {
+    width: 1px;
+    height: 25px;
+    background: #66778b;
+}
+
+.logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    color: white;
+    text-decoration: none;
+}
+
+.logout i {
+    font-size: 21px;
+}
 
 /* =========================
    全体レイアウト
@@ -75,21 +94,25 @@ body {
 
 .layout {
     display: flex;
-    min-height: 100vh;
-    padding-top: 55px;
+    align-items: stretch;
+    width: 100%;
+    min-height: calc(100vh - 55px);
+    margin: 0;
+    padding: 0;
 }
 
-
 /* =========================
-   サイドバー（昨日と同じ）
+   サイドバー
 ========================= */
 
 .sidebar {
     width: 215px;
     min-width: 215px;
+    flex-shrink: 0;
     background-color: #f7fbff;
     border-right: 1px solid #dce5f0;
-    padding-top: 0px;
+    padding-top: 0;
+    margin: 0;
 }
 
 .sidebar a {
@@ -101,6 +124,7 @@ body {
     font-size: 12px;
     font-weight: bold;
     border-left: 5px solid transparent;
+    text-decoration: none;
 }
 
 .sidebar a span {
@@ -121,12 +145,12 @@ body {
 ========================= */
 
 .main-content {
-    width: calc(100% - 215px);
+    flex: 1;
     min-width: 0;
-    margin-left: 0px;
+    width: auto;
+    margin: 0;
     padding: 13px 20px 18px;
 }
-
 
 /* =========================
    パンくずリスト
@@ -151,7 +175,6 @@ body {
     color: #8ba2c3;
     font-size: 10px;
 }
-
 
 /* =========================
    ページタイトル
@@ -192,7 +215,6 @@ body {
     color: #253b65;
 }
 
-
 /* 戻るボタン */
 
 .back-button {
@@ -221,7 +243,6 @@ body {
 .back-button:hover {
     background: #edf5ff;
 }
-
 
 /* =========================
    生徒情報カード
@@ -282,7 +303,6 @@ body {
     background: #8799b6;
 }
 
-
 /* 要確認表示 */
 
 .warning-status {
@@ -312,7 +332,6 @@ body {
     font-size: 28px;
 }
 
-
 /* =========================
    アンケート履歴カード
 ========================= */
@@ -334,7 +353,6 @@ body {
     font-size: 20px;
     font-weight: bold;
 }
-
 
 /* =========================
    回答履歴テーブル
@@ -389,7 +407,6 @@ body {
     border-right: none;
 }
 
-
 /* 列幅 */
 
 .history-table .number-column {
@@ -404,7 +421,6 @@ body {
     width: 14.125%;
 }
 
-
 /* 質問項目 */
 
 .history-table td.question {
@@ -414,7 +430,6 @@ body {
     font-size: 13px;
 }
 
-
 /* 低い評価 */
 
 .history-table td.low-score {
@@ -423,14 +438,12 @@ body {
     font-size: 18px;
 }
 
-
 /* 相談希望 */
 
 .history-table td.answer-text {
     font-size: 13px;
     white-space: nowrap;
 }
-
 
 /* =========================
    判定理由
@@ -480,7 +493,6 @@ body {
     font-weight: bold;
 }
 
-
 /* =========================
    下部エリア
 ========================= */
@@ -493,7 +505,6 @@ body {
     width: 100%;
     margin-top: 9px;
 }
-
 
 /* =========================
    評価点数の説明
@@ -522,7 +533,6 @@ body {
     line-height: 1.7;
     color: #172b55;
 }
-
 
 /* =========================
    操作ボタン
@@ -583,7 +593,6 @@ body {
     background: #003dcc;
 }
 
-
 /* =========================
    画面幅への対応
 ========================= */
@@ -602,18 +611,20 @@ body {
     .action-buttons {
         justify-content: flex-end;
     }
-
 }
 
 @media screen and (max-width: 800px) {
 
     .sidebar {
         width: 170px;
+        min-width: 170px;
     }
 
     .main-content {
-        width: calc(100% - 170px);
-        margin-left: 170px;
+        flex: 1;
+        width: auto;
+        min-width: 0;
+        margin: 0;
     }
 
     .page-heading {
@@ -640,36 +651,4 @@ body {
         flex: 1;
         width: auto;
     }
-
-}
-
-/* =========================
-   ヘッダーの区切り線・ログアウト
-   (management_survey.css と同じ見た目)
-========================= */
-.header-divider {
-    width: 1px;
-    height: 25px;
-    background: #66778b;
-}
-
-.logout {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    white-space: nowrap;
-    color: white;
-}
-
-.logout i {
-    font-size: 21px;
-}
-
-.header-right a {
-    color: white;
-    text-decoration: none;
-}
-
-.header-right a:hover {
-    color: #b8d5ff;
 }

@@ -50,7 +50,7 @@
         <!-- サイドバー -->
         <aside class="sidebar">
 
-            <a href="/manage_top" class="active">
+            <a href="/management_top" class="active">
                 <span>
                     <i class="bi bi-house-door"></i>
                 </span>
@@ -69,7 +69,7 @@
                 先生管理
             </a>
 
-            <a href="/manage_counselor">
+            <a href="/manage_care">
                 <span>
                     <i class="bi bi-calendar3"></i>
                 </span>
@@ -83,10 +83,8 @@
                 クラス管理
             </a>
 
-            <a href="/manage_survey">
-                <span>
-                    <i class="bi bi-bar-chart-line"></i>
-                </span>
+            <a href="/management_survey">
+                <span><i class="bi bi-clipboard-data"></i></span>
                 アンケート結果
             </a>
 
@@ -132,7 +130,7 @@
 
                     <span>クラス名</span>
 
-                    <strong>1年1組</strong>
+                    <strong>{{ changes.class_name }}</strong>
 
                 </div>
 
@@ -145,7 +143,7 @@
 
                     <div class="teacher-value">
                         <i class="bi bi-person-fill"></i>
-                        佐藤 太郎 先生
+                        {{ changes.teacher ~ ' 先生' if changes.teacher else '未設定' }}
                     </div>
 
                 </div>
@@ -157,7 +155,7 @@
                     <section class="student-section add-section">
 
                         <h2>
-                            追加する生徒（5人）
+                            追加する生徒（{{ changes.added|length }}人）
                         </h2>
 
                         <div class="student-table-box">
@@ -174,40 +172,19 @@
                                 </thead>
 
                                 <tbody>
+                                    <!-- No. は追加後の出席番号 -->
+                                    {% for s in changes.added %}
                                     <tr>
-                                        <td>1</td>
-                                        <td>山田 花子</td>
-                                        <td>1年</td>
+                                        <td>{{ s.number }}</td>
+                                        <td>{{ s.name }}</td>
+                                        <td>－</td>
                                         <td>未所属</td>
                                     </tr>
-
+                                    {% else %}
                                     <tr>
-                                        <td>2</td>
-                                        <td>伊藤 健太</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
+                                        <td colspan="4">追加する生徒はいません。</td>
                                     </tr>
-
-                                    <tr>
-                                        <td>3</td>
-                                        <td>木村 一郎</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>4</td>
-                                        <td>吉田 優</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>5</td>
-                                        <td>渡辺 陽菜</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
-                                    </tr>
+                                    {% endfor %}
                                 </tbody>
 
                             </table>
@@ -220,7 +197,7 @@
                     <section class="student-section remove-section">
 
                         <h2>
-                            削除する生徒（2人）
+                            削除する生徒（{{ changes.removed|length }}人）
                         </h2>
 
                         <div class="student-table-box">
@@ -237,19 +214,18 @@
                                 </thead>
 
                                 <tbody>
+                                    {% for name in changes.removed %}
                                     <tr>
-                                        <td>1</td>
-                                        <td>田中 美咲</td>
-                                        <td>1年</td>
-                                        <td>1年1組</td>
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ name }}</td>
+                                        <td>{{ changes.current_grade ~ '年' if changes.current_grade else '－' }}</td>
+                                        <td>{{ changes.current_class_name }}</td>
                                     </tr>
-
+                                    {% else %}
                                     <tr>
-                                        <td>2</td>
-                                        <td>鈴木 さくら</td>
-                                        <td>1年</td>
-                                        <td>1年1組</td>
+                                        <td colspan="4">削除する生徒はいません。</td>
                                     </tr>
+                                    {% endfor %}
                                 </tbody>
 
                             </table>
@@ -273,7 +249,7 @@
                             現在の生徒数
                         </span>
 
-                        <strong>32 人</strong>
+                        <strong>{{ changes.current_count }} 人</strong>
 
                         <i class="bi bi-arrow-right"></i>
 
@@ -282,7 +258,7 @@
                         </span>
 
                         <strong class="new-count">
-                            35 人
+                            {{ changes.new_count }} 人
                         </strong>
 
                     </div>
@@ -309,7 +285,15 @@
                         キャンセル
                     </a>
 
-                    <form action="{{ url_for('manage_allo_complete') }}">
+                    <form action="{{ url_for('manage_allo_complete') }}" method="post">
+                        <!-- 変更内容をそのまま完了画面に送る -->
+                        <input type="hidden" name="class_id" value="{{ changes.class_id }}">
+                        <input type="hidden" name="grade" value="{{ changes.grade }}">
+                        <input type="hidden" name="section" value="{{ changes.section }}">
+                        <input type="hidden" name="teacher_id" value="{{ changes.teacher_id }}">
+                        {% for member_id in changes.member_ids %}
+                        <input type="hidden" name="member_ids" value="{{ member_id }}">
+                        {% endfor %}
 
                         <button type="submit"
                                 class="btn-submit">

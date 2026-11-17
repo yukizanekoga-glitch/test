@@ -1,49 +1,349 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カウンセラー登録 | スクールカウンセラー相談予約システム</title>
 
-  <!-- ページのタイトル -->
-  <title>カウンセラー登録 管理者</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/manage_carereg.css') }}">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* 未入力などのエラーメッセージ */
+        .field-error {
+            margin: 4px 0 0;
+            color: #d93025;
+            font-size: 12px;
+        }
+
+        /* 入力欄の行は高さが決まっているので、エラーは行の中に重ねて出す */
+        .input-row {
+            position: relative;
+        }
+
+        .name-row .field-error {
+            position: absolute;
+            top: 50%;
+            right: 11px;
+            transform: translateY(-50%);
+            margin: 0;
+            padding-left: 6px;
+            background: #fff;
+            pointer-events: none;
+        }
+
+        .gender-row .field-error,
+        .age-row .field-error {
+            margin: 0 0 0 auto;
+        }
+
+        .comment-row .field-error {
+            position: absolute;
+            left: 11px;
+            bottom: 7px;
+            margin: 0;
+            pointer-events: none;
+        }
+
+        /* 選んである画像のファイル名 */
+        .selected-image {
+            margin-top: 6px;
+            color: #0866f5;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        button.confirm-button {
+            font-family: inherit;
+        }
+    </style>
 </head>
 
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー カウンセラー登録</span>
+
+    <!-- ヘッダー -->
+    <header class="top-header">
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="header-right">
+            <span class="admin-name">
+                <i class="bi bi-person-fill"></i>
+                {{ session.display_name }}（管理者）
+                <i class="bi bi-chevron-down"></i>
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+
+            <a href="/management_top">
+                <span><i class="bi bi-house-door"></i></span>
+                ホーム
+            </a>
+
+            <a href="/manage_student">
+                <span><i class="bi bi-people"></i></span>
+                生徒管理
+            </a>
+
+            <a href="/manage_teacher">
+                <span><i class="bi bi-person-badge"></i></span>
+                先生管理
+            </a>
+
+            <a href="/manage_care" class="active">
+                <span><i class="bi bi-calendar3"></i></span>
+                カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}">
+                <span><i class="bi bi-file-earmark-text"></i></span>
+                クラス管理
+            </a>
+
+            <a href="{{ url_for('management_survey') }}">
+                <span><i class="bi bi-clipboard-data"></i></span>
+                アンケート結果
+            </a>
+
+        </aside>
+
+        <!-- メイン画面 -->
+        <main class="main-content">
+
+            <!-- ページタイトル -->
+            <div class="page-heading">
+                <h1>カウンセラーの登録</h1>
+                <p>新しいカウンセラーの情報を入力してください。</p>
+            </div>
+
+            <!-- 登録カード -->
+            <section class="register-card">
+
+                <!-- 未入力のエラーは画面に表示するため、ブラウザの入力チェックは使わない -->
+                <form action="{{ url_for('manage_carereg_check') }}" method="POST" enctype="multipart/form-data" novalidate>
+
+                    <div class="register-layout">
+
+                        <!-- 左：画像登録 -->
+                        <div class="image-section">
+
+                            <div class="image-title">
+                                <span>カウンセラー画像</span>
+                                <span class="optional-label">任意</span>
+                            </div>
+
+                            <label for="counselor-image" class="image-upload">
+
+                                <div class="default-profile">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+
+                                <p>
+                                    画像をドラッグ＆ドロップ<br>
+                                    または
+                                </p>
+
+                                <span class="select-image">
+                                    <i class="bi bi-upload"></i>
+                                    画像を選択
+                                </span>
+
+                                <input
+                                    type="file"
+                                    id="counselor-image"
+                                    name="image"
+                                    accept=".jpg,.jpeg,.png"
+                                >
+
+                            </label>
+
+                            <div class="image-notice">
+                                <p>・対応形式：jpg, jpeg, png</p>
+                                <p>・ファイルサイズ：5MB以内</p>
+                                {% if form.image_name %}
+                                <p class="selected-image" id="selectedImage">選択中の画像：{{ form.image_name }}</p>
+                                {% else %}
+                                <p class="selected-image" id="selectedImage" hidden></p>
+                                {% endif %}
+                                {% if errors.image %}<p class="field-error">{{ errors.image }}</p>{% endif %}
+                            </div>
+
+                        </div>
+
+                        <!-- 中央：項目名 -->
+                        <div class="form-labels">
+
+                            <div class="form-label">
+                                <span>氏名</span>
+                                <span class="required-label">必須</span>
+                            </div>
+
+                            <div class="form-label">
+                                <span>ふりがな</span>
+                                <span class="required-label">必須</span>
+                            </div>
+
+                            <div class="form-label">
+                                <span>性別</span>
+                                <span class="required-label">必須</span>
+                            </div>
+
+                            <div class="form-label">
+                                <span>年齢</span>
+                                <span class="required-label">必須</span>
+                            </div>
+
+                            <div class="form-label comment-label">
+                                <span>コメント</span>
+                                <span class="required-label">必須</span>
+                            </div>
+
+                        </div>
+
+                        <!-- 右：入力欄 -->
+                        <div class="form-inputs">
+
+                            <!-- 氏名 -->
+                            <div class="input-row name-row">
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value="{{ form.name }}"
+                                >
+                                {% if errors.name %}<p class="field-error">{{ errors.name }}</p>{% endif %}
+                            </div>
+
+                            <!-- ふりがな -->
+                            <div class="input-row name-row">
+                                <input
+                                    type="text"
+                                    name="kana"
+                                    value="{{ form.kana }}"
+                                >
+                                {% if errors.kana %}<p class="field-error">{{ errors.kana }}</p>{% endif %}
+                            </div>
+
+                            <!-- 性別 -->
+                            <div class="input-row gender-row">
+
+                                <label class="radio-option">
+                                    <input
+                                        type="radio"
+                                        name="gender"
+                                        value="女性" {% if form.gender == "女性" %}checked{% endif %}
+                                    >
+                                    <span>女性</span>
+                                </label>
+
+                                <label class="radio-option">
+                                    <input
+                                        type="radio"
+                                        name="gender"
+                                        value="男性" {% if form.gender == "男性" %}checked{% endif %}
+                                    >
+                                    <span>男性</span>
+                                </label>
+
+                                <label class="radio-option">
+                                    <input
+                                        type="radio"
+                                        name="gender"
+                                        value="その他" {% if form.gender == "その他" %}checked{% endif %}
+                                    >
+                                    <span>その他</span>
+                                </label>
+                                {% if errors.gender %}<p class="field-error">{{ errors.gender }}</p>{% endif %}
+
+                            </div>
+
+                            <!-- 年齢 -->
+                            <div class="input-row age-row">
+                                <input
+                                    type="number"
+                                    name="age"
+                                    min="1"
+                                    max="120"
+                                    value="{{ form.age }}"
+                                >
+                                <span class="age-unit">歳</span>
+                                {% if errors.age %}<p class="field-error">{{ errors.age }}</p>{% endif %}
+                            </div>
+
+                            <!-- コメント -->
+                            <div class="input-row comment-row">
+
+                                <textarea
+                                    name="comment"
+                                    maxlength="200"
+                                    placeholder="相談の方針や自己紹介など（200文字以内）"
+                                    
+                                >{{ form.comment }}</textarea>
+
+                                <span class="comment-limit">
+                                    200文字以内
+                                </span>
+                                {% if errors.comment %}<p class="field-error">{{ errors.comment }}</p>{% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- 下部ボタン -->
+                    <div class="form-footer">
+
+                        <a href="/manage_care" class="back-button">
+                            戻る
+                        </a>
+
+                        <button type="submit" class="confirm-button">
+                            確認画面へ
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </main>
+
     </div>
-  </nav>
 
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
+    <!-- 画像を選んだら、そのファイル名を表示する -->
+    <script>
+        (function () {
+            const input = document.getElementById("counselor-image");
+            const label = document.getElementById("selectedImage");
+            input.addEventListener("change", function () {
+                if (input.files.length > 0) {
+                    label.textContent = "選択中の画像：" + input.files[0].name;
+                    label.hidden = false;
+                }
+            });
+        })();
+    </script>
 
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
-
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
-
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">カウンセラー</h2>
-        <h3 class="text-center mb-4">カウンセラー登録</h3>
-        <h3 class="text-center mb-4">カウンセラー情報入力</h3>
-
-        <textarea rows="5" cols="40" placeholder="ここにテキストを入力"></textarea>
-        <!-- 戻るボタン -->
-        <a href="{{ url_for('manage_care') }}" class="btn btn-secondary">戻る</a>
-        <!-- 確認ボタン -->
-        <a href="{{ url_for('manage_carereg_check') }}" class="btn btn-primary">次へ</a>
-      </div>
-    </div>
-  </div>
-
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

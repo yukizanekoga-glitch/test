@@ -25,25 +25,26 @@
         </div>
 
         <div class="header-right">
+
             <span class="admin-name">
                 <i class="bi bi-person-fill"></i>
                 {{ session.display_name }}（管理者）
                 <i class="bi bi-chevron-down"></i>
             </span>
 
-            <!-- アンケート結果画面と同じく、区切り線とログアウトを表示 -->
             <span class="header-divider"></span>
 
             <a href="{{ url_for('logout') }}" class="logout">
                 <i class="bi bi-box-arrow-right"></i>
                 ログアウト
             </a>
+
         </div>
 
     </header>
 
     <div class="layout">
-
+        
         <!-- サイドバー -->
         <aside class="sidebar">
 
@@ -72,8 +73,8 @@
                 クラス管理
             </a>
 
-            <a href="{{ url_for('management_survey') }}" class="active">
-                <span><i class="bi bi-bar-chart-line"></i></span>
+            <a href="/management_survey">
+                <span><i class="bi bi-clipboard-data"></i></span>
                 アンケート結果
             </a>
 
@@ -226,7 +227,7 @@
                             </tr>
 
                             <tr>
-                                <td>8</td>
+                                <td>7</td>
                                 <td class="question">
                                     スクールカウンセラーに相談してみたいですか？
                                 </td>

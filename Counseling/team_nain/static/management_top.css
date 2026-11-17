@@ -14,10 +14,10 @@ a {
 }
 
 /* =========================
-   ヘッダー
+   ヘッダー（変更なし）
 ========================= */
 .top-header {
-    height: 72px;
+    height: 55px;
     background-color: #24364b;
     display: flex;
     align-items: center;
@@ -27,7 +27,7 @@ a {
 }
 
 .system-title {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: bold;
 }
 
@@ -46,6 +46,39 @@ a {
     color: #b8d5ff;
 }
 
+.admin-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.admin-name .bi-person-fill {
+    font-size: 20px;
+}
+
+.admin-name .bi-chevron-down {
+    font-size: 12px;
+}
+
+.header-divider {
+    width: 1px;
+    height: 25px;
+    background: #66778b;
+}
+
+.logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    color: white;
+}
+
+.logout i {
+    font-size: 21px;
+}
+
 /* =========================
    レイアウト
 ========================= */
@@ -55,29 +88,29 @@ a {
 }
 
 /* =========================
-   サイドバー
+   サイドバー（変更なし）
 ========================= */
 .sidebar {
-    width: 265px;
-    min-width: 265px;
+    width: 220px;
+    min-width: 220px;
     background-color: #f7fbff;
     border-right: 1px solid #dce5f0;
-    padding-top: 15px;
+    padding-top: 0;
 }
 
 .sidebar a {
     display: flex;
     align-items: center;
-    gap: 20px;
-    padding: 18px 25px;
+    gap: 10px;
+    padding: 10px 20px;
     color: #344d70;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
     border-left: 5px solid transparent;
 }
 
 .sidebar a span {
-    font-size: 25px;
+    font-size: 30px;
     width: 30px;
     text-align: center;
 }
@@ -89,6 +122,10 @@ a {
     border-left-color: #0d6efd;
 }
 
+/* サイドバー最初のメニューの上の余白 */
+.sidebar a:first-child {
+    margin-top: -10px;
+}
 /* =========================
    メイン
 ========================= */
@@ -834,4 +871,47 @@ a {
     .reservation-table {
         font-size: 10px;
     }
+}
+
+/* =========================
+   サイドバーの高さを統一
+========================= */
+@media (min-width: 851px) {
+
+    .sidebar a {
+        height: 50px !important;
+        min-height: 56.8px !important;
+        padding: 0 20px !important;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+
+}
+
+/* サイドバー強制変更テスト */
+.sidebar a {
+    font-size: 12px !important;
+}
+
+.sidebar a span {
+    font-size: 25px !important;
+}
+
+.system-title {
+    transform: translate(8px, 1.7px);
+}
+
+.sidebar a i {
+    margin-left: -0.5px;
+}
+
+.sidebar a span {
+    margin-left: 3px;
+}
+
+.sidebar a i,
+.sidebar a span {
+    position: relative;
+    top: 0.7px;
 }

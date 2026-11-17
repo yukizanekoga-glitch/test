@@ -1,46 +1,195 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カウンセラー登録完了 | スクールカウンセラー相談予約システム</title>
 
-  <!-- ページのタイトル -->
-  <title>カウンセラー登録完了 管理者</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/manage_carereg_complete.css') }}">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* ログインID と初期パスワード */
+        .issued-account {
+            margin: 6px auto 22px;
+            max-width: 420px;
+            padding: 14px 18px;
+            border: 1px solid #dce5f0;
+            border-radius: 8px;
+            background: #f8fbff;
+            text-align: left;
+        }
+
+        .issued-name {
+            margin: 0 0 8px;
+            font-weight: bold;
+            color: #172b4d;
+        }
+
+        .issued-account table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .issued-account th,
+        .issued-account td {
+            padding: 6px 4px;
+            border-top: 1px solid #e1e8f0;
+        }
+
+        .issued-account th {
+            width: 40%;
+            color: #5a6b85;
+            font-weight: normal;
+        }
+
+        .issued-account td {
+            font-family: Consolas, monospace;
+            color: #172b4d;
+            font-weight: bold;
+        }
+
+        .issued-note {
+            margin: 8px 0 0;
+            font-size: 12px;
+            color: #b42318;
+        }
+    </style>
 </head>
 
 <body>
 
-  <!-- ナビゲーションバー -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー カウンセラー登録</span>
+    <!-- ヘッダー -->
+    <header class="top-header">
+
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="header-right">
+
+            <span class="admin-name">
+                <i class="bi bi-person-fill"></i>
+                {{ session.display_name }}（管理者）
+                <i class="bi bi-chevron-down"></i>
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+
+        </div>
+
+    </header>
+
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+
+            <a href="/management_top">
+                <span><i class="bi bi-house-door"></i></span>
+                ホーム
+            </a>
+
+            <a href="/manage_student">
+                <span><i class="bi bi-people"></i></span>
+                生徒管理
+            </a>
+
+            <a href="/manage_teacher">
+                <span><i class="bi bi-person-badge"></i></span>
+                先生管理
+            </a>
+
+            <a href="/manage_care" class="active">
+                <span><i class="bi bi-calendar3"></i></span>
+                カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}">
+                <span><i class="bi bi-file-earmark-text"></i></span>
+                クラス管理
+            </a>
+
+            <a href="{{ url_for('management_survey') }}">
+                <span><i class="bi bi-bar-chart-line"></i></span>
+                アンケート結果
+            </a>
+
+        </aside>
+
+        <!-- メイン画面 -->
+        <main class="main-content">
+
+            <!-- ページタイトル -->
+            <div class="page-heading">
+
+                <h1>カウンセラーの登録（完了）</h1>
+
+                <p>
+                    カウンセラーの登録が完了しました。
+                </p>
+
+            </div>
+
+            <!-- 完了カード -->
+            <section class="complete-card">
+
+                <div class="complete-content">
+
+                    <!-- チェックマーク -->
+                    <div class="complete-icon">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+
+                    <!-- 完了メッセージ -->
+                    <h2>
+                        カウンセラーの登録が完了しました。
+                    </h2>
+
+                    <!-- ふりがなから作ったログインID と初期パスワード (ログインID と同じ) -->
+                    <div class="issued-account">
+                        <p class="issued-name">{{ done.name }} さん</p>
+                        <table>
+                            <tr>
+                                <th>ログインID</th>
+                                <td>{{ done.username }}</td>
+                            </tr>
+                            <tr>
+                                <th>初期パスワード</th>
+                                <td>{{ done.username }}</td>
+                            </tr>
+                        </table>
+                        <p class="issued-note">
+                            ※初期パスワードはログインIDと同じです。カウンセラーに伝えてください。
+                        </p>
+                    </div>
+
+                    <!-- 一覧へ戻る -->
+                    <a href="/manage_care" class="list-button">
+                        カウンセラー一覧へ
+                    </a>
+
+                </div>
+
+            </section>
+
+        </main>
+
     </div>
-  </nav>
 
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
-
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
-
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
-
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">登録が完了しました</h2>
-
-        <a href="{{ url_for('manage_care') }}" class="btn btn-secondary">戻る</a>
-
-      </div>
-    </div>
-  </div>
-  
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

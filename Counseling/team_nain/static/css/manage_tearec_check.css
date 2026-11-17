@@ -1,0 +1,519 @@
+
+/* =========================
+   全体設定
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    background-color: #f7fbff;
+    color: #172f52;
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 14px;
+}
+
+a {
+    text-decoration: none;
+}
+
+
+/* =========================
+   ヘッダー（変更なし）
+========================= */
+.top-header {
+    height: 55px;
+    background-color: #24364b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    color: white;
+}
+
+.system-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 15px;
+}
+
+.header-right a {
+    color: white;
+}
+
+.header-right a:hover {
+    color: #b8d5ff;
+}
+
+.admin-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.admin-name .bi-person-fill {
+    font-size: 20px;
+}
+
+.admin-name .bi-chevron-down {
+    font-size: 12px;
+}
+
+.header-divider {
+    width: 1px;
+    height: 25px;
+    background: #66778b;
+}
+
+.logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    color: white;
+}
+
+.logout i {
+    font-size: 21px;
+}
+
+
+/* =========================
+   レイアウト（変更なし）
+========================= */
+.layout {
+    display: flex;
+    min-height: calc(100vh - 55px);
+}
+
+
+/* =========================
+   サイドバー（変更なし）
+========================= */
+.sidebar {
+    width: 215px;
+    min-width: 215px;
+    background-color: #f7fbff;
+    border-right: 1px solid #dce5f0;
+    padding-top: 0;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: #344d70;
+    font-size: 12px;
+    font-weight: bold;
+    border-left: 5px solid transparent;
+}
+
+.sidebar a span {
+    font-size: 25px;
+    width: 30px;
+    text-align: center;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    border-left-color: #0d6efd;
+}
+
+
+/* =========================
+   メインコンテンツ
+========================= */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 25px 25px 20px;
+}
+
+
+/* =========================
+   ページタイトル
+========================= */
+.page-heading {
+    border-left: 6px solid #0d6efd;
+    padding-left: 15px;
+    margin-bottom: 20px;
+}
+
+.page-heading h1 {
+    margin: 0 0 5px;
+    font-size: 27px;
+    font-weight: bold;
+    color: #142d50;
+}
+
+.page-heading p {
+    margin: 0;
+    font-size: 15px;
+    color: #344d70;
+}
+
+
+/* =========================
+   CSVファイル情報
+========================= */
+.csv-info {
+    display: flex;
+    align-items: center;
+    height: 65px;
+    padding: 0 25px;
+    margin-bottom: 22px;
+
+    background: #eaf2ff;
+    border: 1px solid #d2e2ff;
+    border-radius: 11px;
+}
+
+.file-info,
+.student-count {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.file-info {
+    width: 48%;
+}
+
+.file-info > i,
+.student-count > i {
+    font-size: 26px;
+    color: #2874c9;
+}
+
+.info-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #142d50;
+    white-space: nowrap;
+}
+
+.file-name {
+    font-size: 17px;
+    font-weight: bold;
+    color: #142d50;
+}
+
+.info-divider {
+    width: 1px;
+    height: 35px;
+    background: #c7d8f0;
+    margin-right: 35px;
+}
+
+.student-count {
+    gap: 18px;
+}
+
+.student-count strong {
+    font-size: 21px;
+    color: #142d50;
+}
+
+
+/* =========================
+   生徒一覧タイトル
+========================= */
+.student-list-section {
+    width: 100%;
+}
+
+.section-title {
+    font-size: 19px;
+    font-weight: bold;
+    color: #142d50;
+
+    border-left: 6px solid #0d6efd;
+    padding-left: 14px;
+
+    margin: 0 0 15px;
+}
+
+
+/* =========================
+   生徒テーブル
+========================= */
+.table-wrapper {
+    width: 100%;
+    height: 325px;
+    overflow: hidden;
+
+    border: 1px solid #d6e2f2;
+    border-radius: 11px;
+    background: white;
+}
+
+/* テーブル見出し */
+.table-header {
+    height: 39px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 20px 0 35px;
+
+    background: #e5edf8;
+    border-bottom: 1px solid #d5e1f0;
+
+    font-size: 15px;
+    font-weight: bold;
+    color: #142d50;
+}
+
+.table-header span:last-child {
+    font-size: 12px;
+    font-weight: normal;
+}
+
+/* スクロール部分 */
+.student-scroll {
+    height: calc(100% - 39px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* スクロールバー */
+.student-scroll::-webkit-scrollbar {
+    width: 11px;
+}
+
+.student-scroll::-webkit-scrollbar-track {
+    background: #f1f5fb;
+    border-left: 1px solid #dce5f0;
+}
+
+.student-scroll::-webkit-scrollbar-thumb {
+    background: #91a9c9;
+    border-radius: 10px;
+    border: 2px solid #f1f5fb;
+}
+
+/* テーブル */
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.student-table td {
+    height: 34px;
+    padding: 5px 20px 5px 35px;
+
+    font-size: 15px;
+    color: #172f52;
+
+    border-bottom: 1px solid #e0e8f3;
+}
+
+/* 偶数行 */
+.student-table tr:nth-child(even) {
+    background: #f2f6fc;
+}
+
+.student-table tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+
+/* =========================
+   ページネーション
+========================= */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    margin-top: 13px;
+}
+
+.page-number,
+.page-arrow {
+    width: 37px;
+    height: 37px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #d3dfef;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #172f52;
+
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.page-number:hover,
+.page-arrow:hover {
+    background: #eaf2ff;
+    border-color: #0d6efd;
+}
+
+.page-number.active {
+    background: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+.page-arrow {
+    color: #315c91;
+    font-size: 17px;
+}
+
+.page-arrow.disabled {
+    background: #edf3fb;
+    color: #8ca3c3;
+}
+
+.page-dots {
+    padding: 0 12px;
+    color: #172f52;
+    font-size: 17px;
+}
+
+
+/* =========================
+   下部操作エリア
+========================= */
+.bottom-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    margin-top: 23px;
+}
+
+/* 注意メッセージ */
+.notice {
+    flex: 1;
+    min-width: 0;
+    min-height: 45px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 8px 15px;
+
+    background: #eaf2ff;
+    border-radius: 10px;
+
+    color: #173c91;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.notice i {
+    font-size: 23px;
+    color: #0d6efd;
+    flex-shrink: 0;
+}
+
+
+/* =========================
+   戻る・登録ボタン
+========================= */
+.bottom-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.bottom-buttons form {
+    margin: 0;
+}
+
+.back-button,
+.register-button {
+    width: 150px;
+    height: 51px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.back-button {
+    background: white;
+    border: 1px solid #a9bfdc;
+    color: #0d6efd;
+}
+
+.back-button:hover {
+    background: #edf4ff;
+}
+
+.register-button {
+    background: #0865ed;
+    border: 1px solid #0865ed;
+    color: white;
+}
+
+.register-button:hover {
+    background: #0054ce;
+}
+
+
+/* =========================
+   画面幅が狭い場合
+========================= */
+@media screen and (max-width: 1000px) {
+
+    .main-content {
+        padding: 20px 15px;
+    }
+
+    .page-heading h1 {
+        font-size: 23px;
+    }
+
+    .bottom-area {
+        flex-wrap: wrap;
+    }
+
+    .notice {
+        flex-basis: 100%;
+    }
+
+    .bottom-buttons {
+        margin-left: auto;
+    }
+
+    .file-info {
+        width: 50%;
+    }
+
+}

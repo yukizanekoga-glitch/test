@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -7,30 +6,43 @@
 
     <title>クラスの新規登録 | スクールカウンセラー相談予約システム</title>
 
-    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/manage_clarec.css') }}">
+
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- CSS -->
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/manage_clarec.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
 
     <style>
         /* 未入力などのエラーメッセージ */
         .field-error {
-            margin: 6px 24px 0;
+            margin: 6px 0 0;
             color: #d93025;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .field-error.page-error {
             margin: 0 0 12px;
+            font-size: 13px;
         }
 
-        /* 一覧が空のとき */
-        .student-table td.empty-cell {
-            color: #8a94a6;
-            text-align: center;
+        /* 割り当てる生徒の「削除」ボタン */
+        .delete-btn {
+            padding: 4px 14px;
+            border: 1px solid #8bb5ff;
+            border-radius: 6px;
+            background: #fff;
+            color: #0866f5;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #eef5ff;
         }
     </style>
 </head>
@@ -63,7 +75,6 @@
 
         <!-- サイドバー -->
         <aside class="sidebar">
-
             <a href="/management_top">
                 <span><i class="bi bi-house-door"></i></span>
                 ホーム
@@ -89,32 +100,23 @@
                 クラス管理
             </a>
 
-            <a href="/manage_survey">
-                <span><i class="bi bi-bar-chart-line"></i></span>
+            <a href="{{ url_for('management_survey') }}">
+                <span><i class="bi bi-clipboard-data"></i></span>
                 アンケート結果
             </a>
-
         </aside>
 
-        <!-- メイン -->
+        <!-- メインコンテンツ -->
         <main class="main-content">
-
-            <!-- パンくず -->
-            <div class="breadcrumb">
-                <a href="/manage_top">ホーム</a>
-                <i class="bi bi-chevron-right"></i>
-                <a href="{{ url_for('manage_class') }}">クラス管理</a>
-                <i class="bi bi-chevron-right"></i>
-                <span>クラスの新規登録</span>
-            </div>
 
             <!-- ページタイトル -->
             <div class="page-heading">
                 <h1>クラスの新規登録</h1>
-                <p>クラス情報を入力し、担任の先生と生徒を割り当ててください。</p>
+                <p>
+                    クラス情報を入力し、担任の先生と生徒を割り当ててください。
+                </p>
             </div>
 
-            <!-- 登録フォーム -->
             {% with messages = get_flashed_messages() %}
                 {% for message in messages %}
                     <p class="field-error page-error">{{ message }}</p>
@@ -122,165 +124,166 @@
             {% endwith %}
 
             <!-- 登録フォーム (未入力のエラーは画面に表示するため、ブラウザの入力チェックは使わない) -->
-            <form action="{{ url_for('manage_clarec_check') }}" method="post" class="register-card" id="clarecForm" novalidate>
+            <form action="{{ url_for('manage_clarec_check') }}" method="post" id="clarecForm" novalidate>
 
-                <!-- 1 クラス情報 -->
-                <section class="form-section">
+            <!-- クラス情報 -->
+            <section class="info-card">
 
-                    <div class="section-heading">
-                        <span class="step-number">1</span>
-                        <h2>クラス情報</h2>
+                <h2 class="section-title">
+                    クラス情報
+                </h2>
+
+                <div class="class-info-form">
+
+                    <div class="form-item">
+                        <label for="grade">
+                            学年 <span class="required">*</span>
+                        </label>
+
+                        <select id="grade" name="grade">
+                            <option value="" {% if not form.grade %}selected{% endif %}>学年を選択</option>
+                            {% for g in ['1', '2', '3'] %}
+                            <option value="{{ g }}" {% if form.grade|string == g %}selected{% endif %}>{{ g }}年</option>
+                            {% endfor %}
+                        </select>
+
+                        {% if errors.grade %}<p class="field-error">{{ errors.grade }}</p>{% endif %}
                     </div>
 
-                    <div class="class-fields">
+                    <div class="form-item">
+                        <label for="class-name">
+                            クラス <span class="required">*</span>
+                        </label>
 
-                        <label for="grade">学年</label>
-                        <span class="required">必須</span>
+                        <input type="text"
+                               id="class-name"
+                               name="section"
+                               placeholder="例：1組"
+                               value="{{ form.section }}">
 
-                        <input
-                            type="number"
-                            id="grade"
-                            name="grade"
-                            min="1"
-                            max="6"
-                            placeholder="例）1"
-                            value="{{ form.grade }}"
-                        >
-                        <span class="unit">年</span>
-
-                        <label for="class_name">クラス</label>
-                        <span class="required">必須</span>
-
-                        <input
-                            type="text"
-                            id="class_name"
-                            name="section"
-                            placeholder="例）1"
-                            value="{{ form.section }}"
-                        >
-                        <span class="unit">組</span>
-
+                        {% if errors.section %}<p class="field-error">{{ errors.section }}</p>{% endif %}
                     </div>
 
-                    {% if errors.grade %}<p class="field-error">{{ errors.grade }}</p>{% endif %}
-                    {% if errors.section %}<p class="field-error">{{ errors.section }}</p>{% endif %}
-                </section>
-
-                <!-- 2 担任の先生 -->
-                <section class="form-section">
-
-                    <div class="section-heading">
-                        <span class="step-number">2</span>
-                        <h2>担任の先生の選択</h2>
-                    </div>
-
-                    <div class="teacher-fields">
-
-                        <label for="teacher">担任の先生</label>
-                        <span class="required">必須</span>
+                    <div class="form-item">
+                        <label for="teacher">
+                            担任の先生 <span class="required">*</span>
+                        </label>
 
                         <select id="teacher" name="teacher_id">
-                            <option value="" {% if not form.teacher_id %}selected{% endif %} disabled>
-                                先生を選択してください
-                            </option>
+                            <option value="" {% if not form.teacher_id %}selected{% endif %}>先生を選択</option>
                             {% for t in teachers %}
                             <option value="{{ t.id }}" {% if form.teacher_id|string == t.id|string %}selected{% endif %}>{{ t.display_name }}</option>
                             {% endfor %}
                         </select>
 
+                        {% if errors.teacher_id %}<p class="field-error">{{ errors.teacher_id }}</p>{% endif %}
                     </div>
 
-                    {% if errors.teacher_id %}<p class="field-error">{{ errors.teacher_id }}</p>{% endif %}
-                </section>
+                </div>
+            </section>
 
-                <!-- 3 生徒の割り当て -->
-                <section class="form-section">
+            <!-- 生徒割り当て -->
+            <div class="student-area">
 
-                    <div class="section-heading">
-                        <span class="step-number">3</span>
-                        <h2>生徒の割り当て</h2>
+                <!-- 未割り当ての生徒 (class_id が空の生徒。中身はJavaScriptで作成します) -->
+                <section class="student-card">
+
+                    <h2 class="section-title">
+                        未割り当ての生徒
+                    </h2>
+
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text"
+                               id="studentSearch"
+                               placeholder="生徒名で検索"
+                               aria-label="生徒名で検索"
+                               autocomplete="off">
                     </div>
 
-                    <p class="section-description">
-                        このクラスに所属する生徒を選択してください。
-                        選択した生徒は右側の一覧に追加されます。
-                    </p>
+                    <div class="student-table-wrapper">
 
-                    <div class="student-panels">
+                        <table class="student-table">
+                            <thead>
+                                <tr>
+                                    <th class="check-column">
+                                        <input type="checkbox">
+                                    </th>
+                                    <th>生徒名</th>
+                                    <th>学年</th>
+                                </tr>
+                            </thead>
 
-                        <!-- 未所属の生徒 (class_id が空の生徒。中身はJavaScriptで作成します) -->
-                        <div class="student-panel">
-
-                            <h3>未所属の生徒</h3>
-
-                            <div class="search-box">
-                                <i class="bi bi-search"></i>
-                                <input
-                                    type="search"
-                                    id="studentSearch"
-                                    placeholder="生徒名で検索"
-                                    aria-label="生徒名で検索"
-                                    autocomplete="off"
-                                >
-                            </div>
-
-                            <table class="student-table">
-                                <thead>
-                                    <tr>
-                                        <th class="check-column">選択</th>
-                                        <th>生徒名</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="unassignedBody"></tbody>
-                            </table>
-
-                        </div>
-
-                        <!-- 選択済みの生徒 (中身はJavaScriptで作成します) -->
-                        <div class="student-panel">
-
-                            <div class="selected-header">
-                                <h3>選択済みの生徒（<span id="selectedCount">0</span>名）</h3>
-
-                                <button type="button" class="clear-btn" id="clearAll">
-                                    すべて削除
-                                </button>
-                            </div>
-
-                            <table class="student-table selected-table">
-                                <thead>
-                                    <tr>
-                                        <th>生徒名</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="selectedBody"></tbody>
-                            </table>
-
-                        </div>
+                            <tbody id="unassignedBody"></tbody>
+                        </table>
 
                     </div>
 
-                    <!-- 選択済みの生徒を送信する欄 (JavaScriptで作成します) -->
-                    <div id="selectedInputs" hidden></div>
-                </section>
-
-                <!-- 下部ボタン -->
-                <div class="form-actions">
-
-                    <a href="{{ url_for('manage_class') }}" class="back-btn">
-                        <i class="bi bi-chevron-left"></i>
-                        クラス管理に戻る
-                    </a>
-
-                    <button type="submit" class="confirm-btn">
-                        確認画面へ
+                    <button type="button" class="add-button">
+                        選択した生徒を追加
                         <i class="bi bi-chevron-right"></i>
                     </button>
 
+                </section>
+
+                <!-- 割り当てる生徒 (中身はJavaScriptで作成します) -->
+                <section class="student-card">
+
+                    <h2 class="section-title">
+                        割り当てる生徒
+                    </h2>
+
+                    <div class="info-message">
+                        <i class="bi bi-info-circle"></i>
+                        選択した生徒がこのクラスに登録されます。
+                    </div>
+
+                    <div class="assigned-table-wrapper">
+
+                        <table class="assigned-table">
+                            <thead>
+                                <tr>
+                                    <th>生徒名</th>
+                                    <th>学年</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="selectedBody"></tbody>
+                        </table>
+
+                    </div>
+
+                    <!-- 割り当てる生徒を送信する欄 (JavaScriptで作成します) -->
+                    <div id="selectedInputs" hidden></div>
+
+                </section>
+
+            </div>
+
+            <!-- 下部操作 -->
+            <div class="bottom-area">
+
+                <div class="bottom-info">
+                    <i class="bi bi-info-circle"></i>
+                    登録するクラス情報と生徒の割り当てを確認してください。
                 </div>
+
+                <div class="bottom-buttons">
+
+                    <a href="{{ url_for('manage_class') }}"
+                       class="back-button">
+                        戻る
+                    </a>
+
+                    <button type="submit" class="register-button">
+                        <i class="bi bi-check-circle"></i>
+                        クラスを登録
+                    </button>
+
+                </div>
+
+            </div>
 
             </form>
 
@@ -288,8 +291,8 @@
     </div>
 
     <!-- 生徒の割り当て
-         未所属の生徒にチェックを入れると、その場で「選択済みの生徒」に移る。
-         「削除」「すべて削除」で「未所属の生徒」に戻る。
+         未割り当ての生徒にチェックを入れると、その場で「割り当てる生徒」に移る。
+         「削除」で「未割り当ての生徒」に戻る。
          どの生徒を選んだかは selectedIds だけで管理し、表示は render() で毎回作り直す
          (あとでドラッグ&ドロップなどを足すときも、selectedIds を変えて render() を呼べばよい) -->
     <script>
@@ -297,17 +300,18 @@
             // 未所属の生徒 [{id, name}] (DBの users から)
             const students = {{ students | tojson }};
 
-            // 選択済みの生徒の id (選んだ順)
+            // 割り当てる生徒の id (選んだ順)
             const selectedIds = {{ form.student_ids | tojson }}.filter(function (id) {
                 return students.some(function (s) { return s.id === id; });
             });
 
+            // 未所属の生徒はまだクラスが無いので、学年は「－」
+            const NO_GRADE = "－";
+
             const unassignedBody = document.getElementById("unassignedBody");
             const selectedBody = document.getElementById("selectedBody");
-            const selectedCount = document.getElementById("selectedCount");
             const selectedInputs = document.getElementById("selectedInputs");
             const studentSearch = document.getElementById("studentSearch");
-            const clearAll = document.getElementById("clearAll");
 
             function removeSpaces(text) {
                 return text.replace(/[\s　]/g, "");
@@ -317,12 +321,17 @@
                 return students.find(function (s) { return s.id === id; });
             }
 
-            function emptyRow(colspan, text) {
+            function emptyRow(text, withIcon) {
                 const row = document.createElement("tr");
                 const td = document.createElement("td");
-                td.colSpan = colspan;
-                td.className = "empty-cell";
-                td.textContent = text;
+                td.colSpan = 3;
+                td.className = "empty-message";
+                if (withIcon) {
+                    const icon = document.createElement("i");
+                    icon.className = "bi bi-person-plus";
+                    td.appendChild(icon);
+                }
+                td.appendChild(document.createTextNode(text));
                 row.appendChild(td);
                 return row;
             }
@@ -339,7 +348,7 @@
             }
 
             function render() {
-                // 未所属の生徒 (選択済みと検索に合わない生徒は出さない)
+                // 未割り当ての生徒 (割り当て済みと検索に合わない生徒は出さない)
                 const keyword = removeSpaces(studentSearch.value);
                 const unassigned = students.filter(function (s) {
                     return !selectedIds.includes(s.id) && removeSpaces(s.name).includes(keyword);
@@ -358,16 +367,17 @@
                     checkCell.appendChild(check);
 
                     row.insertCell().textContent = s.name;
+                    row.insertCell().textContent = NO_GRADE;
                     unassignedBody.appendChild(row);
                 });
 
                 if (unassigned.length === 0) {
                     let text = "未所属の生徒はいません。";
                     if (keyword && students.length > selectedIds.length) text = "該当する生徒はいません。";
-                    unassignedBody.appendChild(emptyRow(2, text));
+                    unassignedBody.appendChild(emptyRow(text, false));
                 }
 
-                // 選択済みの生徒
+                // 割り当てる生徒
                 selectedBody.replaceChildren();
                 selectedInputs.replaceChildren();
                 selectedIds.forEach(function (id) {
@@ -376,6 +386,7 @@
                     row.dataset.studentId = id;
 
                     row.insertCell().textContent = s.name;
+                    row.insertCell().textContent = NO_GRADE;
 
                     const actionCell = row.insertCell();
                     const button = document.createElement("button");
@@ -396,17 +407,9 @@
                 });
 
                 if (selectedIds.length === 0) {
-                    selectedBody.appendChild(emptyRow(2, "選択された生徒はいません。"));
+                    selectedBody.appendChild(emptyRow("まだ生徒が選択されていません。", true));
                 }
-
-                selectedCount.textContent = selectedIds.length;
-                clearAll.disabled = selectedIds.length === 0;
             }
-
-            clearAll.addEventListener("click", function () {
-                selectedIds.length = 0;
-                render();
-            });
 
             studentSearch.addEventListener("input", render);
 

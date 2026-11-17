@@ -14,7 +14,7 @@ import subprocess
 from threading import Timer
 ########################
 
-from models import db, User, Class, AvailableSlot, Reservation, SurveyResponse
+from models import db, User, Class, AvailableSlot, Reservation, SurveyResponse, CounselorProfile
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -175,10 +175,12 @@ def reserva():
         .filter(AvailableSlot.date >= week_dates[0])
         .filter(AvailableSlot.date <= week_dates[-1])
     )
-    if selected_counselor_id is not None:
+    # カウンセラーを選ぶまで (「指定なし」のときも) 日時は出さない
+    if selected_counselor_id is None:
+        week_slots = []
+    else:
         query = query.filter(AvailableSlot.counselor_id == selected_counselor_id)
-
-    week_slots = query.order_by(AvailableSlot.date, AvailableSlot.start_time).all()
+        week_slots = query.order_by(AvailableSlot.date, AvailableSlot.start_time).all()
 
     # 日付・時間帯ごとに1枠だけ表示する（「指定なし」の場合は最初に見つかった枠を使う）
     slot_by_cell = {}
@@ -1330,7 +1332,142 @@ def manage_studel_complete():
 @app.route("/manage_care")
 @role_required(User.ROLE_ADMIN)
 def manage_care():
-    return render_template("Management/ManageCare/manage_care.html")
+    # カウンセラー一覧: users の role が counselor の人を表示する
+    # (氏名の検索と1ページ5人のページ送りは、画面側で行う)
+    counselors = (
+        User.query
+        .filter_by(role=User.ROLE_COUNSELOR)
+        .order_by(User.username)
+        .all()
+    )
+    return render_template(
+        "Management/ManageCare/manage_care.html",
+        counselors=counselors,
+        reserved_ids=_counselor_ids_with_reservations(),  # 削除できないカウンセラー
+    )
+
+
+def _counselor_ids_with_reservations():
+    """これからの面談予約 (確定) が入っているカウンセラーの id"""
+    now = datetime.now()
+    rows = (
+        db.session.query(AvailableSlot.counselor_id)
+        .join(Reservation, Reservation.slot_id == AvailableSlot.id)
+        .filter(Reservation.status == Reservation.STATUS_CONFIRMED)
+        .filter(
+            (AvailableSlot.date > now.date())
+            | ((AvailableSlot.date == now.date()) & (AvailableSlot.start_time >= now.time()))
+        )
+        .distinct()
+        .all()
+    )
+    return {row[0] for row in rows}
+
+
+@app.route("/manage_care_delete", methods=["POST"])
+@role_required(User.ROLE_ADMIN)
+def manage_care_delete():
+    # 削除確認ポップアップの「削除する」: カウンセラーを DB から削除する
+    # (生徒の削除と同じく、このカウンセラーに結びつくデータも一緒に消す:
+    #  面談可能日時・その日時への予約・プロフィール)
+    try:
+        counselor = User.query.filter_by(
+            id=int(request.form.get("counselor_id", "")), role=User.ROLE_COUNSELOR
+        ).first()
+    except ValueError:
+        counselor = None
+    if counselor is None:
+        return redirect(url_for("manage_care"))
+
+    # これからの面談予約が入っているカウンセラーは削除しない
+    # (削除確認ポップアップを開き直すと「削除できません」の表示になる)
+    if counselor.id in _counselor_ids_with_reservations():
+        return redirect(url_for("manage_care") + f"#delete{counselor.id}")
+
+    name = counselor.display_name
+    slot_ids = [s.id for s in AvailableSlot.query.filter_by(counselor_id=counselor.id).all()]
+    if slot_ids:
+        Reservation.query.filter(Reservation.slot_id.in_(slot_ids)).delete(synchronize_session=False)
+        AvailableSlot.query.filter(AvailableSlot.id.in_(slot_ids)).delete(synchronize_session=False)
+    CounselorProfile.query.filter_by(counselor_id=counselor.id).delete(synchronize_session=False)
+    db.session.delete(counselor)
+    db.session.commit()
+
+    flash(f"{name} さんの情報を削除しました。", "deleted")
+    return redirect(url_for("manage_care"))
+
+
+@app.route("/manage_care_update", methods=["POST"])
+@role_required(User.ROLE_ADMIN)
+def manage_care_update():
+    # 編集ポップアップの「変更を保存」: 氏名 (users) と ふりがな・性別・年齢・コメント (counselor_profiles)、
+    # 入力があればパスワードも保存する
+    try:
+        counselor = User.query.filter_by(
+            id=int(request.form.get("counselor_id", "")), role=User.ROLE_COUNSELOR
+        ).first()
+    except ValueError:
+        counselor = None
+    if counselor is None:
+        return redirect(url_for("manage_care"))
+
+    display_name = request.form.get("display_name", "").strip()
+    kana = request.form.get("kana", "").strip()
+    gender = request.form.get("gender", "").strip()
+    age_text = request.form.get("age", "").strip()
+    comment = request.form.get("comment", "").strip()
+    password = request.form.get("password", "")
+    password_confirm = request.form.get("password_confirm", "")
+
+    # エラーはそのカウンセラーの編集ポップアップの中に出す
+    error_category = f"edit{counselor.id}"
+    errors = []
+    if not display_name:
+        errors.append("氏名を入力してください。")
+    if kana and not _kana_to_romaji(kana):
+        errors.append("ふりがなはひらがなで入力してください。")
+    age = None
+    if age_text:
+        if not age_text.isdigit() or not 1 <= int(age_text) <= 120:
+            errors.append("年齢は1〜120の数字で入力してください。")
+        else:
+            age = int(age_text)
+    if password or password_confirm:
+        if password != password_confirm:
+            errors.append("新しいパスワードと確認用のパスワードが一致しません。")
+    if errors:
+        for message in errors:
+            flash(message, error_category)
+        return redirect(url_for("manage_care") + f"#edit{counselor.id}")
+
+    counselor.display_name = display_name
+
+    profile = counselor.counselor_profile
+    # ふりがなが変わったら、ログインID も作り直して、パスワードも新しい ID と同じにする
+    # (新しいパスワードが入力されていれば、そちらを使う)
+    old_kana = profile.kana if profile else None
+    id_message = ""
+    if kana and kana != old_kana:
+        new_username = _counselor_username(kana, exclude_id=counselor.id)
+        if new_username != counselor.username:
+            counselor.username = new_username
+            if not password:
+                counselor.set_password(new_username)
+            id_message = f" ログインIDは {new_username} に変わりました。"
+    if password:
+        counselor.set_password(password)
+
+    if profile is None:
+        profile = CounselorProfile(counselor_id=counselor.id)
+        db.session.add(profile)
+    profile.kana = kana or None
+    profile.gender = gender or None
+    profile.age = age
+    profile.comment = comment or None
+
+    db.session.commit()
+    flash(f"{display_name} さんの情報を保存しました。{id_message}", "saved")
+    return redirect(url_for("manage_care"))
 
 
 # =========================
@@ -1354,33 +1491,257 @@ def manage_schedule():
 
 
 # =========================
-# カウンセラー新規登録画面
+# カウンセラー新規登録 (入力 → 確認 → 完了)
+# 入力内容は確認画面に進むときに session["carereg"] に保存し、登録で DB に反映する
+# 画像は確認画面に進むときに static/uploads/tmp/ に仮置きし、登録で
+# static/uploads/counselors/<カウンセラーのid>.<拡張子> に移して、そのパスを
+# counselor_profiles.image に入れる
 # =========================
+
+CAREREG_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png"}
+CAREREG_IMAGE_MAX_BYTES = 5 * 1024 * 1024  # 5MB
+UPLOAD_TMP_DIR = os.path.join(BASE_DIR, "static", "uploads", "tmp")
+COUNSELOR_IMAGE_DIR = os.path.join(BASE_DIR, "static", "uploads", "counselors")
+
+
+# ひらがな → ローマ字 (ログインID を作るため)
+_KANA_ROMAJI = {
+    "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
+    "か": "ka", "き": "ki", "く": "ku", "け": "ke", "こ": "ko",
+    "さ": "sa", "し": "shi", "す": "su", "せ": "se", "そ": "so",
+    "た": "ta", "ち": "chi", "つ": "tsu", "て": "te", "と": "to",
+    "な": "na", "に": "ni", "ぬ": "nu", "ね": "ne", "の": "no",
+    "は": "ha", "ひ": "hi", "ふ": "fu", "へ": "he", "ほ": "ho",
+    "ま": "ma", "み": "mi", "む": "mu", "め": "me", "も": "mo",
+    "や": "ya", "ゆ": "yu", "よ": "yo",
+    "ら": "ra", "り": "ri", "る": "ru", "れ": "re", "ろ": "ro",
+    "わ": "wa", "ゐ": "i", "ゑ": "e", "を": "wo", "ん": "n",
+    "が": "ga", "ぎ": "gi", "ぐ": "gu", "げ": "ge", "ご": "go",
+    "ざ": "za", "じ": "ji", "ず": "zu", "ぜ": "ze", "ぞ": "zo",
+    "だ": "da", "ぢ": "ji", "づ": "zu", "で": "de", "ど": "do",
+    "ば": "ba", "び": "bi", "ぶ": "bu", "べ": "be", "ぼ": "bo",
+    "ぱ": "pa", "ぴ": "pi", "ぷ": "pu", "ぺ": "pe", "ぽ": "po",
+    "ゔ": "vu",
+    "ぁ": "a", "ぃ": "i", "ぅ": "u", "ぇ": "e", "ぉ": "o",
+    "ゃ": "ya", "ゅ": "yu", "ょ": "yo", "ゎ": "wa",
+}
+# きゃ・しゅ・ちょ などの2文字の組み合わせ
+_KANA_ROMAJI_PAIRS = {
+    "しゃ": "sha", "しゅ": "shu", "しぇ": "she", "しょ": "sho",
+    "ちゃ": "cha", "ちゅ": "chu", "ちぇ": "che", "ちょ": "cho",
+    "じゃ": "ja", "じゅ": "ju", "じぇ": "je", "じょ": "jo",
+    "ぢゃ": "ja", "ぢゅ": "ju", "ぢょ": "jo",
+    "ふぁ": "fa", "ふぃ": "fi", "ふぇ": "fe", "ふぉ": "fo",
+    "てぃ": "ti", "でぃ": "di", "とぅ": "tu", "どぅ": "du",
+    "うぃ": "wi", "うぇ": "we", "うぉ": "wo", "ゔぁ": "va", "ゔぃ": "vi", "ゔぇ": "ve", "ゔぉ": "vo",
+}
+for _head, _sound in [("き", "k"), ("に", "n"), ("ひ", "h"), ("み", "m"), ("り", "r"),
+                      ("ぎ", "g"), ("び", "b"), ("ぴ", "p")]:
+    for _small, _vowel in [("ゃ", "a"), ("ゅ", "u"), ("ょ", "o")]:
+        _KANA_ROMAJI_PAIRS[_head + _small] = _sound + "y" + _vowel
+
+
+def _kana_to_romaji(kana):
+    """ふりがなをローマ字にする (例: わたなべ ゆうすけ → watanabe_yuusuke)。
+
+    カタカナはひらがなとして扱い、空白 (全角・半角) は _ にする。
+    ローマ字にできない文字があれば None を返す。
+    """
+    # カタカナ → ひらがな
+    text = "".join(chr(ord(ch) - 0x60) if "ァ" <= ch <= "ヴ" else ch for ch in kana.strip())
+    words = []
+    for word in text.split():
+        result = ""
+        i = 0
+        while i < len(word):
+            pair = word[i:i + 2]
+            if pair in _KANA_ROMAJI_PAIRS:
+                result += _KANA_ROMAJI_PAIRS[pair]
+                i += 2
+            elif word[i] == "っ":
+                # 小さい「っ」は次の音の子音を重ねる (ちゃ・ち などの前は t)
+                rest = word[i + 1:i + 3]
+                following = _KANA_ROMAJI_PAIRS.get(rest[:2]) or _KANA_ROMAJI.get(rest[:1])
+                if not following or following[0] in "aiueon":
+                    return None
+                result += "t" if following.startswith("ch") else following[0]
+                i += 1
+            elif word[i] == "ー":
+                # 伸ばす音は前の母音をもう1回
+                if not result or result[-1] not in "aiueo":
+                    return None
+                result += result[-1]
+                i += 1
+            elif word[i] in _KANA_ROMAJI:
+                result += _KANA_ROMAJI[word[i]]
+                i += 1
+            else:
+                return None
+        words.append(result)
+    return "_".join(words) if words else None
+
+
+def _counselor_username(kana, exclude_id=None):
+    """カウンセラーのログインID を作る: C + ふりがなのローマ字 (例: Cwatanabe_yuusuke)。
+
+    同じ ID がすでにあるときは後ろに 2, 3, ... を付ける。
+    exclude_id: 編集のときの本人の id (本人の今の ID とはかぶっていてもよい)
+    """
+    base = "C" + _kana_to_romaji(kana)
+    username = base
+    suffix = 2
+    while User.query.filter(User.username == username, User.id != exclude_id).first():
+        username = f"{base}{suffix}"
+        suffix += 1
+    return username
+
+
+def _render_carereg(form_values, errors=None):
+    return render_template(
+        "Management/ManageCare/manage_carereg.html",
+        form=form_values,
+        errors=errors or {},
+    )
+
+
+def _remove_tmp_image(data):
+    """仮置きした画像があれば消す"""
+    if data and data.get("image_tmp"):
+        path = os.path.join(BASE_DIR, "static", data["image_tmp"])
+        if os.path.exists(path):
+            os.remove(path)
+
 
 @app.route("/manage_carereg")
 @role_required(User.ROLE_ADMIN)
 def manage_carereg():
-    return render_template("Management/ManageCare/manage_carereg.html")
+    # 確認画面の「戻る」からは、入力した内容を残したまま表示する
+    if request.args.get("back") and session.get("carereg"):
+        return _render_carereg(session["carereg"])
+    _remove_tmp_image(session.pop("carereg", None))
+    return _render_carereg({"name": "", "kana": "", "gender": "", "age": "", "comment": ""})
 
 
-# =========================
-# カウンセラー新規登録確認画面
-# =========================
-
-@app.route("/manage_carereg_check")
+@app.route("/manage_carereg_check", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_carereg_check():
-    return render_template("Management/ManageCare/manage_carereg_check.html")
+    if request.method == "GET":
+        if not session.get("carereg"):
+            return redirect(url_for("manage_carereg"))
+        return render_template("Management/ManageCare/manage_carereg_check.html", data=session["carereg"])
+
+    previous = session.get("carereg") or {}
+    form_values = {
+        "name": request.form.get("name", "").strip(),
+        "kana": request.form.get("kana", "").strip(),
+        "gender": request.form.get("gender", "").strip(),
+        "age": request.form.get("age", "").strip(),
+        "comment": request.form.get("comment", "").strip(),
+        # 前に選んだ画像 (確認画面から戻ってきたとき) はそのまま使う
+        "image_tmp": previous.get("image_tmp", ""),
+        "image_name": previous.get("image_name", ""),
+    }
+
+    errors = {}
+    if not form_values["name"]:
+        errors["name"] = "氏名を入力してください。"
+    if not form_values["kana"]:
+        errors["kana"] = "ふりがなを入力してください。"
+    elif not _kana_to_romaji(form_values["kana"]):
+        # ログインID をふりがなから作るので、ひらがな (カタカナ) と空白だけにする
+        errors["kana"] = "ふりがなはひらがなで入力してください。"
+    if form_values["gender"] not in ("女性", "男性", "その他"):
+        errors["gender"] = "性別を選択してください。"
+    if not form_values["age"]:
+        errors["age"] = "年齢を入力してください。"
+    elif not form_values["age"].isdigit() or not 1 <= int(form_values["age"]) <= 120:
+        errors["age"] = "年齢は1〜120の数字で入力してください。"
+    if not form_values["comment"]:
+        errors["comment"] = "コメントを入力してください。"
+    elif len(form_values["comment"]) > 200:
+        errors["comment"] = "コメントは200文字以内で入力してください。"
+
+    # 画像 (任意): jpg / jpeg / png、5MB以内
+    image = request.files.get("image")
+    new_image = None
+    if image and image.filename:
+        extension = image.filename.rsplit(".", 1)[-1].lower() if "." in image.filename else ""
+        content = image.read()
+        if extension not in CAREREG_IMAGE_EXTENSIONS:
+            errors["image"] = "画像は jpg / jpeg / png のファイルを選択してください。"
+        elif len(content) > CAREREG_IMAGE_MAX_BYTES:
+            errors["image"] = "画像は5MB以内のファイルを選択してください。"
+        else:
+            new_image = (extension, content, image.filename)
+
+    if errors:
+        session["carereg"] = form_values
+        return _render_carereg(form_values, errors)
+
+    if new_image:
+        # 新しく選ばれた画像を仮置きする (前の仮置きは消す)
+        _remove_tmp_image(previous)
+        extension, content, original_name = new_image
+        os.makedirs(UPLOAD_TMP_DIR, exist_ok=True)
+        tmp_name = f"{secrets.token_hex(8)}.{extension}"
+        with open(os.path.join(UPLOAD_TMP_DIR, tmp_name), "wb") as f:
+            f.write(content)
+        form_values["image_tmp"] = f"uploads/tmp/{tmp_name}"
+        form_values["image_name"] = original_name
+
+    session["carereg"] = form_values
+    return redirect(url_for("manage_carereg_check"))
 
 
-# =========================
-# カウンセラー新規登録完了画面
-# =========================
-
-@app.route("/manage_carereg_complete")
+@app.route("/manage_carereg_complete", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_carereg_complete():
-    return render_template("Management/ManageCare/manage_carereg_complete.html")
+    if request.method == "GET":
+        # 完了画面はこの1回だけ (再読み込みしたら一覧へ)
+        done = session.pop("carereg_done", None)
+        if not done:
+            return redirect(url_for("manage_care"))
+        return render_template("Management/ManageCare/manage_carereg_complete.html", done=done)
+
+    data = session.get("carereg")
+    if not data:
+        return redirect(url_for("manage_carereg"))
+
+    # ログインID は ふりがな から作る (例: わたなべ ゆうすけ → Cwatanabe_yuusuke)
+    counselor = User(
+        username=_counselor_username(data["kana"]),
+        display_name=data["name"],
+        role=User.ROLE_COUNSELOR,
+    )
+    # 初期パスワードはログインID と同じにする
+    counselor.set_password(counselor.username)
+    db.session.add(counselor)
+    db.session.flush()
+
+    # 画像を仮置きから本番の場所に移す
+    image_path = None
+    if data.get("image_tmp"):
+        tmp_path = os.path.join(BASE_DIR, "static", data["image_tmp"])
+        if os.path.exists(tmp_path):
+            extension = data["image_tmp"].rsplit(".", 1)[-1]
+            os.makedirs(COUNSELOR_IMAGE_DIR, exist_ok=True)
+            final_name = f"{counselor.id}.{extension}"
+            os.replace(tmp_path, os.path.join(COUNSELOR_IMAGE_DIR, final_name))
+            image_path = f"uploads/counselors/{final_name}"
+
+    db.session.add(CounselorProfile(
+        counselor_id=counselor.id,
+        image=image_path,
+        kana=data.get("kana") or None,
+        gender=data["gender"],
+        age=int(data["age"]),
+        comment=data["comment"],
+    ))
+    db.session.commit()
+
+    session.pop("carereg", None)
+    session["carereg_done"] = {"name": data["name"], "username": counselor.username}
+    return redirect(url_for("manage_carereg_complete"))
 
 
 # =========================
@@ -1554,6 +1915,7 @@ def manage_class():
 
     rows = [
         {
+            "id": c.id,
             "name": c.name,
             "teacher": c.homeroom_teacher.display_name if c.homeroom_teacher else None,
             "student_count": sum(1 for s in c.students if s.role == User.ROLE_STUDENT),
@@ -1562,20 +1924,183 @@ def manage_class():
     ]
     return render_template("Management/ManageClass/manage_class.html", rows=rows)
 
-@app.route("/manage_allo")
+@app.route("/manage_class_delete", methods=["POST"])
+@role_required(User.ROLE_ADMIN)
+def manage_class_delete():
+    # クラス一覧の削除確認ポップアップの「削除する」から、クラスの id を受け取って削除する
+    try:
+        school_class = db.session.get(Class, int(request.form.get("class_id", "")))
+    except ValueError:
+        school_class = None
+
+    if school_class is not None:
+        # 所属していた生徒は未所属に戻す (クラスが無くなるので出席番号も空にする)
+        for student in User.query.filter_by(class_id=school_class.id).all():
+            student.class_id = None
+            student.class_number = None
+        db.session.delete(school_class)
+        db.session.commit()
+
+    return redirect(url_for("manage_class"))
+
+@app.route("/manage_allo", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_allo():
-    return render_template("Management/ManageClass/manage_allo.html")
+    # クラス一覧の「編集」から、編集するクラスの id を POST で受け取る
+    # (再読み込みで再送信にならないよう、session に入れて GET で表示し直す)
+    if request.method == "POST":
+        try:
+            session["allo_class_id"] = int(request.form.get("class_id", ""))
+        except ValueError:
+            session.pop("allo_class_id", None)
+        return redirect(url_for("manage_allo"))
 
-@app.route("/manage_allo_check")
+    school_class = db.session.get(Class, session.get("allo_class_id") or 0)
+    if school_class is None:
+        return redirect(url_for("manage_class"))
+
+    teachers = User.query.filter_by(role=User.ROLE_TEACHER).order_by(User.username).all()
+
+    # このクラスの生徒 (出席番号順。番号が空の生徒は最後)
+    members = sorted(
+        (s for s in school_class.students if s.role == User.ROLE_STUDENT),
+        key=lambda s: (s.class_number is None, s.class_number or 0, s.username),
+    )
+    return render_template(
+        "Management/ManageClass/manage_allo.html",
+        school_class=school_class,
+        teachers=teachers,
+        members=[{"id": s.id, "name": s.display_name} for s in members],
+        available=[{"id": s.id, "name": s.display_name} for s in _unassigned_students()],
+    )
+
+def _allo_changes(form):
+    """クラス編集で送られた内容 (POST) を、確認・完了画面で表示する形にまとめる。
+
+    送られてくる値: class_id, grade, section, teacher_id,
+    member_ids (このクラスの生徒の id。並び順 = 出席番号順)
+    クラスが見つからないときは None
+    """
+    try:
+        school_class = db.session.get(Class, int(form.get("class_id", "")))
+    except ValueError:
+        school_class = None
+    if school_class is None:
+        return None
+
+    grade = form.get("grade", "").strip()
+    section = form.get("section", "").strip()
+    if section.endswith("組"):  # 「B組」と入力されたら「組」は取る
+        section = section[:-1].strip()
+    teacher_id = str(form.get("teacher_id", "")).strip()
+    teacher = None
+    if teacher_id.isdigit():
+        teacher = User.query.filter_by(id=int(teacher_id), role=User.ROLE_TEACHER).first()
+
+    current = [s for s in school_class.students if s.role == User.ROLE_STUDENT]
+    current_ids = {s.id for s in current}
+
+    # このクラスの生徒になれるのは、今のメンバーか未所属の生徒だけ
+    members = []
+    for raw_id in form.getlist("member_ids"):
+        if not raw_id.isdigit() or any(m.id == int(raw_id) for m in members):
+            continue
+        student = db.session.get(User, int(raw_id))
+        if student and student.role == User.ROLE_STUDENT and (
+            student.id in current_ids or student.class_id is None
+        ):
+            members.append(student)
+    member_ids = {m.id for m in members}
+
+    return {
+        "class_id": school_class.id,
+        "grade": grade,
+        "section": section,
+        "teacher_id": teacher.id if teacher else "",
+        "class_name": f"{grade}年{section}組",
+        "current_class_name": school_class.name,
+        "current_grade": school_class.grade,
+        "teacher": teacher.display_name if teacher else "",
+        # 追加する生徒: 出席番号 (上からの順番) つき
+        "added": [
+            {"number": i + 1, "name": m.display_name}
+            for i, m in enumerate(members) if m.id not in current_ids
+        ],
+        # 削除する生徒: このクラスの生徒から外された生徒
+        "removed": [s.display_name for s in current if s.id not in member_ids],
+        "member_ids": [m.id for m in members],
+        "current_count": len(current),
+        "new_count": len(members),
+    }
+
+
+@app.route("/manage_allo_check", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_allo_check():
-    return render_template("Management/ManageClass/manage_allo_check.html")
+    # クラス編集の「更新する」から、変更内容を POST で受け取って表示する
+    changes = _allo_changes(request.form) if request.method == "POST" else None
+    if changes is None:
+        return redirect(url_for("manage_allo"))
+    return render_template("Management/ManageClass/manage_allo_check.html", changes=changes)
 
-@app.route("/manage_allo_complete")
+@app.route("/manage_allo_complete", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_allo_complete():
-    return render_template("Management/ManageClass/manage_allo_complete.html")
+    # 完了画面の表示 (保存したあとに GET で開き直す)
+    if request.method == "GET":
+        changes = session.get("allo_done")
+        if not changes:
+            return redirect(url_for("manage_class"))
+        return render_template("Management/ManageClass/manage_allo_complete.html", changes=changes)
+
+    # 確認画面の「登録する」から、変更内容を POST で受け取って DB に保存する
+    changes = _allo_changes(request.form)
+    if changes is None:
+        return redirect(url_for("manage_class"))
+
+    school_class = db.session.get(Class, changes["class_id"])
+
+    def back_with(message):
+        flash(message)
+        session["allo_class_id"] = school_class.id
+        return redirect(url_for("manage_allo"))
+
+    if not changes["grade"].isdigit() or not changes["section"]:
+        return back_with("学年とクラスを入力してください。")
+    if not changes["teacher_id"]:
+        return back_with("担任の先生を選択してください。")
+    new_name = changes["class_name"]
+    if Class.query.filter(Class.name == new_name, Class.id != school_class.id).first():
+        return back_with(f"{new_name} はすでに登録されています。")
+
+    # クラス情報
+    school_class.name = new_name
+    school_class.grade = int(changes["grade"])
+    school_class.section = changes["section"]
+    school_class.homeroom_teacher_id = changes["teacher_id"]
+
+    # 外された生徒は未所属に戻し、出席番号も空にする
+    member_ids = changes["member_ids"]
+    for s in list(school_class.students):
+        if s.role == User.ROLE_STUDENT and s.id not in member_ids:
+            s.class_id = None
+            s.class_number = None
+
+    # このクラスの生徒: 上から順に出席番号 1, 2, 3…
+    for number, student_id in enumerate(member_ids, start=1):
+        student = db.session.get(User, student_id)
+        student.class_id = school_class.id
+        student.class_number = number
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return back_with(f"{new_name} はすでに登録されています。")
+
+    session.pop("allo_class_id", None)
+    session["allo_done"] = changes
+    return redirect(url_for("manage_allo_complete"))
 
 # =========================
 # クラスの新規登録 (入力 → 確認 → 完了)
@@ -1745,6 +2270,11 @@ def management_graph():
 @role_required(User.ROLE_ADMIN)
 def management_warning():
     return render_template("Management/ManageSurvey/management_warning.html")
+
+@app.route("/management_reserva")
+@role_required(User.ROLE_ADMIN)
+def management_reserva():
+    return render_template("Management/ManageSurvey/management_reserva.html")
 
 @app.route("/manage_stuallo")
 @role_required(User.ROLE_ADMIN)

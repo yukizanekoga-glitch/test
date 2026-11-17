@@ -8,49 +8,73 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='management_top.css') }}">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
 
-    <!-- ヘッダー -->
+   <!-- ヘッダー -->
     <header class="top-header">
+
         <div class="system-title">
             スクールカウンセラー相談予約システム
         </div>
 
         <div class="header-right">
-            <span>♙ {{ session.display_name }}（管理者）</span>
-            <a href="{{ url_for('logout') }}">⇥ ログアウト</a>
+
+            <span class="admin-name">
+                <i class="bi bi-person-fill"></i>
+                {{ session.display_name }}（管理者）
+                <i class="bi bi-chevron-down"></i>
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+
         </div>
+
     </header>
 
     <div class="layout">
-
+        
         <!-- サイドバー -->
         <aside class="sidebar">
 
-            <a href="{{ url_for('management_top') }}" class="active">
-                <span>⌂</span> ホーム
+            <a href="/management_top" class="active">
+                <span><i class="bi bi-house-door"></i></span>
+                ホーム
             </a>
 
-            <a href="{{ url_for('manage_student') }}">
-                <span>♙</span> 生徒管理
+            <a href="/manage_student">
+                <span><i class="bi bi-people"></i></span>
+                生徒管理
             </a>
 
-            <a href="{{ url_for('manage_teacher') }}">
-                <span>♙</span> 先生管理
+            <a href="/manage_teacher">
+                <span><i class="bi bi-person-badge"></i></span>
+                先生管理
             </a>
 
-            <a href="{{ url_for('manage_care') }}">
-                <span>▦</span> カウンセラー管理
+            <a href="/manage_care">
+                <span><i class="bi bi-calendar3"></i></span>
+                カウンセラー管理
             </a>
 
             <a href="{{ url_for('manage_class') }}">
-                <span>▤</span> クラス管理
+                <span><i class="bi bi-file-earmark-text"></i></span>
+                クラス管理
             </a>
 
-            <a href="{{ url_for('management_survey') }}">
-                <span>▥</span> アンケート結果
+            <a href="/management_survey">
+                <span><i class="bi bi-clipboard-data"></i></span>
+                アンケート結果
             </a>
 
         </aside>
@@ -72,7 +96,7 @@
 
                 <a href="{{ url_for('manage_student') }}"
                    class="stat-card stat-blue">
-                    <div class="stat-icon">♙</div>
+                    <div class="stat-icon"><span><i class="bi bi-people"></i></span></div>
                     <div class="stat-info">
                         <span>生徒数</span>
                         <strong>{{ counts.student }} <small>人</small></strong>
@@ -82,7 +106,7 @@
 
                 <a href="{{ url_for('manage_teacher') }}"
                    class="stat-card stat-green">
-                    <div class="stat-icon">♙</div>
+                    <div class="stat-icon"><span><i class="bi bi-person-badge"></i></span></div>
                     <div class="stat-info">
                         <span>先生数</span>
                         <strong>{{ counts.teacher }} <small>人</small></strong>
@@ -92,7 +116,7 @@
 
                 <a href="{{ url_for('manage_care') }}"
                    class="stat-card stat-orange">
-                    <div class="stat-icon">♟</div>
+                    <div class="stat-icon"><span><i class="bi bi-calendar3"></i></span></div>
                     <div class="stat-info">
                         <span>カウンセラー数</span>
                         <strong>{{ counts.counselor }} <small>人</small></strong>
@@ -102,7 +126,7 @@
 
                 <a href="{{ url_for('manage_class') }}"
                    class="stat-card stat-purple">
-                    <div class="stat-icon">▦</div>
+                    <div class="stat-icon"><span><i class="bi bi-file-earmark-text"></i></span></div>
                     <div class="stat-info">
                         <span>クラス数</span>
                         <strong>{{ counts['class'] }} <small>クラス</small></strong>
@@ -204,8 +228,7 @@
                     </div>
 
                     <div class="panel-bottom">
-                        <!-- 面談予定一覧 (management_reserva) の画面はまだ無いため、リンク先は仮 -->
-                        <a href="#">
+                        <a href="{{ url_for('management_reserva') }}">
                             すべての予定を見る ›
                         </a>
                     </div>
@@ -223,30 +246,30 @@
 
                 <div class="quick-grid">
 
-                    <a href="{{ url_for('manage_sturec') }}"
+                    <a href="{{ url_for('manage_student') }}"
                        class="quick-item quick-blue">
-                        <span>♙</span>
-                        生徒の登録・編集
+                        <span><i class="bi bi-people"></i></span>
+                        生徒の登録
                         <span class="quick-arrow">›</span>
                     </a>
 
                     <a href="{{ url_for('manage_tearec') }}"
                        class="quick-item quick-green">
-                        <span>♙</span>
-                        先生の登録・編集
+                        <span><i class="bi bi-person-badge"></i></span>
+                        先生の登録
                         <span class="quick-arrow">›</span>
                     </a>
 
                     <a href="{{ url_for('manage_carereg') }}"
                        class="quick-item quick-orange">
-                        <span>♟</span>
-                        カウンセラーの登録・編集
+                        <span><i class="bi bi-calendar3"></i></span>
+                        カウンセラーの登録
                         <span class="quick-arrow">›</span>
                     </a>
 
                     <a href="{{ url_for('manage_class') }}"
                        class="quick-item quick-purple">
-                        <span>▦</span>
+                        <span><i class="bi bi-file-earmark-text"></i></span>
                         クラス登録
                         <span class="quick-arrow">›</span>
                     </a>

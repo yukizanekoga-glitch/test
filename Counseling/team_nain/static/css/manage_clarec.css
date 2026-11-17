@@ -13,14 +13,14 @@ body {
 }
 
 body {
-    background: #ffffff;
-    color: #09194b;
+    background: #f3f6fb;
+    color: #263248;
     font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 /* =========================
-   ヘッダー（共通・変更なし）
+   ヘッダー（共通）
 ========================= */
 .top-header {
     height: 55px;
@@ -35,6 +35,13 @@ body {
 .system-title {
     font-size: 18px;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.system-title i {
+    font-size: 23px;
 }
 
 .header-right {
@@ -79,7 +86,6 @@ body {
     align-items: center;
     gap: 10px;
     white-space: nowrap;
-    color: white;
 }
 
 .logout i {
@@ -95,7 +101,7 @@ body {
 }
 
 /* =========================
-   サイドバー（共通・変更なし）
+   サイドバー（共通）
 ========================= */
 .sidebar {
     width: 215px;
@@ -131,431 +137,391 @@ body {
 }
 
 /* =========================
-   メイン
+   メインコンテンツ
 ========================= */
 .main-content {
     flex: 1;
     min-width: 0;
-    padding: 14px 22px 20px;
-}
-
-/* パンくず */
-.breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.breadcrumb a {
-    color: #006aff;
-    text-decoration: none;
-}
-
-.breadcrumb a:hover {
-    text-decoration: underline;
-}
-
-.breadcrumb i {
-    font-size: 11px;
-    color: #8495b3;
+    padding: 22px 22px;
 }
 
 /* =========================
    ページタイトル
 ========================= */
 .page-heading {
-    border-left: 4px solid #006aff;
-    padding-left: 16px;
-    margin-bottom: 15px;
+    border-left: 5px solid #0d6efd;
+    padding-left: 15px;
+    margin-bottom: 17px;
 }
 
 .page-heading h1 {
+    font-size: 23px;
+    color: #172642;
     margin: 0 0 5px;
-    font-size: 26px;
-    font-weight: 700;
+    font-weight: bold;
 }
 
 .page-heading p {
+    font-size: 12px;
+    color: #344b6c;
     margin: 0;
-    font-size: 14px;
 }
 
 /* =========================
-   登録フォーム
+   セクション共通
 ========================= */
-.register-card {
-    border: 1px solid #d6e3f5;
-    border-radius: 5px;
-    padding: 9px 10px 14px;
-    background: #ffffff;
+.info-card,
+.student-card {
+    background: #fff;
+    border: 1px solid #dce7f7;
+    border-radius: 11px;
+    padding: 14px;
 }
 
-.form-section {
-    margin-bottom: 15px;
-}
-
-.section-heading {
-    height: 44px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 0 10px;
-    background: #eef5ff;
-    border-radius: 5px;
-}
-
-.step-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 35px;
-    height: 35px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    background: #006aff;
-    color: #ffffff;
-    font-size: 19px;
-    font-weight: 700;
-}
-
-.section-heading h2 {
-    margin: 0;
+.section-title {
     font-size: 17px;
-    font-weight: 700;
+    font-weight: bold;
+    color: #172642;
+    border-left: 5px solid #0d6efd;
+    padding-left: 11px;
+    margin: 0 0 15px;
 }
 
 /* =========================
    クラス情報
 ========================= */
-.class-fields {
+.info-card {
+    margin-bottom: 15px;
+}
+
+.class-info-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 20px;
+    padding: 3px 10px 7px;
+}
+
+.form-item {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 13px;
-    padding: 13px 24px 2px;
+    flex-direction: column;
+    gap: 7px;
 }
 
-.class-fields label,
-.teacher-fields label {
-    font-weight: 700;
-    font-size: 14px;
-    white-space: nowrap;
-}
-
-.class-fields label {
-    margin-right: 10px;
-}
-
-.class-fields label[for="class_name"] {
-    margin-left: 40px;
+.form-item label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #34445d;
 }
 
 .required {
-    color: #ff0000;
-    border: 1px solid #ff0000;
-    padding: 3px 7px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
+    color: #e34b4b;
+    margin-left: 3px;
 }
 
-.class-fields input {
-    width: 190px;
-    height: 36px;
-    border: 1px solid #c9d6e9;
-    border-radius: 4px;
-    padding: 0 13px;
-    font-size: 14px;
+.form-item input,
+.form-item select {
+    width: 100%;
+    height: 38px;
+    border: 1px solid #cbd7e7;
+    border-radius: 7px;
+    background: #fff;
+    padding: 0 11px;
     font-family: inherit;
-    color: #09194b;
+    font-size: 13px;
+    color: #263b58;
+    outline: none;
 }
 
-.unit {
-    font-weight: 700;
+.form-item input:focus,
+.form-item select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.08);
 }
 
 /* =========================
-   担任の先生
+   生徒エリア
 ========================= */
-.teacher-fields {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    padding: 13px 24px 2px;
-}
-
-.teacher-fields label {
-    margin-right: 10px;
-}
-
-.teacher-fields select {
-    width: 420px;
-    max-width: 100%;
-    height: 36px;
-    border: 1px solid #c9d6e9;
-    border-radius: 4px;
-    padding: 0 13px;
-    background: #ffffff;
-    color: #536582;
-    font-size: 14px;
-    font-family: inherit;
-}
-
-/* =========================
-   生徒の割り当て
-========================= */
-.section-description {
-    margin: 0;
-    padding: 0 10px 9px 60px;
-    font-size: 12px;
-}
-
-.student-panels {
+.student-area {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 20px;
-    padding: 0 8px;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+    align-items: stretch;
 }
 
-.student-panel {
-    border: 1px solid #d6e3f5;
-    border-radius: 5px;
-    padding: 12px 15px;
-    min-height: 286px;
+.student-card {
     min-width: 0;
+    min-height: 365px;
 }
 
-.student-panel h3 {
-    font-size: 16px;
-    margin: 0 0 5px;
-    font-weight: 700;
-}
-
-/* 検索欄 */
+/* =========================
+   検索欄
+========================= */
 .search-box {
     display: flex;
     align-items: center;
-    height: 33px;
-    border: 1px solid #c9d6e9;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    padding: 0 12px;
     gap: 10px;
+    width: 100%;
+    height: 36px;
+    border: 1px solid #cbd7e7;
+    border-radius: 7px;
+    padding: 0 11px;
+    margin-bottom: 13px;
+    background: #fff;
 }
 
 .search-box i {
-    color: #91a1bf;
     font-size: 15px;
+    color: #71849e;
 }
 
 .search-box input {
     width: 100%;
-    height: 100%;
     border: none;
     outline: none;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 /* =========================
    生徒テーブル
 ========================= */
-.student-table {
+.student-table-wrapper,
+.assigned-table-wrapper {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    border: 1px solid #d6e3f5;
-    border-radius: 4px;
-    overflow: hidden;
-    font-size: 13px;
+    overflow-x: auto;
 }
 
-.student-table th {
-    background: #edf3fa;
-    font-weight: 600;
-    height: 30px;
+.student-table,
+.assigned-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
 }
 
-.student-table td {
-    height: 25px;
-    background: #ffffff;
+.student-table thead,
+.assigned-table thead {
+    background: #edf2f8;
 }
 
 .student-table th,
-.student-table td {
-    border-right: 1px solid #dce5f0;
-    border-bottom: 1px solid #dce5f0;
-    padding: 2px 10px;
+.assigned-table th {
+    height: 36px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #263b58;
+    text-align: center;
 }
 
-.student-table tr > :last-child {
-    border-right: none;
+.student-table td,
+.assigned-table td {
+    height: 37px;
+    border-bottom: 1px solid #e4eaf2;
+    text-align: center;
+    font-size: 12px;
+    color: #34445d;
 }
 
-.student-table tbody tr:last-child td {
-    border-bottom: none;
+.student-table tbody tr:hover,
+.assigned-table tbody tr:hover {
+    background: #f7faff;
 }
 
-.student-table .check-column {
-    width: 55px;
-}
-
+.student-table th:first-child,
 .student-table td:first-child {
-    text-align: center;
+    width: 17%;
 }
 
+.student-table th:nth-child(2),
+.student-table td:nth-child(2) {
+    text-align: left;
+    padding-left: 15px;
+}
+
+.student-table th:last-child,
+.student-table td:last-child {
+    width: 22%;
+}
+
+/* チェックボックス */
 .student-table input[type="checkbox"] {
-    width: 14px;
-    height: 14px;
+    width: 17px;
+    height: 17px;
+    accent-color: #0866f5;
     cursor: pointer;
-    accent-color: #006aff;
+    vertical-align: middle;
 }
 
 /* =========================
-   選択済み生徒
+   生徒追加ボタン
 ========================= */
-.selected-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 5px;
-}
-
-.selected-header h3 {
-    margin: 0;
-}
-
-.clear-btn {
-    border: 1px solid #aabbd6;
-    border-radius: 4px;
-    background: #ffffff;
-    padding: 6px 12px;
-    color: #09194b;
-    font-size: 12px;
-    font-family: inherit;
-    cursor: pointer;
-}
-
-.clear-btn:hover {
-    background: #f1f5fb;
-}
-
-.selected-table th:last-child,
-.selected-table td:last-child {
-    width: 40%;
-    text-align: center;
-}
-
-.delete-btn {
-    width: 70px;
-    height: 25px;
-    border: 1px solid #ff0000;
-    border-radius: 4px;
-    background: #ffffff;
-    color: #ff0000;
-    font-size: 12px;
-    font-family: inherit;
-    cursor: pointer;
-}
-
-.delete-btn:hover {
-    background: #fff0f0;
-}
-
-/* =========================
-   下部ボタン
-========================= */
-.form-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
-    padding: 0 8px;
-}
-
-.back-btn,
-.confirm-btn {
+.add-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
-    height: 47px;
-    border-radius: 4px;
-    font-size: 13px;
+    gap: 9px;
+    width: 65%;
+    max-width: 280px;
+    height: 40px;
+    margin: 15px auto 0;
+    border: none;
+    border-radius: 7px;
+    background: #0866f5;
+    color: #fff;
     font-family: inherit;
-    font-weight: 600;
-    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
     cursor: pointer;
 }
 
-.back-btn {
-    width: 215px;
-    background: #ffffff;
-    border: 1px solid #aabbd6;
-    color: #09194b;
+.add-button:hover {
+    background: #0052d4;
 }
 
-.back-btn:hover {
-    background: #f1f5fb;
+/* =========================
+   案内メッセージ
+========================= */
+.info-message {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 36px;
+    padding: 7px 11px;
+    margin-bottom: 13px;
+    border-radius: 7px;
+    background: #e8f2ff;
+    color: #0758c8;
+    font-size: 11px;
+    font-weight: bold;
 }
 
-.confirm-btn {
-    width: 250px;
-    border: 1px solid #006aff;
-    background: #006aff;
-    color: #ffffff;
-}
-
-.confirm-btn:hover {
-    background: #0057d8;
-}
-
-.back-btn i,
-.confirm-btn i {
+.info-message i {
     font-size: 16px;
 }
 
 /* =========================
-   フォーカス
+   割り当て済み生徒
 ========================= */
-.class-fields input:focus,
-.teacher-fields select:focus {
-    outline: 1px solid #006aff;
-    outline-offset: 0;
+.assigned-table th:first-child {
+    width: 48%;
+}
+
+.assigned-table th:nth-child(2) {
+    width: 20%;
+}
+
+.assigned-table th:last-child {
+    width: 32%;
+}
+
+.empty-message {
+    height: 100px !important;
+    color: #8a9ab0 !important;
+    font-size: 12px !important;
+}
+
+.empty-message i {
+    margin-right: 7px;
+    font-size: 16px;
 }
 
 /* =========================
-   画面サイズ調整
+   下部操作エリア
 ========================= */
-@media (max-width: 1100px) {
-    .class-fields label[for="class_name"] {
-        margin-left: 0;
-    }
-
-    .student-panels {
-        gap: 10px;
-    }
-
-    .student-panel {
-        padding: 10px;
-    }
+.bottom-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 17px;
 }
 
-@media (max-width: 850px) {
-    .student-panels {
+.bottom-info {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #405572;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.bottom-info i {
+    color: #315b9a;
+    font-size: 17px;
+}
+
+.bottom-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 戻るボタン */
+.back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 115px;
+    height: 40px;
+    border: 1px solid #8bb5ff;
+    border-radius: 8px;
+    background: #fff;
+    color: #0866f5;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    background: #eef5ff;
+}
+
+/* 登録ボタン */
+.register-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 190px;
+    height: 40px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 8px;
+    background: #0866f5;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.register-button:hover {
+    background: #0052d4;
+}
+
+/* =========================
+   画面幅が狭い場合
+========================= */
+@media screen and (max-width: 1100px) {
+
+    .main-content {
+        padding: 18px 14px;
+    }
+
+    .student-area {
         grid-template-columns: 1fr;
     }
 
-    .main-content {
-        padding: 14px;
+    .class-info-form {
+        gap: 12px;
     }
 
-    .form-actions {
-        flex-wrap: wrap;
+    .bottom-area {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .bottom-buttons {
+        align-self: flex-end;
     }
 }

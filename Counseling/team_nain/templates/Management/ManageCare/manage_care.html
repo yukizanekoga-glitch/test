@@ -1,123 +1,462 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>カウンセラー一覧 | スクールカウンセラー相談予約システム</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/manage_care.css') }}">
 
-  <!-- ページのタイトル -->
-  <title>カウンセラー一覧 管理者</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 保存しましたのメッセージ */
+        .saved-message {
+            margin: 0 0 14px;
+            padding: 10px 14px;
+            border: 1px solid #b7e4cf;
+            border-radius: 8px;
+            background: #effaf4;
+            color: #0a7a52;
+            font-size: 13px;
+        }
+
+        /* 削除しましたのメッセージ (赤) */
+        .deleted-message {
+            margin: 0 0 14px;
+            padding: 10px 14px;
+            border: 1px solid #f3c6c6;
+            border-radius: 8px;
+            background: #fdecec;
+            color: #b42318;
+            font-size: 13px;
+        }
+
+        /* 編集ポップアップの中のエラー */
+        .modal-error {
+            margin: 0 0 12px;
+            padding: 9px 12px;
+            border-radius: 7px;
+            background: #fdecec;
+            color: #b42318;
+            font-size: 12px;
+        }
+
+        .modal-error p {
+            margin: 0;
+        }
+
+        .modal-content form {
+            margin: 0;
+        }
+    </style>
 </head>
 
 <body>
 
-  <!-- ナビゲーションバー -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー カウンセラー一覧</span>
+    <!-- ヘッダー -->
+    <header class="top-header">
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="header-right">
+            <span class="admin-name">
+                <i class="bi bi-person-fill"></i>
+                {{ session.display_name }}（管理者）
+                <i class="bi bi-chevron-down"></i>
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+
+            <a href="/management_top">
+                <span><i class="bi bi-house-door"></i></span>
+                ホーム
+            </a>
+
+            <a href="/manage_student">
+                <span><i class="bi bi-people"></i></span>
+                生徒管理
+            </a>
+
+            <a href="/manage_teacher">
+                <span><i class="bi bi-person-badge"></i></span>
+                先生管理
+            </a>
+
+            <a href="/manage_care" class="active">
+                <span><i class="bi bi-calendar3"></i></span>
+                カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}">
+                <span><i class="bi bi-file-earmark-text"></i></span>
+                クラス管理
+            </a>
+
+            <a href="{{ url_for('management_survey') }}">
+                <span><i class="bi bi-clipboard-data"></i></span>
+                アンケート結果
+            </a>
+
+        </aside>
+
+        <!-- メイン画面 -->
+        <main class="main-content">
+
+            <div class="page-heading">
+                <h1>カウンセラー一覧</h1>
+                <p>登録されているカウンセラーの一覧です。</p>
+            </div>
+
+            {% for message in get_flashed_messages(category_filter=['saved']) %}
+            <p class="saved-message"><i class="bi bi-check-circle"></i> {{ message }}</p>
+            {% endfor %}
+
+            {% for message in get_flashed_messages(category_filter=['deleted']) %}
+            <p class="deleted-message"><i class="bi bi-trash3"></i> {{ message }}</p>
+            {% endfor %}
+
+            <!-- 一覧カード -->
+            <section class="counselor-card">
+
+                <!-- 検索・操作エリア -->
+                <div class="search-area">
+
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text"
+                               id="counselorSearch"
+                               placeholder="氏名で検索"
+                               aria-label="氏名で検索"
+                               autocomplete="off">
+                    </div>
+
+                    <a href="{{ url_for('manage_carereg') }}" class="new-button">
+                        <i class="bi bi-plus-lg"></i>
+                        新規登録
+                    </a>
+
+                </div>
+
+                <!-- カウンセラー一覧 -->
+                <div class="table-wrapper">
+
+                    <table class="counselor-table">
+
+                        <thead>
+                            <tr>
+                                <th class="image-column">画像</th>
+                                <th class="name-column">氏名</th>
+                                <th class="gender-column">性別</th>
+                                <th class="age-column">年齢</th>
+                                <th class="comment-column">コメント</th>
+                                <th class="action-column">操作</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <!-- カウンセラー (users の role が counselor の人)
+                                 性別・年齢・コメントは counselor_profiles から。データが無いところは「－」 -->
+                            {% for c in counselors %}
+                            <tr class="counselor-row" data-name="{{ c.display_name }}">
+                                <td>
+                                    <div class="profile-image">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                </td>
+
+                                {% set profile = c.counselor_profile %}
+                                <td class="counselor-name">{{ c.display_name }}</td>
+                                <td>{{ profile.gender if profile and profile.gender else '－' }}</td>
+                                <td>{{ profile.age ~ '歳' if profile and profile.age is not none else '－' }}</td>
+
+                                <td class="comment">{{ profile.comment if profile and profile.comment else '－' }}</td>
+
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="#edit{{ c.id }}" class="edit-button">
+                                            <i class="bi bi-pencil"></i> 編集
+                                        </a>
+                                        <a href="#delete{{ c.id }}" class="delete-button">
+                                            <i class="bi bi-trash3"></i> 削除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6">登録されているカウンセラーはいません。</td>
+                            </tr>
+                            {% endfor %}
+
+                            <!-- 検索に一致するカウンセラーがいないとき -->
+                            <tr id="noMatchRow" hidden>
+                                <td colspan="6">該当するカウンセラーはいません。</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ページ下部 -->
+                <div class="table-footer">
+
+                    <div class="total-count">
+                        全 <span id="totalCount">{{ counselors|length }}</span> 件
+                    </div>
+
+                    <!-- ページ送り (1ページ5人。ボタンは JavaScript で作成します) -->
+                    <div class="pagination" id="pagination">
+                        <button type="button" class="page-arrow" disabled>
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+
+                        <button type="button" class="page-number active">1</button>
+
+                        <button type="button" class="page-arrow" disabled>
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
     </div>
-  </nav>
 
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
 
-    <!-- ページの見出し -->
-    <h2 class="text-center mb-4">カウンセラー一覧</h2>
+    {% for c in counselors %}
+    <!-- =========================
+         編集ポップアップ ({{ c.display_name }})
+    ========================= -->
+    <div id="edit{{ c.id }}" class="modal">
+        <a href="#" class="modal-background"></a>
 
-    <!-- カウンセラー一覧 -->
-    <div class="row justify-content-center">
+        <div class="modal-content">
 
-      <!-- 生徒1 -->
-      <div class="col-md-6 mb-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">山田 太郎</h5>
-            <a href="{{ url_for('manage_carepass') }}" class="btn btn-primary">
-              パスワード変更
-            </a>
-            <a href="{{ url_for('manage_caredit') }}" class="btn btn-primary">
-              編集
-            </a>
-            <a href="{{ url_for('manage_caredel_check') }}" class="btn btn-primary">
-              削除
-            </a>
-          </div>
+            <div class="modal-header">
+                <h2><i class="bi bi-pencil-square"></i> カウンセラー情報編集</h2>
+                <a href="#" class="modal-close"><i class="bi bi-x-lg"></i></a>
+            </div>
+
+            <!-- 「変更を保存」で、このカウンセラーの内容を保存する -->
+            <form action="{{ url_for('manage_care_update') }}" method="post">
+            <input type="hidden" name="counselor_id" value="{{ c.id }}">
+
+            <div class="modal-body">
+
+                {% set modal_errors = get_flashed_messages(category_filter=['edit' ~ c.id]) %}
+                {% if modal_errors %}
+                <div class="modal-error">
+                    {% for message in modal_errors %}<p>{{ message }}</p>{% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label>画像</label>
+                    <div class="image-edit">
+                        <div class="profile-image large">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <input type="file" accept="image/*">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>氏名</label>
+                    <input type="text" name="display_name" value="{{ c.display_name }}">
+                </div>
+
+                <!-- ふりがな・性別・年齢・コメントは counselor_profiles の値 (無ければ空) -->
+                {% set profile = c.counselor_profile %}
+                <div class="form-group">
+                    <label>ふりがな</label>
+                    <input type="text" name="kana" value="{{ profile.kana if profile and profile.kana else '' }}">
+                </div>
+
+                {% set gender = profile.gender if profile and profile.gender else '' %}
+                <div class="form-group">
+                    <label>性別</label>
+                    <select name="gender">
+                        <option value="" {% if not gender %}selected{% endif %}>－</option>
+                        {% for g in ['女性', '男性'] %}
+                        <option {% if gender == g %}selected{% endif %}>{{ g }}</option>
+                        {% endfor %}
+                        {% if gender and gender not in ['女性', '男性'] %}
+                        <option selected>{{ gender }}</option>
+                        {% endif %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>年齢</label>
+                    <input type="number" name="age" min="1" max="120"
+                           value="{{ profile.age if profile and profile.age is not none else '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label>コメント</label>
+                    <textarea rows="3" name="comment">{{ profile.comment if profile and profile.comment else '' }}</textarea>
+                </div>
+
+                        <div class="form-group">
+                            <label>新しいパスワード</label>
+
+                            <input type="password"
+                                   class="form-control"
+                                   name="password"
+                                   autocomplete="new-password"
+                                   placeholder="新しいパスワードを入力">
+                        </div>
+
+                        <div class="form-group">
+                            <label>新しいパスワード（確認）</label>
+
+                            <input type="password"
+                                   class="form-control"
+                                   name="password_confirm"
+                                   autocomplete="new-password"
+                                   placeholder="新しいパスワードを再入力">
+                        </div>
+
+
+            </div>
+
+            <div class="modal-footer">
+                <a href="#" class="cancel-button">キャンセル</a>
+                <button type="submit" class="save-button">
+                    <i class="bi bi-check-lg"></i> 変更を保存
+                </button>
+            </div>
+
+            </form>
+
         </div>
-      </div>
-
-      <!-- 生徒2 -->
-      <div class="col-md-6 mb-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">佐藤 花子</h5>
-            <a href="{{ url_for('manage_carepass') }}" class="btn btn-primary">
-              パスワード変更
-            </a>
-            <a href="{{ url_for('manage_caredit') }}" class="btn btn-primary">
-              編集
-            </a>
-            <a href="{{ url_for('manage_caredel_check') }}" class="btn btn-primary">
-              削除
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- 生徒3 -->
-      <div class="col-md-6 mb-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">鈴木 一郎</h5>
-            <a href="{{ url_for('manage_carepass') }}" class="btn btn-primary">
-              パスワード変更
-            </a>
-            <a href="{{ url_for('manage_caredit') }}" class="btn btn-primary">
-              編集
-            </a>
-            <a href="{{ url_for('manage_caredel_check') }}" class="btn btn-primary">
-              削除
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- 生徒4 -->
-      <div class="col-md-6 mb-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">高橋 美咲</h5>
-            <a href="{{ url_for('manage_carepass') }}" class="btn btn-primary">
-              パスワード変更
-            </a>
-            <a href="{{ url_for('manage_caredit') }}" class="btn btn-primary">
-              編集
-            </a>
-            <a href="{{ url_for('manage_caredel_check') }}" class="btn btn-primary">
-              削除
-            </a>
-          </div>
-        </div>
-      </div>
-
     </div>
 
-     
-    <!-- 戻るボタン -->
-    <div class="text-center mt-4">
-      <a href="{{ url_for('management_top') }}" class="btn btn-secondary">
-        戻る
-      </a>
-      <!-- 登録ボタン -->
-     <a href="{{ url_for('manage_carereg') }}" class="btn btn-primary">新規登録</a>
+    <!-- 削除確認ポップアップ ({{ c.display_name }}) -->
+    <div id="delete{{ c.id }}" class="modal">
+        <a href="#" class="modal-background"></a>
+        <div class="delete-modal-content">
+            <div class="delete-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            {% if c.id in reserved_ids %}
+            <!-- これからの面談予約が入っているときは削除できない -->
+            <h2>削除できません</h2>
+            <p>「{{ c.display_name }}」には、生徒の面談予約が入っています。</p>
+            <p class="delete-warning">面談予約されているカウンセラーは削除できません。</p>
+            <div class="modal-footer">
+                <a href="#" class="cancel-button">閉じる</a>
+            </div>
+            {% else %}
+            <h2>削除してもよろしいですか？</h2>
+            <p>「{{ c.display_name }}」の登録情報を削除します。</p>
+            <!-- 「削除する」で、このカウンセラーを DB から削除する -->
+            <form action="{{ url_for('manage_care_delete') }}" method="post">
+                <input type="hidden" name="counselor_id" value="{{ c.id }}">
+                <div class="modal-footer">
+                    <a href="#" class="cancel-button">キャンセル</a>
+                    <button type="submit" class="confirm-delete-button">削除する</button>
+                </div>
+            </form>
+            {% endif %}
+        </div>
     </div>
 
-  </div>
+    {% endfor %}
 
+    <!-- 氏名の絞り込み (入力するたびに絞り込む) と、1ページ5人のページ送り
+         検索に合ったカウンセラーだけを5人ずつ表示する -->
+    <script>
+        (function () {
+            const PER_PAGE = 5;
+            const search = document.getElementById("counselorSearch");
+            const rows = Array.from(document.querySelectorAll(".counselor-row"));
+            const noMatchRow = document.getElementById("noMatchRow");
+            const totalCount = document.getElementById("totalCount");
+            const pagination = document.getElementById("pagination");
+            let page = 1;
+
+            function removeSpaces(text) {
+                return text.replace(/[\s　]/g, "");
+            }
+
+            function pageButton(className, content, targetPage, disabled) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = className;
+                button.disabled = disabled;
+                if (typeof content === "string") {
+                    button.textContent = content;
+                } else {
+                    button.appendChild(content);
+                }
+                button.addEventListener("click", function () {
+                    page = targetPage;
+                    render();
+                });
+                return button;
+            }
+
+            function arrowIcon(direction) {
+                const icon = document.createElement("i");
+                icon.className = "bi bi-chevron-" + direction;
+                return icon;
+            }
+
+            function render() {
+                const keyword = removeSpaces(search.value);
+                const matched = rows.filter(function (row) {
+                    return removeSpaces(row.dataset.name).includes(keyword);
+                });
+
+                const pageCount = Math.max(Math.ceil(matched.length / PER_PAGE), 1);
+                page = Math.min(Math.max(page, 1), pageCount);
+                const start = (page - 1) * PER_PAGE;
+
+                rows.forEach(function (row) { row.hidden = true; });
+                matched.slice(start, start + PER_PAGE).forEach(function (row) { row.hidden = false; });
+
+                noMatchRow.hidden = rows.length === 0 || matched.length > 0;
+                totalCount.textContent = matched.length;
+
+                pagination.replaceChildren();
+                pagination.appendChild(pageButton("page-arrow", arrowIcon("left"), page - 1, page <= 1));
+                for (let n = 1; n <= pageCount; n++) {
+                    pagination.appendChild(pageButton("page-number" + (n === page ? " active" : ""), String(n), n, false));
+                }
+                pagination.appendChild(pageButton("page-arrow", arrowIcon("right"), page + 1, page >= pageCount));
+            }
+
+            // 検索したら1ページ目から表示する
+            search.addEventListener("input", function () {
+                page = 1;
+                render();
+            });
+
+            render();
+        })();
+    </script>
+
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

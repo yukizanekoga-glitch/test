@@ -5,30 +5,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>クラスの割り当て | スクールカウンセラー相談予約システム</title>
+    <title>クラス編集 | スクールカウンセラー相談予約システム</title>
 
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- CSS -->
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/manage_allo.css') }}">
-</head>
 
+    <style>
+        /* ドラッグ中の行 */
+        /* 元の行は「ここに入る」場所として、点線の枠で表示する */
+        .current-table tr.dragging td {
+            background: #eef5ff;
+            color: #8bb5ff;
+            border-top: 2px dashed #8bb5ff;
+            border-bottom: 2px dashed #8bb5ff;
+        }
+
+        .current-table tr.dragging td:first-child {
+            border-left: 2px dashed #8bb5ff;
+        }
+
+        .current-table tr.dragging td:last-child {
+            border-right: 2px dashed #8bb5ff;
+        }
+
+        .current-table tr.dragging .delete-button {
+            visibility: hidden;
+        }
+
+        .current-table tr[draggable="true"] {
+            cursor: grab;
+        }
+
+        /* 一覧が空のとき */
+        .student-table td[colspan] {
+            color: #8a9ab0;
+            text-align: center;
+        }
+
+        .page-error {
+            margin: 0 0 12px;
+            color: #d93025;
+            font-size: 13px;
+        }
+
+        .add-button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+    </style>
+</head>
 <body>
 
-    <!-- =========================
-         ヘッダー
-    ========================= -->
+    <!-- ヘッダー -->
     <header class="top-header">
-
-        <div class="header-title">
-            <span>スクールカウンセラー相談予約システム</span>
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
         </div>
 
         <div class="header-right">
-
             <span class="admin-name">
                 <i class="bi bi-person-fill"></i>
                 {{ session.display_name }}（管理者）
@@ -41,19 +78,15 @@
                 <i class="bi bi-box-arrow-right"></i>
                 ログアウト
             </a>
-
         </div>
-
     </header>
 
     <div class="layout">
 
-        <!-- =========================
-             サイドバー
-        ========================= -->
+        <!-- サイドバー -->
         <aside class="sidebar">
 
-            <a href="/manage_top">
+            <a href="/management_top">
                 <span><i class="bi bi-house-door"></i></span>
                 ホーム
             </a>
@@ -68,7 +101,7 @@
                 先生管理
             </a>
 
-            <a href="/manage_counselor">
+            <a href="/manage_care">
                 <span><i class="bi bi-calendar3"></i></span>
                 カウンセラー管理
             </a>
@@ -78,440 +111,415 @@
                 クラス管理
             </a>
 
-            <a href="/manage_survey">
-                <span><i class="bi bi-bar-chart-line"></i></span>
+            <a href="/management_survey">
+                <span><i class="bi bi-clipboard-data"></i></span>
                 アンケート結果
             </a>
 
         </aside>
 
-        <!-- =========================
-             メイン
-        ========================= -->
+        <!-- メイン -->
         <main class="main-content">
 
-            <!-- パンくず -->
-            <div class="breadcrumb">
-                <a href="{{ url_for('manage_class') }}">
-                    クラス管理
-                </a>
-
-                <i class="bi bi-chevron-right"></i>
-
-                <span>クラスの割り当て</span>
+            <!-- ページタイトル -->
+            <div class="page-heading">
+                <h1>クラス編集</h1>
+                <p>クラスの情報を編集し、所属する生徒の追加・削除を行います。</p>
             </div>
 
-            <!-- ページタイトル -->
-            <section class="page-heading">
+            <!-- 保存できなかったときのメッセージ -->
+            {% with messages = get_flashed_messages() %}
+                {% for message in messages %}
+                    <p class="page-error">{{ message }}</p>
+                {% endfor %}
+            {% endwith %}
 
-                <h1>クラスの割り当て</h1>
+            <!-- 変更内容は「更新する」で確認画面に POST する -->
+            <form action="{{ url_for('manage_allo_check') }}" method="post" id="alloForm">
+            <input type="hidden" name="class_id" value="{{ school_class.id }}">
 
-                <p>
-                    クラスの担任の先生と、生徒の割り当てを行います。
-                </p>
+            <!-- クラス情報 -->
+            <section class="class-info-section">
+                <h2 class="section-title">クラス情報</h2>
 
-            </section>
+                <div class="class-info-form">
 
-            <!-- =========================
-                 割り当てパネル
-            ========================= -->
-            <section class="assign-panel">
-
-                <!-- クラス名 -->
-                <div class="class-name-bar">
-
-                    <span>クラス名</span>
-
-                    <strong>1年1組</strong>
-
-                </div>
-
-                <!-- 担任選択 -->
-                <div class="teacher-section">
-
-                    <label for="teacher" class="section-label">
-                        担任の先生
-                        <span class="required">必須</span>
-                    </label>
-
-                    <select id="teacher"
-                            name="teacher_id"
-                            form="confirm-form"
-                            required>
-                        <option value="1" selected>
-                            佐藤 太郎 先生
-                        </option>
-                        <option value="2">
-                            田中 美咲 先生
-                        </option>
-                        <option value="3">
-                            山本 健一 先生
-                        </option>
-                        <option value="4">
-                            鈴木 さくら 先生
-                        </option>
-                    </select>
-
-                </div>
-
-                <!-- =========================
-                     生徒割り当て
-                ========================= -->
-                <div class="assignment-area">
-
-                    <!-- 未所属の生徒 -->
-                    <section class="student-panel">
-
-                        <div class="student-panel-header">
-
-                            <h2>未所属の生徒</h2>
-
-                            <form class="student-search"
-                                  action="{{ url_for('manage_class') }}"
-                                  method="GET">
-
-                                <i class="bi bi-search"></i>
-
-                                <input type="search"
-                                       name="q"
-                                       placeholder="生徒名で検索">
-
-                            </form>
-
-                        </div>
-
-                        <div class="student-table-wrapper">
-
-                            <table class="student-table">
-
-                                <thead>
-                                    <tr>
-                                        <th class="check-col">
-                                            <input type="checkbox"
-                                                   aria-label="全員選択（表示のみ）"
-                                                   disabled>
-                                        </th>
-                                        <th>生徒名</th>
-                                        <th>学年</th>
-                                        <th>現在のクラス</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="add_students"
-                                                   value="1"
-                                                   form="add-form">
-                                        </td>
-                                        <td>高橋 蓮</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="add_students"
-                                                   value="2"
-                                                   form="add-form">
-                                        </td>
-                                        <td>渡辺 陽菜</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="add_students"
-                                                   value="3"
-                                                   form="add-form">
-                                        </td>
-                                        <td>小林 直樹</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="add_students"
-                                                   value="4"
-                                                   form="add-form">
-                                        </td>
-                                        <td>加藤 美月</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="add_students"
-                                                   value="5"
-                                                   form="add-form">
-                                        </td>
-                                        <td>中村 悠真</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="add_students"
-                                                   value="6"
-                                                   form="add-form">
-                                        </td>
-                                        <td>山口 凛</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="add_students"
-                                                   value="7"
-                                                   form="add-form">
-                                        </td>
-                                        <td>松本 翔太</td>
-                                        <td>1年</td>
-                                        <td>未所属</td>
-                                    </tr>
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                        <div class="table-footer">
-
-                            <span>全 15 件中 1-7 件を表示</span>
-
-                            <div class="pagination">
-                                <span class="page-btn">
-                                    <i class="bi bi-chevron-left"></i>
-                                </span>
-                                <span class="page-btn current">1</span>
-                                <span class="page-btn">2</span>
-                                <span class="page-btn">3</span>
-                                <span class="page-btn">
-                                    <i class="bi bi-chevron-right"></i>
-                                </span>
-                            </div>
-
-                        </div>
-
-                    </section>
-
-                    <!-- 追加・削除ボタン -->
-                    <div class="move-buttons">
-
-                        <button type="submit"
-                                form="add-form"
-                                class="btn-add">
-                            追加
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-
-                        <button type="submit"
-                                form="remove-form"
-                                class="btn-remove">
-                            <i class="bi bi-chevron-left"></i>
-                            削除
-                        </button>
-
+                    <div class="form-group">
+                        <label for="grade">学年 <span>*</span></label>
+                        <select id="grade" name="grade">
+                            {% for g in [1, 2, 3] %}
+                            <option value="{{ g }}" {% if school_class.grade == g %}selected{% endif %}>{{ g }}年</option>
+                            {% endfor %}
+                        </select>
                     </div>
 
-                    <!-- このクラスの生徒 -->
-                    <section class="student-panel">
+                    <div class="form-group">
+                        <label for="class-name">クラス <span>*</span></label>
 
-                        <div class="student-panel-header">
-
-                            <h2>このクラスの生徒</h2>
-
-                            <div class="student-search">
-                                <i class="bi bi-search"></i>
-                                <input type="search"
-                                       placeholder="生徒名で検索"
-                                       aria-label="このクラスの生徒を検索">
-                            </div>
-
+                        <div class="class-number-input">
+                            <input
+                                
+                                id="class-name"
+                                name="section"
+                                inputmode="numeric"
+                                value="{{ school_class.section or '' }}"
+                            >
+                            <span class="class-unit">組</span>
                         </div>
+                    </div>
 
-                        <div class="student-table-wrapper">
-
-                            <table class="student-table">
-
-                                <thead>
-                                    <tr>
-                                        <th class="check-col">
-                                            <input type="checkbox"
-                                                   aria-label="全員選択（表示のみ）"
-                                                   disabled>
-                                        </th>
-                                        <th>生徒名</th>
-                                        <th>学年</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="remove_students"
-                                                   value="101"
-                                                   form="remove-form"
-                                                   >
-                                        </td>
-                                        <td>佐藤 太郎</td>
-                                        <td>1年</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="remove_students"
-                                                   value="102"
-                                                   form="remove-form"
-                                                   >
-                                        </td>
-                                        <td>鈴木 さくら</td>
-                                        <td>1年</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="remove_students"
-                                                   value="103"
-                                                   form="remove-form"
-                                                   >
-                                        </td>
-                                        <td>田中 美咲</td>
-                                        <td>1年</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="remove_students"
-                                                   value="104"
-                                                   form="remove-form"
-                                                   >
-                                        </td>
-                                        <td>伊藤 健太</td>
-                                        <td>1年</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="remove_students"
-                                                   value="105"
-                                                   form="remove-form"
-                                                   >
-                                        </td>
-                                        <td>山田 花子</td>
-                                        <td>1年</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="remove_students"
-                                                   value="106"
-                                                   form="remove-form"
-                                                   >
-                                        </td>
-                                        <td>木村 一郎</td>
-                                        <td>1年</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox"
-                                                   name="remove_students"
-                                                   value="107"
-                                                   form="remove-form"
-                                                   >
-                                        </td>
-                                        <td>吉田 優</td>
-                                        <td>1年</td>
-                                    </tr>
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                        <div class="table-footer">
-
-                            <span>全 32 件中 1-7 件を表示</span>
-
-                            <div class="pagination">
-                                <span class="page-btn">
-                                    <i class="bi bi-chevron-left"></i>
-                                </span>
-                                <span class="page-btn current">1</span>
-                                <span class="page-btn">2</span>
-                                <span class="page-btn">3</span>
-                                <span class="page-btn">4</span>
-                                <span class="page-btn">5</span>
-                                <span class="page-btn">
-                                    <i class="bi bi-chevron-right"></i>
-                                </span>
-                            </div>
-
-                        </div>
-
-                    </section>
+                    <div class="form-group teacher-group">
+                        <label for="teacher">担任 <span>*</span></label>
+                        <select id="teacher" name="teacher_id">
+                            {% if not school_class.homeroom_teacher_id %}
+                            <option value="" selected>先生を選択</option>
+                            {% endif %}
+                            {% for t in teachers %}
+                            <option value="{{ t.id }}" {% if school_class.homeroom_teacher_id == t.id %}selected{% endif %}>{{ t.display_name }} 先生</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                 </div>
-
             </section>
 
-            <!-- フォーム送信先は既存のFlaskルートに合わせて設定 -->
-            <form id="add-form"
-                  action=""
-                  method="POST"></form>
+            <!-- 生徒管理エリア -->
+            <div class="student-management">
 
-            <form id="remove-form"
-                  action=""
-                  method="POST"></form>
+                <!-- 追加できる生徒 -->
+                <section class="student-panel available-panel">
 
-            <form id="confirm-form"
-                  action=""
-                  method="POST"></form>
+                    <h2 class="section-title">追加できる生徒</h2>
+
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text"
+                               id="studentSearch"
+                               placeholder="生徒名で検索"
+                               aria-label="生徒名で検索"
+                               autocomplete="off">
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="student-table available-table">
+                            <thead>
+                                <tr>
+                                    <th class="check-column"></th>
+                                    <th>生徒名</th>
+                                    <th class="number-column">出席番号（追加後）</th>
+                                </tr>
+                            </thead>
+
+                            <!-- 中身はJavaScriptで作成します -->
+                            <tbody id="availableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <button type="button" class="add-button" id="addButton">
+                        選択した生徒を追加
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+
+                </section>
+
+                <!-- このクラスの生徒 -->
+                <section class="student-panel current-panel">
+
+                    <h2 class="section-title">このクラスの生徒（{{ school_class.name }}）</h2>
+
+                    <div class="info-message">
+                        <i class="bi bi-info-circle"></i>
+                        生徒をドラッグ＆ドロップで並び順を変更できます。
+                    </div>
+
+                    <div class="table-wrapper current-table-wrapper">
+                        <table class="student-table current-table">
+                            <thead>
+                                <tr>
+                                    <th class="drag-column"></th>
+                                    <th>生徒名</th>
+                                    <th class="current-number-column">出席番号</th>
+                                    <th class="delete-column"></th>
+                                </tr>
+                            </thead>
+
+                            <!-- 中身はJavaScriptで作成します -->
+                            <tbody id="memberBody"></tbody>
+                        </table>
+                    </div>
+
+                </section>
+
+            </div>
 
             <!-- 下部ボタン -->
             <div class="bottom-actions">
 
-                <a href="{{ url_for('manage_class') }}"
-                   class="btn-cancel">
-                    キャンセル
+                <a href="{{ url_for('manage_class') }}" class="back-button">
+                    <i class="bi bi-arrow-left"></i>
+                    戻る
                 </a>
 
-                <a type="submit"
-                        form="confirm-form"
-                        href="{{ url_for('manage_allo_check') }}"
-                        class="btn-confirm">
-                    確認画面へ
-                    <i class="bi bi-chevron-right"></i>
-            </a>
+                <div class="right-actions">
+                    <button type="submit" class="update-button">
+                        更新する
+                    </button>
+                </div>
 
             </div>
 
-        </main>
+            <!-- このクラスの生徒 (並び順 = 出席番号順) を送信する欄 (JavaScriptで作成します) -->
+            <div id="memberInputs" hidden></div>
 
+            </form>
+
+        </main>
     </div>
+
+    <!-- 生徒の割り当て
+         ・追加できる生徒にチェックを付けた順に、このクラスの最後の番号の次から出席番号を表示する
+         ・「選択した生徒を追加」で、チェックした生徒をこのクラスの生徒の一番下に追加する
+         ・このクラスの生徒はドラッグ＆ドロップで並べ替えでき、出席番号は上から 1, 2, 3… と振り直す
+         ・「削除」で、このクラスの生徒から外して追加できる生徒に戻す (出席番号は振り直す)
+         どの生徒がどこにいるかは members / available / checkedIds だけで管理し、表示は render() で毎回作り直す -->
+    <script>
+        (function () {
+            const initialMembers = {{ members | tojson }};
+            const initialAvailable = {{ available | tojson }};
+
+            // 生徒 {id, name} (DBの users から)
+            const allStudents = {};
+            initialMembers.concat(initialAvailable).forEach(function (s) {
+                allStudents[s.id] = s;
+            });
+
+            // このクラスの生徒の id (並び順 = 出席番号順)
+            const members = initialMembers.map(function (s) { return s.id; });
+
+            // 追加できる生徒の id
+            let available = initialAvailable.map(function (s) { return s.id; });
+
+            // チェックを付けた生徒の id (付けた順)
+            const checkedIds = [];
+
+            const availableBody = document.getElementById("availableBody");
+            const memberBody = document.getElementById("memberBody");
+            const studentSearch = document.getElementById("studentSearch");
+            const addButton = document.getElementById("addButton");
+            const memberInputs = document.getElementById("memberInputs");
+
+            // 検索欄で Enter を押してもフォームを送信しない
+            studentSearch.addEventListener("keydown", function (event) {
+                if (event.key === "Enter") event.preventDefault();
+            });
+
+            // ドラッグ中の行
+            let dragRow = null;
+
+            // 画面上の並び順のまま、出席番号 (3列目) を上から振り直す
+            function renumberRows() {
+                memberBody.querySelectorAll("tr[data-student-id]").forEach(function (tr, i) {
+                    tr.cells[2].textContent = i + 1;
+                });
+            }
+
+            // 行を動かすとき、ほかの行がすっと移動して見えるようにする
+            function moveWithAnimation(moveFn) {
+                const rows = Array.from(memberBody.querySelectorAll("tr[data-student-id]"));
+                const before = new Map(rows.map(function (tr) { return [tr, tr.getBoundingClientRect().top]; }));
+                moveFn();
+                rows.forEach(function (tr) {
+                    const diff = before.get(tr) - tr.getBoundingClientRect().top;
+                    if (!diff || tr === dragRow) return;
+                    tr.style.transition = "none";
+                    tr.style.transform = "translateY(" + diff + "px)";
+                    requestAnimationFrame(function () {
+                        tr.style.transition = "transform 0.15s ease";
+                        tr.style.transform = "";
+                    });
+                });
+                renumberRows();
+            }
+
+            memberBody.addEventListener("dragover", function (event) {
+                if (!dragRow) return;
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+
+                const target = event.target.closest("tr[data-student-id]");
+                if (!target || target === dragRow) return;
+
+                // マウスが行の上半分なら前、下半分なら後ろに入れる
+                const rect = target.getBoundingClientRect();
+                const after = event.clientY > rect.top + rect.height / 2;
+                const ref = after ? target.nextSibling : target;
+                if (ref === dragRow || ref === dragRow.nextSibling) return;
+
+                moveWithAnimation(function () { memberBody.insertBefore(dragRow, ref); });
+            });
+
+            memberBody.addEventListener("drop", function (event) {
+                if (dragRow) event.preventDefault();
+            });
+
+            // ドロップした (またはドラッグをやめた) ときの並び順を members に反映する
+            function finishDrag() {
+                if (!dragRow) return;
+                dragRow.classList.remove("dragging");
+                dragRow = null;
+                const order = Array.from(memberBody.querySelectorAll("tr[data-student-id]")).map(function (tr) {
+                    return Number(tr.dataset.studentId);
+                });
+                members.length = 0;
+                order.forEach(function (sid) { members.push(sid); });
+                render();
+            }
+
+            function removeSpaces(text) {
+                return text.replace(/[\s　]/g, "");
+            }
+
+            function emptyRow(colspan, text) {
+                const row = document.createElement("tr");
+                const td = document.createElement("td");
+                td.colSpan = colspan;
+                td.textContent = text;
+                row.appendChild(td);
+                return row;
+            }
+
+            function toggleCheck(id, checked) {
+                const index = checkedIds.indexOf(id);
+                if (checked && index < 0) checkedIds.push(id);
+                if (!checked && index >= 0) checkedIds.splice(index, 1);
+                render();
+            }
+
+            function renderAvailable() {
+                const keyword = removeSpaces(studentSearch.value);
+                const shown = available.filter(function (id) {
+                    return removeSpaces(allStudents[id].name).includes(keyword);
+                });
+
+                availableBody.replaceChildren();
+                shown.forEach(function (id) {
+                    const row = document.createElement("tr");
+                    row.dataset.studentId = id;
+
+                    const check = document.createElement("input");
+                    check.type = "checkbox";
+                    check.checked = checkedIds.includes(id);
+                    check.setAttribute("aria-label", allStudents[id].name + "を選択");
+                    check.addEventListener("change", function () { toggleCheck(id, check.checked); });
+                    row.insertCell().appendChild(check);
+
+                    row.insertCell().textContent = allStudents[id].name;
+
+                    // 追加後の出席番号 (チェックを付けた順に、このクラスの最後の番号の次から)
+                    const numberCell = row.insertCell();
+                    const order = checkedIds.indexOf(id);
+                    if (order >= 0) {
+                        const badge = document.createElement("span");
+                        badge.className = "number-badge";
+                        badge.textContent = members.length + order + 1;
+                        numberCell.appendChild(badge);
+                    } else {
+                        numberCell.textContent = "－";
+                    }
+
+                    availableBody.appendChild(row);
+                });
+
+                if (shown.length === 0) {
+                    const text = available.length === 0 ? "追加できる生徒はいません。" : "該当する生徒はいません。";
+                    availableBody.appendChild(emptyRow(3, text));
+                }
+            }
+
+            function renderMembers() {
+                memberBody.replaceChildren();
+                members.forEach(function (id, index) {
+                    const row = document.createElement("tr");
+                    row.dataset.studentId = id;
+                    row.draggable = true;
+
+                    const handle = row.insertCell();
+                    handle.className = "drag-handle";
+                    const grip = document.createElement("i");
+                    grip.className = "bi bi-grip-vertical";
+                    handle.appendChild(grip);
+
+                    row.insertCell().textContent = allStudents[id].name;
+                    row.insertCell().textContent = index + 1;  // 出席番号は上から順に
+
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "delete-button";
+                    const icon = document.createElement("i");
+                    icon.className = "bi bi-trash";
+                    button.append(icon, " 削除");
+                    button.addEventListener("click", function () { removeMember(id); });
+                    row.insertCell().appendChild(button);
+
+                    // ドラッグ＆ドロップで並べ替え (動かしている間に、ほかの生徒がずれて入る場所を空ける)
+                    row.addEventListener("dragstart", function (event) {
+                        dragRow = row;
+                        event.dataTransfer.effectAllowed = "move";
+                        event.dataTransfer.setData("text/plain", String(id));
+                        // 掴んだ瞬間の見た目 (半透明の行) はブラウザが作るので、少し遅らせて元の行を「入る場所」の表示にする
+                        setTimeout(function () { row.classList.add("dragging"); }, 0);
+                    });
+                    row.addEventListener("dragend", finishDrag);
+
+                    memberBody.appendChild(row);
+                });
+
+                if (members.length === 0) {
+                    memberBody.appendChild(emptyRow(4, "このクラスの生徒はいません。"));
+                }
+            }
+
+            function removeMember(id) {
+                const index = members.indexOf(id);
+                if (index >= 0) members.splice(index, 1);
+                if (!available.includes(id)) available.push(id);
+                render();
+            }
+
+            // 確認画面に送る値 (このクラスの生徒の id を上から順に)
+            function renderInputs() {
+                memberInputs.replaceChildren();
+                members.forEach(function (id) {
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "member_ids";
+                    input.value = id;
+                    memberInputs.appendChild(input);
+                });
+            }
+
+            function render() {
+                renderAvailable();
+                renderMembers();
+                renderInputs();
+                addButton.disabled = checkedIds.length === 0;
+            }
+
+            // 選択した生徒を追加 (チェックを付けた順に、このクラスの生徒の一番下へ)
+            addButton.addEventListener("click", function () {
+                checkedIds.forEach(function (id) {
+                    if (!members.includes(id)) members.push(id);
+                });
+                available = available.filter(function (id) { return !checkedIds.includes(id); });
+                checkedIds.length = 0;
+                render();
+            });
+
+            studentSearch.addEventListener("input", render);
+
+            render();
+        })();
+    </script>
 
     <!-- ログアウトの確認ポップアップ (全画面共通) -->
     <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>

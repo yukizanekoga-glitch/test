@@ -1,0 +1,614 @@
+
+/* =========================
+   全体設定
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    background: #f3f6fb;
+    color: #263248;
+    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 13px;
+}
+
+/* =========================
+   ヘッダー
+========================= */
+.top-header {
+    height: 55px;
+    background-color: #24364b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    color: white;
+}
+
+.system-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 15px;
+}
+
+.header-right a {
+    color: white;
+    text-decoration: none;
+}
+
+.header-right a:hover {
+    color: #b8d5ff;
+}
+
+.admin-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.admin-name .bi-person-fill {
+    font-size: 20px;
+}
+
+.admin-name .bi-chevron-down {
+    font-size: 12px;
+}
+
+.header-divider {
+    width: 1px;
+    height: 25px;
+    background: #66778b;
+}
+
+.logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    color: white;
+}
+
+.logout i {
+    font-size: 21px;
+}
+
+/* =========================
+   全体レイアウト
+========================= */
+.layout {
+    display: flex;
+    min-height: calc(100vh - 55px);
+}
+
+/* =========================
+   サイドバー
+========================= */
+.sidebar {
+    width: 215px;
+    min-width: 215px;
+    background-color: #f7fbff;
+    border-right: 1px solid #dce5f0;
+    padding-top: 0;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: #344d70;
+    font-size: 12px;
+    font-weight: bold;
+    border-left: 5px solid transparent;
+    text-decoration: none;
+}
+
+.sidebar a span {
+    font-size: 25px;
+    width: 30px;
+    text-align: center;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    border-left-color: #0d6efd;
+}
+
+/* =========================
+   メイン画面
+========================= */
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 16px 20px 20px;
+}
+
+/* =========================
+   ページタイトル
+========================= */
+.page-heading {
+    border-left: 5px solid #0d6efd;
+    padding-left: 13px;
+    margin-bottom: 13px;
+}
+
+.page-heading h1 {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0 0 4px;
+    color: #172b4d;
+}
+
+.page-heading p {
+    color: #344563;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* =========================
+   登録カード
+========================= */
+.register-card {
+    width: 100%;
+    min-width: 0;
+    background-color: #fff;
+    border: 1px solid #dce5f0;
+    border-radius: 10px;
+    padding: 18px 20px 16px;
+    box-shadow: 0 1px 3px rgba(30, 64, 100, 0.03);
+}
+
+.register-card form {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+/* =========================
+   フォーム全体
+========================= */
+.register-layout {
+    display: grid;
+    grid-template-columns: 205px 170px minmax(0, 1fr);
+    gap: 12px;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+}
+
+/* =========================
+   左：画像登録
+========================= */
+.image-section {
+    min-width: 0;
+    background: #f5f8fc;
+    border-radius: 7px;
+    padding: 10px;
+}
+
+.image-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    margin-bottom: 9px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.optional-label,
+.required-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: #f04469;
+    border-radius: 5px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.image-upload {
+    min-height: 205px;
+    border: 1.5px dashed #aebed5;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 5px;
+    background: #fff;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.image-upload:hover {
+    background: #f5f9ff;
+    border-color: #0d6efd;
+}
+
+.image-upload input {
+    display: none;
+}
+
+.default-profile {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #e1e9f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 9px;
+}
+
+.default-profile i {
+    font-size: 62px;
+    color: #9aa9bc;
+}
+
+.image-upload p {
+    font-size: 11px;
+    line-height: 1.7;
+    font-weight: bold;
+    margin: 2px 0 8px;
+}
+
+.select-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 31px;
+    padding: 0 12px;
+    border: 1px solid #b9c6d8;
+    border-radius: 7px;
+    background: #fff;
+    color: #172b4d;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.select-image i {
+    font-size: 14px;
+}
+
+.image-notice {
+    margin-top: 8px;
+}
+
+.image-notice p {
+    margin: 3px 0;
+    font-size: 10px;
+    color: #344563;
+}
+
+/* =========================
+   中央：項目ラベル
+========================= */
+.form-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.form-label {
+    height: 43px;
+    flex-shrink: 0;
+    background: #f1f4f8;
+    border-radius: 6px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* コメントラベル */
+.comment-label {
+    height: 105px;
+    align-items: flex-start;
+    padding-top: 12px;
+}
+
+/* =========================
+   右：入力欄
+========================= */
+.form-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.input-row {
+    width: 100%;
+    min-width: 0;
+    flex-shrink: 0;
+}
+
+/* 氏名・ふりがな */
+.name-row {
+    height: 43px;
+}
+
+.name-row input {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0 11px;
+    border: 1px solid #c5cfdf;
+    border-radius: 7px;
+    outline: none;
+    font-size: 13px;
+    color: #172b4d;
+    background: #fff;
+}
+
+.name-row input:focus {
+    border-color: #0d6efd;
+}
+
+/* =========================
+   性別
+========================= */
+.gender-row {
+    height: 43px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    padding: 0 3px;
+    border-bottom: 1px solid #e5ebf3;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.radio-option input {
+    width: 16px;
+    height: 16px;
+    accent-color: #0875ff;
+    cursor: pointer;
+}
+
+/* =========================
+   年齢
+========================= */
+.age-row {
+    height: 43px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 3px;
+    border-bottom: 1px solid #e5ebf3;
+}
+
+.age-row input {
+    width: 115px;
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid #c5cfdf;
+    border-radius: 7px;
+    outline: none;
+    font-size: 12px;
+    color: #172b4d;
+}
+
+.age-row input:focus {
+    border-color: #0d6efd;
+}
+
+.age-unit {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* =========================
+   コメント
+========================= */
+.comment-row {
+    height: 105px;
+    position: relative;
+    min-width: 0;
+}
+
+.comment-row textarea {
+    display: block;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    padding: 10px;
+    border: 1px solid #c5cfdf;
+    border-radius: 7px;
+    outline: none;
+    font-family: inherit;
+    font-size: 12px;
+    color: #172b4d;
+    line-height: 1.6;
+}
+
+.comment-row textarea:focus {
+    border-color: #0d6efd;
+}
+
+.comment-row textarea::placeholder,
+.name-row input::placeholder,
+.age-row input::placeholder {
+    color: #718096;
+}
+
+.comment-limit {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    font-size: 10px;
+    color: #64748b;
+    pointer-events: none;
+}
+
+/* =========================
+   下部ボタン
+   カード右下に配置
+========================= */
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+
+    margin: 14px 0 0;
+    padding: 12px 0 0;
+
+    border-top: 1px solid #e1e8f1;
+}
+
+/* ボタン共通 */
+.back-button,
+.confirm-button {
+    flex-shrink: 0;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* 戻る */
+.back-button {
+    width: 125px;
+    color: #172b4d;
+    background: #fff;
+    border: 1px solid #aebbd0;
+}
+
+.back-button:hover {
+    background: #f1f5f9;
+}
+
+/* 確認画面へ */
+.confirm-button {
+    width: 190px;
+    color: #fff;
+    background: #0866f5;
+    border: 1px solid #0866f5;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.confirm-button:hover {
+    background: #0052cc;
+}
+
+/* =========================
+   画面サイズ調整
+========================= */
+@media screen and (max-width: 1100px) {
+
+    .main-content {
+        padding: 15px 12px;
+    }
+
+    .register-card {
+        padding: 12px;
+    }
+
+    .register-layout {
+        grid-template-columns: 175px 135px minmax(0, 1fr);
+        gap: 9px;
+    }
+
+    .gender-row {
+        gap: 12px;
+    }
+
+    .image-upload {
+        min-height: 190px;
+    }
+}
+
+/* =========================
+   スマートフォン対応
+========================= */
+@media screen and (max-width: 700px) {
+
+    .sidebar {
+        width: 65px;
+        min-width: 65px;
+    }
+
+    .sidebar a {
+        justify-content: center;
+        padding: 12px 5px;
+        font-size: 0;
+    }
+
+    .sidebar a span {
+        font-size: 22px;
+    }
+
+    .system-title {
+        font-size: 13px;
+    }
+
+    .header-right {
+        gap: 10px;
+        font-size: 12px;
+    }
+
+    .main-content {
+        padding: 15px 10px;
+    }
+
+    .register-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .form-labels {
+        display: none;
+    }
+
+    .form-footer {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+}
