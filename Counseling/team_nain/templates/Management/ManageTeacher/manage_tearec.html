@@ -36,11 +36,25 @@
         <h3 class="text-center mb-4">先生登録</h3>
         <h3 class="text-center mb-4">先生情報入力</h3>
 
-        <textarea rows="5" cols="40" placeholder="ここにテキストを入力"></textarea>
-        <!-- 戻るボタン -->
-        <a href="{{ url_for('manage_teacher') }}" class="btn btn-secondary">戻る</a>
-        <!-- 確認ボタン -->
-        <a href="{{ url_for('manage_tearec_check') }}" class="btn btn-primary">次へ</a>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" action="{{ url_for('manage_tearec') }}">
+          <div class="mb-3">
+            <label for="display_name" class="form-label">先生名</label>
+            <input type="text" id="display_name" name="display_name" class="form-control" placeholder="例: 山田 太郎">
+          </div>
+
+          <!-- 戻るボタン -->
+          <a href="{{ url_for('manage_teacher') }}" class="btn btn-secondary">戻る</a>
+          <!-- 確認ボタン -->
+          <button type="submit" class="btn btn-primary">次へ</button>
+        </form>
       </div>
     </div>
   </div>

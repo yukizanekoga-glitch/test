@@ -34,10 +34,13 @@
       <div class="col-md-4">
 
         <!-- ページの見出し -->
-        <h2 class="text-center mb-4">こちらの先生を削除しますか？</h2>
+        <h2 class="text-center mb-4">{{ teacher.display_name }} さんを削除しますか？</h2>
 
-        <a href="{{ url_for('manage_teadel_complete') }}" class="btn btn-primary">完了</a>       
-        <a href="{{ url_for('manage_teacher') }}" class="btn btn-secondary">戻る</a>
+        <form method="post" action="{{ url_for('manage_teadel_check') }}">
+          <input type="hidden" name="teacher_id" value="{{ teacher.id }}">
+          <button type="submit" class="btn btn-primary">完了</button>
+          <a href="{{ url_for('manage_teacher') }}" class="btn btn-secondary">戻る</a>
+        </form>
 
       </div>
     </div>

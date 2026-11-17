@@ -35,9 +35,12 @@
 
         <!-- ページの見出し -->
         <h2 class="text-center mb-4">こちらの内容を登録します</h2>
+        <p class="text-center">先生名: {{ display_name }}</p>
 
-        <a href="{{ url_for('manage_tearec_complete') }}" class="btn btn-primary">完了</a>       
-        <a href="{{ url_for('manage_tearec') }}" class="btn btn-secondary">戻る</a>
+        <form method="post" action="{{ url_for('manage_tearec_check') }}">
+          <button type="submit" class="btn btn-primary">完了</button>
+          <a href="{{ url_for('manage_tearec') }}" class="btn btn-secondary">戻る</a>
+        </form>
 
       </div>
     </div>

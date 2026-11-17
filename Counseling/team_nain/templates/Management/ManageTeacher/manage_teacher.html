@@ -30,68 +30,34 @@
     <!-- ページの見出し -->
     <h2 class="text-center mb-4">先生一覧</h2>
 
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <!-- 先生一覧 -->
     <div class="row justify-content-center">
 
-      <!-- 先生1 -->
+      {% for teacher in teachers %}
       <div class="col-md-6 mb-3">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">山田 太郎</h5>
-            <a href="{{ url_for('manage_teapass') }}" class="btn btn-primary">
+            <h5 class="card-title">{{ teacher.display_name }}</h5>
+            <a href="{{ url_for('manage_teapass', teacher_id=teacher.id) }}" class="btn btn-primary">
               パスワード変更
             </a>
-            <a href="{{ url_for('manage_teadel_check') }}" class="btn btn-primary">
+            <a href="{{ url_for('manage_teadel_check', teacher_id=teacher.id) }}" class="btn btn-primary">
               削除
             </a>
           </div>
         </div>
       </div>
-
-      <!-- 先生2 -->
-      <div class="col-md-6 mb-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">佐藤 花子</h5>
-            <a href="{{ url_for('manage_teapass') }}" class="btn btn-primary">
-              パスワード変更
-            </a>
-            <a href="{{ url_for('manage_teadel_check') }}" class="btn btn-primary">
-              削除
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- 先生3 -->
-      <div class="col-md-6 mb-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">鈴木 一郎</h5>
-            <a href="{{ url_for('manage_teapass') }}" class="btn btn-primary">
-              パスワード変更
-            </a>
-            <a href="{{ url_for('manage_teadel_check') }}" class="btn btn-primary">
-              削除
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- 先生4 -->
-      <div class="col-md-6 mb-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">高橋 美咲</h5>
-            <a href="{{ url_for('manage_teapass') }}" class="btn btn-primary">
-              パスワード変更
-            </a>
-            <a href="{{ url_for('manage_teadel_check') }}" class="btn btn-primary">
-              削除
-            </a>
-          </div>
-        </div>
-      </div>
+      {% else %}
+      <p class="text-center text-muted">先生が登録されていません。</p>
+      {% endfor %}
 
     </div>
 

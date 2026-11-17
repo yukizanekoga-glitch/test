@@ -1774,22 +1774,46 @@ def manage_stupass_complete():
 @app.route("/manage_teacher")
 @role_required(User.ROLE_ADMIN)
 def manage_teacher():
-    return render_template("Management/ManageTeacher/manage_teacher.html")
+    teachers = User.query.filter_by(role=User.ROLE_TEACHER).order_by(User.id).all()
+    return render_template("Management/ManageTeacher/manage_teacher.html", teachers=teachers)
 
 @app.route("/manage_teacher_check")
 @role_required(User.ROLE_ADMIN)
 def manage_teacher_check():
     return render_template("Management/ManageTeacher/manage_teacher_check.html")
 
-@app.route("/manage_teadel_check")
+@app.route("/manage_teadel_check", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_teadel_check():
-    return render_template("Management/ManageTeacher/manage_teadel_check.html")
+    if request.method == "POST":
+        teacher_id = request.form.get("teacher_id", type=int)
+        teacher = User.query.filter_by(id=teacher_id, role=User.ROLE_TEACHER).first()
+        if teacher is None:
+            flash("対象の先生が見つかりません。")
+            return redirect(url_for("manage_teacher"))
+
+        Class.query.filter_by(homeroom_teacher_id=teacher.id).update({"homeroom_teacher_id": None})
+        db.session.delete(teacher)
+        db.session.commit()
+
+        session["teacher_delete_name"] = teacher.display_name
+        return redirect(url_for("manage_teadel_complete"))
+
+    teacher_id = request.args.get("teacher_id", type=int)
+    teacher = User.query.filter_by(id=teacher_id, role=User.ROLE_TEACHER).first()
+    if teacher is None:
+        flash("対象の先生が見つかりません。")
+        return redirect(url_for("manage_teacher"))
+
+    return render_template("Management/ManageTeacher/manage_teadel_check.html", teacher=teacher)
 
 @app.route("/manage_teadel_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_teadel_complete():
-    return render_template("Management/ManageTeacher/manage_teadel_complete.html")
+    display_name = session.pop("teacher_delete_name", None)
+    if not display_name:
+        return redirect(url_for("manage_teacher"))
+    return render_template("Management/ManageTeacher/manage_teadel_complete.html", display_name=display_name)
 
 @app.route("/manage_teaedit")
 @role_required(User.ROLE_ADMIN)
@@ -1821,30 +1845,107 @@ def manage_teallo_check():
 def manage_teallo_complete():
     return render_template("Management/ManageClass/manage_teallo_complete.html")
 
-@app.route("/manage_teapass")
+@app.route("/manage_teapass", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_teapass():
-    return render_template("Management/ManageTeacher/manage_teapass.html")
+    if request.method == "POST":
+        teacher_id = request.form.get("teacher_id", type=int)
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        teacher = User.query.filter_by(id=teacher_id, role=User.ROLE_TEACHER).first()
+
+        if teacher is None:
+            flash("対象の先生が見つかりません。")
+            return redirect(url_for("manage_teacher"))
+        if len(new_password) < 8:
+            flash("パスワードは八文字以上にしてください。")
+        elif not re.fullmatch(r"[A-Za-z0-9]+", new_password):
+            flash("パスワードは半角英数字で入力してください。")
+        elif new_password != confirm_password:
+            flash("パスワードが一致しません。")
+        else:
+            teacher.set_password(new_password)
+            db.session.commit()
+            session["teacher_pass_name"] = teacher.display_name
+            return redirect(url_for("manage_teapass_complete"))
+
+        return redirect(url_for("manage_teapass", teacher_id=teacher_id))
+
+    teacher_id = request.args.get("teacher_id", type=int)
+    teacher = User.query.filter_by(id=teacher_id, role=User.ROLE_TEACHER).first()
+    if teacher is None:
+        flash("対象の先生が見つかりません。")
+        return redirect(url_for("manage_teacher"))
+
+    return render_template("Management/ManageTeacher/manage_teapass.html", teacher=teacher)
 
 @app.route("/manage_teapass_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_teapass_complete():
-    return render_template("Management/ManageTeacher/manage_teapass_complete.html")
+    display_name = session.pop("teacher_pass_name", None)
+    if not display_name:
+        return redirect(url_for("manage_teacher"))
+    return render_template("Management/ManageTeacher/manage_teapass_complete.html", display_name=display_name)
 
-@app.route("/manage_tearec")
+def _generate_teacher_password():
+    """自動登録される先生の初期パスワードを生成する"""
+    alphabet = string.ascii_letters + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(10))
+
+def _generate_unique_teacher_username():
+    """自動登録される先生のログインユーザー名を、重複しないように生成する"""
+    while True:
+        candidate = "teacher" + "".join(secrets.choice(string.digits) for _ in range(6))
+        if not User.query.filter_by(username=candidate).first():
+            return candidate
+
+@app.route("/manage_tearec", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_tearec():
+    if request.method == "POST":
+        display_name = request.form.get("display_name", "").strip()
+        if not display_name:
+            flash("先生名を入力してください。")
+            return redirect(url_for("manage_tearec"))
+
+        session["tearec_pending_name"] = display_name
+        return redirect(url_for("manage_tearec_check"))
+
     return render_template("Management/ManageTeacher/manage_tearec.html")
 
-@app.route("/manage_tearec_check")
+@app.route("/manage_tearec_check", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_tearec_check():
-    return render_template("Management/ManageTeacher/manage_tearec_check.html")
+    display_name = session.get("tearec_pending_name")
+    if not display_name:
+        return redirect(url_for("manage_tearec"))
+
+    if request.method == "POST":
+        username = _generate_unique_teacher_username()
+        raw_password = _generate_teacher_password()
+        teacher = User(username=username, display_name=display_name, role=User.ROLE_TEACHER)
+        teacher.set_password(raw_password)
+        db.session.add(teacher)
+        db.session.commit()
+
+        session.pop("tearec_pending_name", None)
+        session["tearec_result"] = {
+            "display_name": teacher.display_name,
+            "username": teacher.username,
+            "password": raw_password,
+        }
+        return redirect(url_for("manage_tearec_complete"))
+
+    return render_template("Management/ManageTeacher/manage_tearec_check.html", display_name=display_name)
 
 @app.route("/manage_tearec_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_tearec_complete():
-    return render_template("Management/ManageTeacher/manage_tearec_complete.html")
+    result = session.pop("tearec_result", None)
+    if not result:
+        return redirect(url_for("manage_teacher"))
+    return render_template("Management/ManageTeacher/manage_tearec_complete.html", result=result)
 
 
 if __name__ == "__main__":
