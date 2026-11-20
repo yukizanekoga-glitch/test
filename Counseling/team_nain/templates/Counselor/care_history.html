@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>面談履歴｜スクールカウンセラー相談予約システム</title>
 
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/care_history.css') }}">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<!-- 共通ヘッダー・サイドバー -->
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='care_common.css') }}">
+
+<!-- 面談履歴専用 -->
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/care_history.css') }}">
 
     <style>
         /* 押せない矢印 (面談可能日時一覧と同じ見た目) */
@@ -22,55 +27,13 @@
 </head>
 <body>
 
-    <!-- 上部ヘッダー -->
-    <header class="top-header">
-        <div class="site-title">
-            スクールカウンセラー相談予約システム
-        </div>
-
-        <div class="user-area">
-            <span class="user-name">
-                <i class="bi bi-person"></i>
-                {{ session.display_name }} 先生（スクールカウンセラー）
-            </span>
-
-            <span class="header-divider"></span>
-
-            <a href="{{ url_for('logout') }}" class="logout-link">
-                <i class="bi bi-box-arrow-right"></i>
-                ログアウト
-            </a>
-        </div>
-    </header>
+    {% set active_page = 'history' %}
+    {% include 'components/care_header.html' %}
 
     <div class="layout">
 
-        <!-- 左側メニュー -->
-        <aside class="sidebar">
+        {% include 'components/care_sidebar.html' %}
 
-            <a href="{{ url_for('care_top') }}" >
-                <i class="bi bi-house-door"></i>
-                <span>ホーム</span>
-            </a>
-
-            <a href="{{ url_for('care_reseva_top') }}">
-                <i class="bi bi-calendar3"></i>
-                <span>面談可能日時登録</span>
-            </a>
-
-            <a href="{{ url_for('care_schedule') }}">
-                <i class="bi bi-calendar-check"></i>
-                <span>面談予約確認</span>
-            </a>
-
-            <a href="{{ url_for('care_history') }} " class="active">
-                <i class="bi bi-clock-history"></i>
-                <span>面談履歴</span>
-            </a>
-
-        </aside>
-
-        <!-- メインコンテンツ -->
         <main class="main-content">
 
             <!-- タイトル -->
@@ -133,6 +96,7 @@
                                 <th>実施日</th>
                                 <th>時間帯</th>
                                 <th>生徒名</th>
+                                <th>カルテ</th>
                             </tr>
                         </thead>
 
@@ -142,6 +106,7 @@
                                 <td>{{ r.slot.date.strftime('%Y/%m/%d') }}（{{ '月火水木金土日'[r.slot.date.weekday()] }}）</td>
                                 <td>{{ r.slot.start_time.strftime('%H:%M') }}～{{ r.slot.end_time.strftime('%H:%M') }}</td>
                                 <td>{{ r.student.display_name }}</td>
+                                <td><a class="record-button" href="{{ url_for('care_record') }}">カルテ</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -201,6 +166,8 @@
 
         </main>
     </div>
+
+    
 
     <!-- 一覧のページ切り替え (5件ずつ、ページ番号は10個ずつ表示し、その先は「…」) -->
     <script>
@@ -264,7 +231,5 @@
         })();
     </script>
 
-    <!-- ログアウトの確認ポップアップ (全画面共通) -->
-    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

@@ -1,537 +1,112 @@
-/* ==============================
-   全体設定
-============================== */
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    margin: 0;
-    min-height: 100%;
-}
-
-body {
-    background: #ffffff;
-    color: #263248;
-    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
-    font-size: 13px;
-}
-
-/* ==============================
-   ヘッダー
-   高さ51px固定
-============================== */
-.header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-
-    width: 100%;
-    height: 51px;
-    padding: 0 21px;
-
-    background: #ffffff;
-    border-bottom: 1px solid #e1e7ef;
-}
-
-/* システム名 */
-.site-title {
-    display: flex;
-    align-items: center;
-    min-width: 0;
-    margin: 0;
-
-    color: #172342;
-    font-size: 17px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-/* ユーザー情報 */
-.user-info {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    flex-shrink: 0;
-
-    color: #293a52;
-    font-size: 13px;
-    font-weight: 400;
-    white-space: nowrap;
-}
-
-/* アイコン */
-.user-info i {
-    margin-right: 4px;
-    font-size: 14px;
-}
-
-/* 区切り線 */
-.header-divider {
-    display: block;
-    width: 1px;
-    height: 21px;
-    margin: 0 5px;
-    background: #d8dee7;
-}
-
-/* ログアウト */
-.logout {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-left: 3px;
-
-    color: #075bd4;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.logout:hover {
-    color: #003e9e;
-}
-
-/* ==============================
-   全体レイアウト
-============================== */
-.layout {
-    display: flex;
-    width: 100%;
-    min-height: 100vh;
-    margin: 0;
-    padding-top: 51px;
-
-    background: #ffffff;
-}
-
-/* ==============================
-   サイドバー
-   幅185px固定
-============================== */
-.sidebar {
-    position: fixed;
-    top: 36px;
-    left: 0;
-    bottom: 0;
-    z-index: 50;
-
-    width: 185px;
-    min-width: 185px;
-    padding-top: 16px;
-
-    background: linear-gradient(135deg, #f8fbff, #f5f9fe);
-    border-right: 1px solid #e0e7f0;
-    overflow-y: auto;
-}
-
-.sidebar a {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-
-    width: 100%;
-    min-height: 44px;
-    padding: 0 16px;
-
-    border-left: 3px solid transparent;
-
-    color: #172943;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.5;
-    text-decoration: none;
-    white-space: nowrap;
-
-    transition: background-color 0.2s;
-}
-
-.sidebar a i {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 22px;
-    flex-shrink: 0;
-
-    color: #3e4e63;
-    font-size: 17px;
-}
-
-.sidebar a span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.sidebar a:hover {
-    background: #edf4ff;
-}
-
-.sidebar a.active {
-    color: #075bd4;
-    background: #dfecff;
-    border-left-color: #1876f2;
-}
-
-.sidebar a.active i {
-    color: #075bd4;
-}
-
-/* ==============================
-   メインコンテンツ
-============================== */
+@charset "UTF-8";
+/* ヘッダー、サイドバー、全体フォントは care_common.css で管理 */
 .main-content {
-    flex: 1;
     min-width: 0;
-    min-height: calc(100vh - 51px);
-
-    margin-left: 185px;
-    padding: 20px 24px 20px;
-
-    background: #ffffff;
+    min-height: calc(100dvh - 51px);
+    padding: 18px 24px 24px;
 }
-
-/* ==============================
-   パンくずリスト
-============================== */
-.breadcrumb {
-    margin-bottom: 13px;
-
-    color: #68748a;
-    font-size: 11px;
-    line-height: 1.5;
-}
-
-.breadcrumb span {
-    margin: 0 6px;
-}
-
-/* ==============================
-   ページ見出し
-============================== */
 .page-heading {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 7px;
+    margin-bottom: 8px;
 }
-
 .heading-line {
-    display: block;
     width: 4px;
-    height: 25px;
-    flex-shrink: 0;
-
+    height: 28px;
     border-radius: 3px;
     background: #3978ed;
+    flex-shrink: 0;
 }
-
 .page-heading h1 {
     margin: 0;
-
     color: #111b30;
-    font-size: 20px;
+    font-size: 26px;
     font-weight: 700;
-    line-height: 1.5;
+    line-height: 1.4;
 }
-
 .description {
-    margin: 0 0 15px 14px;
-
+    margin: 0 0 16px 14px;
     color: #53608a;
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.6;
 }
-
-/* ==============================
-   確認カード
-============================== */
-.confirm-panel {
-    width: 100%;
-    padding: 14px;
-
-    border: 1px solid #e1e6ee;
-    border-radius: 6px;
-
-    background: #ffffff;
-}
-
-.confirm-inner {
-    padding: 0 14px;
-
-    border: 1px solid #e4e8ef;
-    border-radius: 5px;
-
-    background: #ffffff;
-}
-
-/* ==============================
-   確認内容
-============================== */
-.confirm-row {
-    display: grid;
-    grid-template-columns: 150px minmax(0, 1fr);
-    align-items: start;
-    gap: 12px;
-
-    padding: 13px 0;
-
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.confirm-row + .confirm-row {
-    border-top: 1px solid #e9edf3;
-}
-
-.confirm-label {
-    color: #28344a;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.confirm-value {
-    min-width: 0;
-
-    color: #29354b;
-    font-size: 13px;
-    overflow-wrap: anywhere;
-}
-
-/* ==============================
-   時間帯一覧
-============================== */
-.time-list {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.time-list span {
-    line-height: 1.5;
-}
-
-/* ==============================
-   下部ボタン
-============================== */
 .button-area {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 12px;
-
-    margin-top: 16px;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 20px;
 }
-
-.button-area form {
-    margin: 0;
-}
-
-.button-area .btn {
+.btn-back, .btn-register {
     display: inline-flex;
-    align-items: center;
     justify-content: center;
-
-    width: 170px;
-    min-height: 38px;
-    padding: 8px 14px;
-
-    border-radius: 5px;
-
+    align-items: center;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1px solid transparent;
+    border-radius: 6px;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
-    line-height: 1.5;
-    text-align: center;
+    line-height: 1.4;
     text-decoration: none;
-
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
 }
-
-/* 戻るボタン */
 .btn-back {
-    color: #536077;
-    background: #ffffff;
-    border: 1px solid #c8ced9;
+    width: 100px;
+    border-color: #cbd5e1;
+    background: #fff;
+    color: #475569;
 }
-
-.btn-back:hover {
-    background: #f3f5f8;
-    border-color: #aab3c2;
-    color: #344c7c;
-}
-
-/* 登録するボタン */
+.btn-back:hover { background: #f1f5f9; color: #334155; }
 .btn-register {
+    min-width: 170px;
     background: #1769e8;
-    color: #ffffff;
-    border: 1px solid #1769e8;
+    border-color: #1769e8;
+    color: #fff;
+}
+.btn-register:hover { background: #1258c7; color: #fff; }
+@media (max-width: 700px) {
+    .main-content { padding: 14px 12px 20px; }
+    .page-heading h1 { font-size: 21px; }
+    .description { margin-left: 0; }
+    .btn-register { min-width: 130px; }
 }
 
-.btn-register:hover {
-    background: #1258c7;
-    border-color: #1258c7;
-    color: #ffffff;
+.content-panel {
+    margin-bottom: 12px;
+    padding: 14px 16px;
+    border-radius: 7px;
+    border: 1px solid #e0e9f4;
+    background: #f3f9fd;
+}
+.section-title { margin: 0 0 10px; color: #101a43; font-size: 17px; font-weight: 600; }
+.info-table, .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #1c2e4c;
+    background: #fff;
+    font-size: 14px;
+}
+.info-table th, .info-table td, .schedule-table th, .schedule-table td {
+    padding: 9px 13px;
+    height: 40px;
+    text-align: left;
+    border: 1px solid #e0e9f4;
+    line-height: 1.4;
+}
+.info-table th, .schedule-table th { background: #f4f7fa; font-weight: 600; }
+.info-table th { width: 180px; }
+.schedule-table th:first-child { width: 45%; }
+.table-wrapper { width: 100%; overflow-x: auto; }
+@media (max-width: 700px) {
+    .content-panel { padding: 10px; }
+    .info-table, .schedule-table { font-size: 12px; }
+    .info-table th { width: 100px; }
+    .info-table th, .info-table td, .schedule-table th, .schedule-table td { padding: 8px; }
 }
 
-/* ==============================
-   タブレット対応
-============================== */
-@media (max-width: 900px) {
-    .main-content {
-        padding: 18px 16px;
-    }
 
-    .page-heading h1 {
-        font-size: 18px;
-    }
-
-    .confirm-panel {
-        padding: 12px;
-    }
-
-    .confirm-inner {
-        padding: 0 12px;
-    }
-
-    .confirm-row {
-        grid-template-columns: 130px minmax(0, 1fr);
-        gap: 10px;
-        padding: 12px 0;
-    }
-
-    .button-area .btn {
-        width: 150px;
-    }
-}
-
-/* ==============================
-   スマートフォン対応
-============================== */
-@media (max-width: 600px) {
-    .header {
-        gap: 6px;
-        padding: 0 10px;
-    }
-
-    .site-title {
-        font-size: 12px;
-    }
-
-    .user-info {
-        gap: 6px;
-        font-size: 10px;
-    }
-
-    .user-info i {
-        font-size: 12px;
-    }
-
-    .header-divider {
-        height: 17px;
-        margin: 0 2px;
-    }
-
-    .sidebar {
-        width: 185px;
-        min-width: 185px;
-        padding-top: 16px;
-    }
-
-    .sidebar a {
-        gap: 11px;
-        min-height: 44px;
-        padding: 0 16px;
-        font-size: 13px;
-    }
-
-    .sidebar a span {
-        display: inline;
-    }
-
-    .sidebar a i {
-        width: 22px;
-        font-size: 17px;
-    }
-
-    .main-content {
-        margin-left: 185px;
-        padding: 14px 9px 18px;
-    }
-
-    .breadcrumb {
-        margin-bottom: 10px;
-        font-size: 10px;
-    }
-
-    .page-heading {
-        gap: 7px;
-        margin-bottom: 6px;
-    }
-
-    .heading-line {
-        height: 22px;
-    }
-
-    .page-heading h1 {
-        font-size: 16px;
-    }
-
-    .description {
-        margin: 0 0 12px;
-        font-size: 11px;
-    }
-
-    .confirm-panel {
-        padding: 9px;
-    }
-
-    .confirm-inner {
-        padding: 0 9px;
-    }
-
-    .confirm-row {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 5px;
-        padding: 10px 0;
-    }
-
-    .confirm-label {
-        font-size: 12px;
-    }
-
-    .confirm-value {
-        font-size: 11px;
-    }
-
-    .time-list {
-        gap: 5px;
-    }
-
-    .button-area {
-        flex-direction: column-reverse;
-        align-items: stretch;
-        gap: 8px;
-        margin-top: 12px;
-    }
-
-    .button-area form {
-        width: 100%;
-    }
-
-    .button-area .btn {
-        width: 100%;
-        min-height: 36px;
-        padding: 7px;
-        font-size: 11px;
-    }
-}
+/* 「登録する」「変更する」はフォームの送信ボタン (Project 追加分) */
+.button-area form { display: contents; }

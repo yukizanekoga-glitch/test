@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>スクールカウンセラー相談予約システム</title>
 
-    <!-- CSS -->
+    <!-- 共通レイアウトCSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='care_common.css') }}">
+
+    <!-- この画面専用CSS -->
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/care_reseva.css') }}">
 
-    <!-- Font Awesome -->
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
         .error-message {
@@ -92,57 +96,13 @@
 </head>
 <body>
 
-    <!-- ヘッダー -->
-    <header class="header">
-        <div class="site-title">
-            <i class="fa-solid fa-school"></i>
-            スクールカウンセラー相談予約システム
-        </div>
+    {% set active_page = 'reseva' %}
+    {% include 'components/care_header.html' %}
 
-        <div class="user-info">
-            <span>
-                <i class="fa-regular fa-user"></i>
-                {{ session.display_name }} 先生（スクールカウンセラー）
-            </span>
-
-            <span class="header-divider"></span>
-
-            <a href="{{ url_for('logout') }}" class="logout">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                ログアウト
-            </a>
-        </div>
-    </header>
-
-    <!-- 全体レイアウト -->
     <div class="layout">
 
-        <!-- サイドバー -->
-        <aside class="sidebar">
+        {% include 'components/care_sidebar.html' %}
 
-            <a href="{{ url_for('care_top') }}" class="active">
-                <i class="bi bi-house-door"></i>
-                <span>ホーム</span>
-            </a>
-
-            <a href="{{ url_for('care_reseva_top') }}">
-                <i class="bi bi-calendar3"></i>
-                <span>面談可能日時登録</span>
-            </a>
-
-            <a href="{{ url_for('care_schedule') }}">
-                <i class="bi bi-calendar-check"></i>
-                <span>面談予約確認</span>
-            </a>
-
-            <a href="{{ url_for('care_history') }}">
-                <i class="bi bi-clock-history"></i>
-                <span>面談履歴</span>
-            </a>
-
-        </aside>
-
-        <!-- メインコンテンツ -->
         <main class="main-content">
 
             <!-- ページ見出し -->
@@ -240,14 +200,14 @@
                 <div class="pagination-area" id="paginationArea" hidden>
                     <button type="button" class="page-arrow" id="prevPage"
                             aria-label="前のページ">
-                        <i class="fa-solid fa-chevron-left"></i>
+                        <i class="bi bi-chevron-left"></i>
                     </button>
 
                     <span id="pageNumbers" style="display: contents;"></span>
 
                     <button type="button" class="page-arrow" id="nextPage"
                             aria-label="次のページ">
-                        <i class="fa-solid fa-chevron-right"></i>
+                        <i class="bi bi-chevron-right"></i>
                     </button>
                 </div>
 
@@ -269,6 +229,8 @@
 
         </main>
     </div>
+
+    
 
     <script>
         (function () {
@@ -468,7 +430,7 @@
                             td.className = "registered-cell";
                             const lock = document.createElement("span");
                             lock.className = "registered-label";
-                            lock.innerHTML = '<i class="fa-solid fa-lock"></i> 登録済み';
+                            lock.innerHTML = '<i class="bi bi-lock"></i> 登録済み';
                             td.appendChild(lock);
                             return;
                         }
@@ -579,7 +541,5 @@
         })();
     </script>
 
-    <!-- ログアウトの確認ポップアップ (全画面共通) -->
-    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

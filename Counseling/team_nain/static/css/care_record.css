@@ -1,0 +1,262 @@
+
+@charset "UTF-8";
+
+/* =========================
+   メインコンテンツ
+========================= */
+.main-content {
+    padding: 16px 22px 20px;
+    min-height: calc(100dvh - 51px);
+}
+
+/* =========================
+   タイトル
+========================= */
+.page-heading {
+    margin-bottom: 16px;
+    padding-left: 12px;
+    border-left: 4px solid #0875f9;
+}
+
+.page-heading h1 {
+    margin: 0 0 5px;
+    color: #101d3d;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.page-heading p {
+    margin: 0;
+    color: #536887;
+    font-size: 13px;
+}
+
+/* =========================
+   共通パネル
+========================= */
+.content-panel {
+    margin-bottom: 12px;
+    padding: 15px 20px;
+    border: 1px solid #dce6f4;
+    border-radius: 8px;
+    background-color: #ffffff;
+}
+
+/* パネル見出し */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    margin: 0 0 14px;
+    padding-left: 10px;
+
+    border-left: 4px solid #0875f9;
+    color: #17284c;
+
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.section-title i {
+    color: #0875f9;
+    font-size: 18px;
+}
+
+/* =========================
+   生徒情報
+========================= */
+.student-info-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+/* 面談情報 */
+.interview-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* 情報表示 */
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 35px;
+}
+
+.info-label {
+    min-width: 75px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.info-value {
+    color: #17284c;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* =========================
+   カルテ記入
+========================= */
+.record-panel {
+    padding-bottom: 16px;
+}
+
+.record-field {
+    margin-bottom: 14px;
+}
+
+.record-field:last-child {
+    margin-bottom: 0;
+}
+
+.record-field label {
+    display: block;
+    margin-bottom: 7px;
+    color: #17284c;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.record-field textarea {
+    width: 100%;
+    min-height: 85px;
+    padding: 10px 12px;
+
+    border: 1px solid #cfdceb;
+    border-radius: 6px;
+    background-color: #ffffff;
+
+    color: #17284c;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.6;
+
+    resize: vertical;
+    outline: none;
+}
+
+.record-field textarea:focus {
+    border-color: #0875f9;
+    box-shadow: 0 0 0 2px #e6f1ff;
+}
+
+.record-field textarea::placeholder {
+    color: #9aacc5;
+}
+
+/* =========================
+   下部ボタン
+========================= */
+.action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    gap: 15px;
+}
+
+/* 戻るボタン */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 115px;
+    height: 40px;
+    padding: 0 20px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background-color: #ffffff;
+
+    color: #475569;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-back:hover {
+    background-color: #f1f5f9;
+}
+
+/* 送信ボタン */
+.btn-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    min-width: 150px;
+    height: 42px;
+    padding: 0 24px;
+
+    border: 1px solid #0875f9;
+    border-radius: 6px;
+    background-color: #0875f9;
+
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+    background-color: #005bd3;
+}
+
+/* =========================
+   幅の狭いPC
+========================= */
+@media (max-width: 1100px) {
+    .student-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .content-panel {
+        padding: 14px 16px;
+    }
+}
+
+/* =========================
+   タブレット・スマホ
+========================= */
+@media (max-width: 700px) {
+    .main-content {
+        padding: 14px 12px 20px;
+    }
+
+    .page-heading h1 {
+        font-size: 23px;
+    }
+
+    .student-info-grid,
+    .interview-info-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .section-title {
+        font-size: 16px;
+    }
+
+    .record-field textarea {
+        min-height: 100px;
+    }
+
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+
+    .btn-back,
+    .btn-submit {
+        min-width: 110px;
+    }
+}

@@ -1,0 +1,24 @@
+<!-- 左側メニュー -->
+        <aside class="sidebar">
+
+            <a href="{{ url_for('care_top') }}" class="{% if active_page == 'top' %}active{% endif %}">
+                <i class="bi bi-house-door"></i>
+                <span>ホーム</span>
+            </a>
+
+            <a href="{{ url_for('care_reseva_top') }}" class="{% if active_page == 'reseva' %}active{% endif %}">
+                <i class="bi bi-calendar3"></i>
+                <span>面談可能日時登録</span>
+            </a>
+
+            <a href="{{ url_for('care_schedule') }}" class="{% if active_page == 'schedule' %}active{% endif %}">
+                <i class="bi bi-calendar-check"></i>
+                <span>面談予約確認</span>
+            </a>
+
+            <a href="{{ url_for('care_history') }}" class="{% if active_page == 'history' %}active{% endif %}">
+                <i class="bi bi-clock-history"></i>
+                <span>面談履歴</span>
+            </a>
+
+        </aside>

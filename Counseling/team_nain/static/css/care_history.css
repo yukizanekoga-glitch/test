@@ -1,172 +1,5 @@
-
-/* ==============================
-   全体設定
-============================== */
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    width: 100%;
-    min-height: 100%;
-    margin: 0;
-}
-
-body {
-    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
-    color: #17284c;
-    background: #fff;
-    font-size: 13px;
-}
-
-a {
-    text-decoration: none;
-}
-
-/* =========================
-   ヘッダー
-========================= */
-.top-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    width: 100%;
-    height: 51px;
-    padding: 0 21px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    background: #fff;
-    border-bottom: 1px solid #e1e7ef;
-}
-
-.site-title {
-    margin: 0;
-    font-size: 17px;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.user-area {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    white-space: nowrap;
-}
-
-.user-name {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    color: #293a52;
-}
-
-.user-name .bi {
-    font-size: 18px;
-}
-
-.header-divider {
-    height: 21px;
-    margin: 0 5px;
-    border-left: 1px solid #d8dee7;
-}
-
-.logout-link {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #075bd4;
-    font-weight: 600;
-}
-
-.logout-link .bi {
-    font-size: 16px;
-}
-
-.logout-link:hover {
-    color: #003e9e;
-}
-
-/* =========================
-   左側サイドバー
-========================= */
-.sidebar {
-    position: fixed;
-    top: 35px;
-    left: 0;
-    bottom: 0;
-    z-index: 50;
-
-    width: 185px;
-    padding-top: 16px;
-
-    background: linear-gradient(135deg, #f8fbff, #f5f9fe);
-    border-right: 1px solid #e0e7f0;
-
-    overflow-y: auto;
-}
-
-.sidebar a {
-    min-height: 44px;
-    padding: 0 16px;
-
-    display: flex;
-    align-items: center;
-    gap: 11px;
-
-    border-left: 3px solid transparent;
-    color: #172943;
-    font-size: 13px;
-    font-weight: 700;
-    white-space: nowrap;
-
-    transition: background 0.2s;
-}
-
-.sidebar a .bi {
-    width: 22px;
-    flex-shrink: 0;
-    color: #3e4e63;
-    font-size: 19px;
-    text-align: center;
-}
-
-.sidebar a:hover {
-    background: #edf4ff;
-}
-
-.sidebar a.active {
-    color: #075bd4;
-    background: #dfecff;
-    border-left-color: #1876f2;
-}
-
-.sidebar a.active .bi {
-    color: #075bd4;
-}
-
-/* ==============================
-   全体レイアウト
-============================== */
-.layout {
-    display: flex;
-    min-height: 100vh;
-    padding-top: 51px;
-}
-
-.main-content {
-    width: calc(100% - 185px);
-    min-width: 0;
-    min-height: calc(100vh - 51px);
-    margin-left: 185px;
-    padding: 20px 22px 10px;
-}
-
+@charset "UTF-8";
+/* 共通部分はcare_common.cssに委任 */
 /* ==============================
    タイトル・説明
 ============================== */
@@ -575,47 +408,40 @@ a {
     }
 }
 
+/* 履歴画面独自の配置：共通ヘッダー・サイドバーには触れない */
+.main-content { display:flex; flex-direction:column; height:100dvh; min-height:0; padding-top:69px; padding-bottom:14px; }
+.page-heading { flex-shrink:0; margin-bottom:14px; }
+.page-heading h1 { font-size:30px; font-weight:700; line-height:1.3; }
+.search-panel { flex-shrink:0; min-height:88px; padding-top:10px; padding-bottom:10px; }
+.history-panel { display:flex; flex-direction:column; flex:1; min-height:0; }
+.table-heading { flex-shrink:0; }
+.table-scroll { flex:1; min-height:0; overflow:auto; }
+.history-table th:nth-child(1), .history-table td:nth-child(1) { width:27%; }
+.history-table th:nth-child(2), .history-table td:nth-child(2) { width:28%; }
+.history-table th:nth-child(3), .history-table td:nth-child(3) { width:29%; }
+.history-table th:nth-child(4), .history-table td:nth-child(4) { width:16%; }
+.record-button { display:inline-flex; align-items:center; justify-content:center; min-width:76px; min-height:28px; padding:3px 12px; color:#075bd4; border:1px solid #1876f2; border-radius:5px; background:white; font-size:12px; font-weight:500; }
+.record-button:hover { color:white; background:#1876f2; }
+.pagination { flex-shrink:0; min-height:48px; }
+@media (max-width:850px) { .main-content { height:auto; min-height:100dvh; padding-top:68px; } .page-heading h1 { font-size:25px; } .history-panel { min-height:390px; } .history-table { min-width:550px; } }
+@media (max-width:500px) { .main-content { padding-top:61px; } .page-heading h1 { font-size:23px; } }
 
-/* ==============================
-   履歴がない場合
-============================== */
+
+/* 履歴がない場合 (Project 追加分) */
 .empty-history {
     min-height: 300px;
     padding: 45px 20px;
     border-top: 1px solid #dce6f4;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-
     background: #f9fcff;
 }
-
-.empty-history .empty-icon {
-    width: 72px;
-    height: 72px;
-    margin-bottom: 16px;
-
-    color: #46658e;
-}
-
-.empty-history .empty-message {
-    margin: 0;
-
-    color: #17284c;
-    font-size: 17px;
-    font-weight: 800;
-}
-
+.empty-history .empty-icon { width: 72px; height: 72px; margin-bottom: 16px; color: #46658e; }
+.empty-history .empty-message { margin: 0; color: #17284c; font-size: 17px; font-weight: 800; }
 @media (max-width: 767px) {
-    .empty-history {
-        min-height: 240px;
-        padding: 32px 15px;
-    }
-
-    .empty-history .empty-message {
-        font-size: 15px;
-    }
+    .empty-history { min-height: 240px; padding: 32px 15px; }
+    .empty-history .empty-message { font-size: 15px; }
 }

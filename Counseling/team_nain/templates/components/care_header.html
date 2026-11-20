@@ -1,0 +1,130 @@
+<!-- 上部ヘッダー (カウンセラー画面 共通) -->
+    <header class="top-header">
+        <div class="site-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="user-area">
+            <button type="button" class="user-name profile-button" id="openProfile">
+                <i class="bi bi-person"></i>
+                {{ session.display_name }} 先生（スクールカウンセラー）
+                <i class="bi bi-chevron-down profile-chevron"></i>
+            </button>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    {% if care_profile_msg %}
+    <!-- プロフィール保存の結果 -->
+    <div class="profile-toast {{ 'error' if care_profile_msg.error else 'success' }}" id="profileToast" role="status">
+        <i class="bi {{ 'bi-exclamation-circle' if care_profile_msg.error else 'bi-check-circle' }}"></i>
+        {{ care_profile_msg.text }}
+    </div>
+    {% endif %}
+
+    <!-- プロフィール編集モーダル -->
+    <dialog id="profileModal" class="profile-modal" aria-labelledby="profileTitle"{% if care_profile_msg and care_profile_msg.error %} data-open-on-load="1"{% endif %}>
+        <form id="profileForm" method="post" action="{{ url_for('care_profile') }}" enctype="multipart/form-data">
+            <input type="hidden" name="next" value="{{ request.path }}">
+
+            <div class="profile-heading">
+                <h2 id="profileTitle">プロフィール</h2>
+                <button type="button" class="profile-close" id="closeProfile" aria-label="閉じる">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="profile-body">
+                <div class="profile-photo-area">
+                    <div class="profile-photo">
+                        <i class="bi bi-person" id="photoPlaceholder"{% if care_profile.image_url %} hidden{% endif %}></i>
+                        <img id="photoPreview" alt="プロフィール写真"
+                             {% if care_profile.image_url %}src="{{ care_profile.image_url }}"{% else %}hidden{% endif %}>
+                    </div>
+                    <label for="profilePhoto" class="photo-button">写真を変更</label>
+                    <input type="file" id="profilePhoto" name="image" accept="image/png,image/jpeg" hidden>
+                </div>
+
+                <label class="profile-label" for="profileName">名前</label>
+                <input class="profile-input" id="profileName" name="name" type="text" maxlength="100" required
+                       value="{{ care_profile.name }}">
+
+                <label class="profile-label" for="profileAge">年齢</label>
+                <input class="profile-input" id="profileAge" name="age" type="number" min="0" max="120"
+                       value="{{ care_profile.age if care_profile.age is not none else '' }}">
+
+                <label class="profile-label" for="profileComment">コメント</label>
+                <textarea class="profile-input" id="profileComment" name="comment" rows="3" maxlength="500"
+                          placeholder="コメントを入力してください">{{ care_profile.comment }}</textarea>
+            </div>
+
+            <div class="profile-footer">
+                <button type="button" class="profile-cancel" id="cancelProfile">キャンセル</button>
+                <button type="submit" class="profile-save">保存</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script>
+        (function () {
+            const modal = document.getElementById('profileModal');
+            const form = document.getElementById('profileForm');
+            const photoInput = document.getElementById('profilePhoto');
+            const preview = document.getElementById('photoPreview');
+            const placeholder = document.getElementById('photoPlaceholder');
+            const savedPhoto = preview.getAttribute('src') || '';
+
+            // 写真の表示 (選んだ写真のプレビュー / 保存済みの写真 / 未設定)
+            function showPhoto(src) {
+                preview.hidden = !src;
+                placeholder.hidden = !!src;
+                if (src) {
+                    preview.src = src;
+                } else {
+                    preview.removeAttribute('src');
+                }
+            }
+
+            // 閉じたときは入力途中の内容を捨てて、保存済みの内容に戻す
+            function resetForm() {
+                form.reset();
+                showPhoto(savedPhoto);
+            }
+
+            document.getElementById('openProfile').addEventListener('click', () => {
+                resetForm();
+                modal.showModal();
+            });
+
+            photoInput.addEventListener('change', () => {
+                const file = photoInput.files[0];
+                if (!file || !file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = () => showPhoto(reader.result);
+                reader.readAsDataURL(file);
+            });
+
+            function closeModal() {
+                modal.close();
+                resetForm();
+            }
+            document.getElementById('closeProfile').addEventListener('click', closeModal);
+            document.getElementById('cancelProfile').addEventListener('click', closeModal);
+
+            // 保存に失敗したときは、入力画面を開いたままメッセージを見せる
+            if (modal.dataset.openOnLoad) modal.showModal();
+
+            // 保存完了メッセージは数秒で消す
+            const toast = document.getElementById('profileToast');
+            if (toast) setTimeout(() => toast.classList.add('hide'), 4000);
+        })();
+    </script>
+
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>

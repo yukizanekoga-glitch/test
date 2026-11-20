@@ -533,6 +533,104 @@ def care_top():
 
 
 # =========================
+# カウンセラー画面のヘッダー (名前を押すと出るプロフィール)
+# =========================
+
+@app.context_processor
+def inject_care_profile():
+    """カウンセラー画面の共通ヘッダー (components/care_header.html) に渡すプロフィール"""
+    if session.get("role") != User.ROLE_COUNSELOR or "user_id" not in session:
+        return {}
+
+    profile = CounselorProfile.query.filter_by(counselor_id=session["user_id"]).first()
+    image_url = None
+    if profile and profile.image:
+        version = int(profile.updated_at.timestamp()) if profile.updated_at else 0
+        image_url = url_for("static", filename=profile.image) + f"?v={version}"
+
+    return {
+        "care_profile": {
+            "name": session.get("display_name", ""),
+            "age": profile.age if profile else None,
+            "comment": (profile.comment or "") if profile else "",
+            "image_url": image_url,
+        },
+        # 保存の結果は1回だけ表示する
+        "care_profile_msg": session.pop("care_profile_msg", None),
+    }
+
+
+@app.route("/care_profile", methods=["POST"])
+@role_required(User.ROLE_COUNSELOR)
+def care_profile():
+    """ヘッダーのプロフィール (名前・年齢・コメント・写真) を保存する"""
+    # 保存後は、押したときの画面へ戻る (サイト内のパスだけ許可)
+    next_path = request.form.get("next", "")
+    if not next_path.startswith("/") or next_path.startswith("//"):
+        next_path = url_for("care_top")
+
+    def fail(text):
+        session["care_profile_msg"] = {"error": True, "text": text}
+        return redirect(next_path)
+
+    counselor = User.query.get(session["user_id"])
+    name = request.form.get("name", "").strip()
+    comment = request.form.get("comment", "").strip()
+    age_text = request.form.get("age", "").strip()
+
+    if not name:
+        return fail("名前を入力してください。")
+    if len(name) > 100:
+        return fail("名前は100文字以内で入力してください。")
+    if len(comment) > 500:
+        return fail("コメントは500文字以内で入力してください。")
+
+    age = None
+    if age_text:
+        if not age_text.isdigit() or not 0 <= int(age_text) <= 120:
+            return fail("年齢は0〜120の数字で入力してください。")
+        age = int(age_text)
+
+    # 写真 (任意。選ばれたときだけ差し替える)
+    image_path = None
+    image = request.files.get("image")
+    if image and image.filename:
+        extension = image.filename.rsplit(".", 1)[-1].lower() if "." in image.filename else ""
+        if extension not in CAREREG_IMAGE_EXTENSIONS:
+            return fail("写真は jpg / jpeg / png のいずれかにしてください。")
+        content = image.read()
+        if len(content) > CAREREG_IMAGE_MAX_BYTES:
+            return fail("写真は5MB以下にしてください。")
+        os.makedirs(COUNSELOR_IMAGE_DIR, exist_ok=True)
+        final_name = f"{counselor.id}.{extension}"
+        with open(os.path.join(COUNSELOR_IMAGE_DIR, final_name), "wb") as f:
+            f.write(content)
+        image_path = f"uploads/counselors/{final_name}"
+
+    profile = CounselorProfile.query.filter_by(counselor_id=counselor.id).first()
+    if profile is None:
+        profile = CounselorProfile(counselor_id=counselor.id)
+        db.session.add(profile)
+
+    # 拡張子が変わったときは、前の写真のファイルを消す
+    if image_path and profile.image and profile.image != image_path:
+        old_file = os.path.join(BASE_DIR, "static", profile.image)
+        if os.path.abspath(old_file).startswith(COUNSELOR_IMAGE_DIR) and os.path.exists(old_file):
+            os.remove(old_file)
+
+    counselor.display_name = name
+    profile.age = age
+    profile.comment = comment or None
+    if image_path:
+        profile.image = image_path
+    db.session.commit()
+
+    session["display_name"] = name
+    session["care_profile_msg"] = {"error": False, "text": "プロフィールを保存しました。"}
+    return redirect(next_path)
+
+
+# =========================
 # 面談予約確認画面 (面談予約を確認する)
 # =========================
 
@@ -835,6 +933,8 @@ def care_reseva_check():
         return redirect(url_for("care_reseva"))
 
     if request.form.get("confirm") == "1":
+        # 完了画面に「今回登録した枠」を出すため、登録を始めた時刻を覚えておく
+        batch_started = datetime.utcnow()
         for slot_date, start_time, end_time in new_slots:
             db.session.add(AvailableSlot(
                 counselor_id=session["user_id"],
@@ -843,6 +943,7 @@ def care_reseva_check():
                 end_time=end_time,
             ))
         db.session.commit()
+        session["reseva_batch_started"] = batch_started.isoformat()
         return redirect(url_for("care_reseva_complete"))
 
     # 確認画面用に日付ごとにまとめる
@@ -865,7 +966,22 @@ def care_reseva_check():
 @app.route("/care_reseva_complete")
 @role_required(User.ROLE_COUNSELOR)
 def care_reseva_complete():
-    return render_template("Counselor/care_reseva_complete.html")
+    started = session.get("reseva_batch_started")
+    if not started:
+        return redirect(url_for("care_reseva_top"))
+
+    # 今回の登録で作られた枠 (登録を始めた時刻以降に作られた、自分の枠)
+    slots = (
+        AvailableSlot.query
+        .filter_by(counselor_id=session["user_id"])
+        .filter(AvailableSlot.created_at >= datetime.fromisoformat(started))
+        .order_by(AvailableSlot.date, AvailableSlot.start_time)
+        .all()
+    )
+    if not slots:
+        return redirect(url_for("care_reseva_top"))
+
+    return render_template("Counselor/care_reseva_complete.html", slots=slots)
 
 
 def _get_own_slot(slot_id):
@@ -908,8 +1024,10 @@ def care_chadel():
 
         # care_reseva_top の削除ポップアップで「はい」を押したとき: その場で削除して一覧に戻る
         if action == "delete":
+            label = f"{slot.date.strftime('%Y/%m/%d')}（{'月火水木金土日'[slot.date.weekday()]}） {slot.start_time.strftime('%H:%M')} ～ {slot.end_time.strftime('%H:%M')}"
             db.session.delete(slot)
             db.session.commit()
+            flash(f"{label} の面談可能日時を削除しました。", "success")
             return redirect(url_for("care_reseva_top"))
 
         if action == "edit":

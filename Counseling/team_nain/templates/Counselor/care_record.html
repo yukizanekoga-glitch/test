@@ -1,47 +1,184 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カルテ記入｜スクールカウンセラー相談予約システム</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-  <!-- ページのタイトル -->
-  <title>記録登録 スクールカウンセラー</title>
+    <!-- 共通CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='care_common.css') }}">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- カルテ画面専用CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/care_record.css') }}">
 </head>
 
 <body>
 
-  <!-- ナビゲーションバー -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー 記録登録</span>
+    {% set active_page = 'history' %}
+
+    <!-- 共通ヘッダー -->
+    {% include 'components/care_header.html' %}
+
+    <div class="layout">
+
+        <!-- 共通サイドバー -->
+        {% include 'components/care_sidebar.html' %}
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+
+            <!-- タイトル -->
+            <section class="page-heading">
+                <h1>カルテ記入</h1>
+                <p>面談の内容を記録してください。</p>
+            </section>
+
+            <!-- カルテフォーム -->
+            <form id="recordForm">
+
+                <!-- 生徒情報 -->
+                <section class="content-panel">
+
+                    <h2 class="section-title">
+                        <i class="bi bi-person"></i>
+                        生徒情報
+                    </h2>
+
+                    <div class="student-info-grid">
+
+                        <div class="info-item">
+                            <span class="info-label">氏名</span>
+                            <span class="info-value">佐藤 太郎</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">学年</span>
+                            <span class="info-value">1年</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">組</span>
+                            <span class="info-value">1組</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">出席番号</span>
+                            <span class="info-value">12番</span>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- 面談情報 -->
+                <section class="content-panel">
+
+                    <h2 class="section-title">
+                        <i class="bi bi-calendar-check"></i>
+                        面談情報
+                    </h2>
+
+                    <div class="interview-info-grid">
+
+                        <div class="info-item">
+                            <span class="info-label">カウンセラー名</span>
+                            <span class="info-value">{{ session.display_name }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">実施日</span>
+                            <span class="info-value">2026年6月12日</span>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- カルテ記入欄 -->
+                <section class="content-panel record-panel">
+
+                    <h2 class="section-title">
+                        <i class="bi bi-pencil-square"></i>
+                        カルテ内容
+                    </h2>
+
+                    <!-- 相談内容 -->
+                    <div class="record-field">
+                        <label for="consultation">
+                            相談内容
+                        </label>
+
+                        <textarea
+                            id="consultation"
+                            name="consultation"
+                            placeholder="生徒から相談された内容を記入してください。"
+                            required></textarea>
+                    </div>
+
+                    <!-- 会話内容 -->
+                    <div class="record-field">
+                        <label for="conversation">
+                            実施した会話の内容
+                        </label>
+
+                        <textarea
+                            id="conversation"
+                            name="conversation"
+                            placeholder="面談中に話した内容や対応した内容を記入してください。"
+                            required></textarea>
+                    </div>
+
+                    <!-- 今後の内容 -->
+                    <div class="record-field">
+                        <label for="future">
+                            今後の内容
+                        </label>
+
+                        <textarea
+                            id="future"
+                            name="future"
+                            placeholder="今後の対応方針や次回の面談に向けた内容を記入してください。"
+                            required></textarea>
+                    </div>
+
+                </section>
+
+                <!-- 操作ボタン -->
+                <div class="action-buttons">
+
+                    <a href="{{ url_for('care_history') }}"
+                       class="btn-back">
+                        戻る
+                    </a>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-send"></i>
+                        送信
+                    </button>
+
+                </div>
+
+            </form>
+
+        </main>
     </div>
-  </nav>
 
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
+    <script>
+        // 送信処理（画面確認用）
+        document.getElementById("recordForm")
+            .addEventListener("submit", function(event) {
 
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
+                // 実際の送信は行わない
+                event.preventDefault();
 
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
+                alert("送信ボタンが押されました。（実際の送信処理は行いません）");
+            });
+    </script>
 
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">記録登録</h2>
-
-        <a href="{{ url_for('care_record_check') }}" class="btn btn-primar">次へ</a>       
-        <a href="{{ url_for('care_student') }}" class="btn btn-secondary">戻る</a>
-
-      </div>
-    </div>
-  </div>
-  
 </body>
 </html>

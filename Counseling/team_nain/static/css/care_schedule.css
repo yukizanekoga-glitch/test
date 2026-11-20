@@ -1,186 +1,9 @@
+@charset "UTF-8";
+/* ヘッダー・サイドバー・全体フォント・基本配置は care_common.css で管理 */
 
-/* ==============================
-   全体設定
-============================== */
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    margin: 0;
-    width: 100%;
-    min-height: 100%;
-}
-
-body {
-    font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
-    font-size: 14px;
-    color: #293a52;
-    background: #fff;
-}
-
-/* 文字・リンクの下線を削除 */
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
-a:hover,
-a:focus,
-a:active {
-    text-decoration: none;
-}
-
-/* =========================
-   ヘッダー
-   高さ51px固定
-========================= */
-.top-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-
-    width: 100%;
-    height: 51px;
-    padding: 0 21px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    background: #fff;
-    border-bottom: 1px solid #e1e7ef;
-}
-
-.site-title {
-    margin: 0;
-    font-size: 17px;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.user-area {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    white-space: nowrap;
-}
-
-.user-name {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    color: #293a52;
-}
-
-.user-name .bi {
-    font-size: 18px;
-}
-
-.header-divider {
-    height: 21px;
-    margin: 0 5px;
-    border-left: 1px solid #d8dee7;
-}
-
-.logout-link {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    color: #075bd4;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.logout-link .bi {
-    font-size: 16px;
-}
-
-.logout-link:hover {
-    color: #003e9e;
-    text-decoration: none;
-}
-
-/* ==============================
-   サイドバー
-   幅185px固定
-============================== */
-.sidebar {
-    position: fixed;
-    top: 35px;
-    left: 0;
-    bottom: 0;
-    z-index: 50;
-
-    width: 185px;
-    padding-top: 16px;
-
-    background: linear-gradient(
-        135deg,
-        #f8fbff,
-        #f5f9fe
-    );
-
-    border-right: 1px solid #e0e7f0;
-    overflow-y: auto;
-}
-
-.sidebar a {
-    min-height: 44px;
-    padding: 0 16px;
-
-    display: flex;
-    align-items: center;
-    gap: 11px;
-
-    border-left: 3px solid transparent;
-
-    color: #172943;
-    font-size: 13px;
-    font-weight: 700;
-    white-space: nowrap;
-    text-decoration: none;
-
-    transition: background-color 0.2s;
-}
-
-.sidebar a .bi {
-    width: 22px;
-    flex-shrink: 0;
-
-    color: #3e4e63;
-    font-size: 19px;
-    text-align: center;
-}
-
-.sidebar a:hover {
-    background: #edf4ff;
-    text-decoration: none;
-}
-
-.sidebar a.active {
-    color: #075bd4;
-    background: #dfecff;
-    border-left-color: #1876f2;
-}
-
-.sidebar a.active .bi {
-    color: #075bd4;
-}
-
-/* ==============================
-   メインコンテンツ
-============================== */
+/* 面談予約確認画面専用の余白 */
 .main-content {
-    margin-left: 190px;
-    padding: 70px 26px 12px;
-
-    min-height: 100vh;
-    width: auto;
+    padding-bottom: 16px;
 }
 
 /* ==============================
@@ -410,7 +233,6 @@ a:active {
 ============================== */
 @media (max-height: 750px) {
     .main-content {
-        padding-top: 62px;
         padding-bottom: 8px;
     }
 
@@ -471,48 +293,25 @@ a:active {
     }
 }
 
+/* 共通CSS側のレイアウト位置・サイドバー幅には触れない */
 
-/* ==============================
-   予約がない場合
-============================== */
+
+/* 予約がない場合 (Project 追加分) */
 .empty-reservation {
     min-height: 300px;
     padding: 45px 20px;
     border: 1px solid #e2eaf4;
     border-radius: 7px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-
     background: #f9fcff;
 }
-
-.empty-reservation .empty-icon {
-    width: 72px;
-    height: 72px;
-    margin-bottom: 16px;
-
-    color: #46658e;
-}
-
-.empty-reservation .empty-message {
-    margin: 0;
-
-    color: #203751;
-    font-size: 17px;
-    font-weight: 800;
-}
-
+.empty-reservation .empty-icon { width: 72px; height: 72px; margin-bottom: 16px; color: #46658e; }
+.empty-reservation .empty-message { margin: 0; color: #203751; font-size: 17px; font-weight: 800; }
 @media (max-width: 767px) {
-    .empty-reservation {
-        min-height: 240px;
-        padding: 32px 15px;
-    }
-
-    .empty-reservation .empty-message {
-        font-size: 15px;
-    }
+    .empty-reservation { min-height: 240px; padding: 32px 15px; }
+    .empty-reservation .empty-message { font-size: 15px; }
 }
