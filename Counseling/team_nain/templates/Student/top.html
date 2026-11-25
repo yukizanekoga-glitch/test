@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -5,18 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>スクールカウンセラー相談予約システム</title>
 
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- CSS -->
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='top.css') }}">
+          href="{{ url_for('static', filename='css/top2.css') }}">
+
+    <style>
+        /* 回答済みのときの「回答済みです」(押せない) */
+        .survey-button.is-answered {
+            color: #5b6b80;
+            background: #eef1f5;
+            border-color: #d5dbe3;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .survey-button.is-answered .bi {
+            color: #2e9e5b;
+        }
+
+        /* 回答状況: 回答済みは緑 */
+        .survey-status.answered > .bi,
+        .survey-status.answered .meta-status {
+            color: #1e7a3c;
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- 上部ヘッダー -->
+    <!-- ヘッダー：元のサイズを維持 -->
     <header class="top-header">
         <div class="site-title">
             スクールカウンセラー相談予約システム
@@ -39,7 +59,7 @@
 
     <div class="layout">
 
-        <!-- 左側メニュー -->
+        <!-- サイドバー：元のサイズを維持 -->
         <aside class="sidebar">
 
             <a href="{{ url_for('top') }}" class="active">
@@ -66,6 +86,7 @@
 
         <!-- メインコンテンツ -->
         <main class="main-content">
+
 
             <!-- あいさつエリア -->
             <section class="hero">
@@ -123,7 +144,7 @@
                         </div>
 
                         <div class="menu-text">
-                            <h3>予約確認</h3>
+                            <h3>予約変更削除</h3>
                             <p>
                                 予約情報を<br>
                                 変更または削除できます
@@ -154,36 +175,93 @@
 
                 </div>
             </section>
-            
-<!-- 今週のアンケート -->
-<section class="survey-section">
 
-    <!-- 見出し -->
-    <div class="survey-heading">
-        <i class="bi bi-file-earmark-text survey-heading-icon"></i>
-        <h2>今週のアンケート</h2>
-    </div>
+            <!-- 今週のアンケート -->
+            <section class="survey-section">
 
-    <!-- アンケート内容 -->
-    <div class="survey-content">
+                <div class="survey-heading">
+                    <i class="bi bi-file-earmark-text survey-heading-icon"></i>
+                    <h2>今週のアンケート</h2>
+                </div>
 
-        <div class="survey-info">
-            <h3>今週の学校生活アンケート</h3>
-            <p>
-                学校での生活に関するアンケートです。
-                率直な気持ちを回答してください。
-            </p>
-        </div>
+                <div class="survey-content">
 
-        <!-- 回答ボタン -->
-        <a href="{{ url_for('student_survey') }}" class="survey-button">
-            <span>アンケートに回答する</span>
-            <i class="bi bi-chevron-right"></i>
-        </a>
+                    <div class="survey-info">
+                        <h3>今週の学校生活アンケート</h3>
+                        <p>
+                            学校での生活に関するアンケートです。
+                            率直な気持ちを回答してください。
+                        </p>
+                    </div>
 
-    </div>
+                    {% if survey.answered %}
+                    <!-- 今週は回答済み: ボタンは押せない -->
+                    <span class="survey-button is-answered" aria-disabled="true">
+                        <i class="bi bi-check-circle"></i>
+                        <span>回答済みです</span>
+                    </span>
+                    {% elif survey.state == 'open' %}
+                    <a href="{{ url_for('student_survey') }}" class="survey-button">
+                        <span>アンケートに回答する</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    {% elif survey.state == 'upcoming' %}
+                    <!-- 金曜日より前: まだ回答できない -->
+                    <span class="survey-button is-answered" aria-disabled="true">
+                        <i class="bi bi-clock"></i>
+                        <span>金曜日に回答できます</span>
+                    </span>
+                    {% else %}
+                    <!-- 金曜日を過ぎた: 回答できない -->
+                    <span class="survey-button is-answered" aria-disabled="true">
+                        <i class="bi bi-x-circle"></i>
+                        <span>回答期限が過ぎました</span>
+                    </span>
+                    {% endif %}
 
-</section>
+                </div>
+
+                <div class="survey-meta">
+
+                    <div class="survey-period">
+                        <i class="bi bi-calendar-check"></i>
+                        <span class="meta-label">実施日</span>
+                        <span class="meta-value">
+                            {{ survey.date }}（期限：当日中）
+                        </span>
+                    </div>
+
+                    <span class="survey-meta-divider"></span>
+
+                    {% if survey.answered %}
+                    <div class="survey-status answered">
+                        <i class="bi bi-check-circle"></i>
+                        <span class="meta-label">回答状況</span>
+                        <span class="meta-status">
+                            回答済みです
+                        </span>
+                    </div>
+                    {% elif survey.state == 'upcoming' %}
+                    <div class="survey-status">
+                        <i class="bi bi-clock"></i>
+                        <span class="meta-label">回答状況</span>
+                        <span class="meta-status">
+                            まだ回答できません
+                        </span>
+                    </div>
+                    {% else %}
+                    <div class="survey-status">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <span class="meta-label">回答状況</span>
+                        <span class="meta-status">
+                            {{ '未回答' if survey.state == 'open' else '未提出' }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                </div>
+
+            </section>
 
         </main>
     </div>

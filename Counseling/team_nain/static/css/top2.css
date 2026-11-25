@@ -1,0 +1,872 @@
+
+@charset "UTF-8";
+
+/* =========================
+   全体設定
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Yu Gothic", "Meiryo", sans-serif;
+    font-size: 13px;
+    color: #14233b;
+    background: #fff;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* =========================
+   ヘッダー：元のサイズを維持
+========================= */
+.top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100%;
+    height: 51px;
+    padding: 0 21px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #fff;
+    border-bottom: 1px solid #e1e7ef;
+}
+
+.site-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.user-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #293a52;
+}
+
+.user-name .bi {
+    font-size: 18px;
+}
+
+.header-divider {
+    height: 21px;
+    margin: 0 5px;
+    border-left: 1px solid #d8dee7;
+}
+
+.logout-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #075bd4;
+    font-weight: 600;
+}
+
+.logout-link .bi {
+    font-size: 16px;
+}
+
+.logout-link:hover {
+    color: #003e9e;
+}
+
+/* =========================
+   サイドバー：元のサイズを維持
+========================= */
+.sidebar {
+    position: fixed;
+    top: 35px;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+
+    width: 185px;
+    padding-top: 16px;
+
+    background: linear-gradient(135deg, #f8fbff, #f5f9fe);
+    border-right: 1px solid #e0e7f0;
+
+    overflow-y: auto;
+}
+
+.sidebar a {
+    min-height: 44px;
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    border-left: 3px solid transparent;
+    color: #172943;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    transition: background 0.2s;
+}
+
+.sidebar a .bi {
+    width: 22px;
+    flex-shrink: 0;
+    color: #3e4e63;
+    font-size: 19px;
+    text-align: center;
+}
+
+.sidebar a:hover {
+    background: #edf4ff;
+}
+
+.sidebar a.active {
+    color: #075bd4;
+    background: #dfecff;
+    border-left-color: #1876f2;
+}
+
+.sidebar a.active .bi {
+    color: #075bd4;
+}
+
+/* =========================
+   メインコンテンツ
+========================= */
+.main-content {
+    min-height: 100vh;
+    margin-left: 185px;
+    padding: 61px 23px 16px;
+}
+
+/* =========================
+   アンケート警告バナー
+========================= */
+.survey-alert {
+    min-height: 76px;
+    margin: 0 0 12px;
+    padding: 9px 12px;
+
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    background: linear-gradient(90deg, #fff0f0, #fff5f5);
+    border: 1px solid #ff3038;
+    border-radius: 8px;
+}
+
+.survey-alert-icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #fff;
+    background: #ed111b;
+    border-radius: 50%;
+}
+
+.survey-alert-icon .bi {
+    font-size: 25px;
+}
+
+.survey-alert-text {
+    min-width: 0;
+    flex: 1;
+}
+
+.survey-alert-text h2 {
+    margin: 0 0 4px;
+    color: #e71920;
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: 800;
+}
+
+.survey-alert-text p {
+    margin: 0;
+    color: #172943;
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 700;
+}
+
+.survey-alert-button {
+    min-width: 190px;
+    min-height: 44px;
+    padding: 0 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-shrink: 0;
+
+    color: #fff;
+    background: #e60012;
+    border: 1px solid #e60012;
+    border-radius: 7px;
+
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.survey-alert-button:hover,
+.survey-button:hover {
+    background: #c90010;
+}
+
+.survey-alert-button .bi {
+    font-size: 12px;
+}
+
+/* =========================
+   あいさつ画像
+========================= */
+.hero {
+    position: relative;
+    height: 145px;
+
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    background: #f4f5f5;
+    border: 1px solid #e1e7ef;
+    border-radius: 8px;
+}
+
+.hero-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.97) 0%,
+        rgba(255, 255, 255, 0.88) 32%,
+        rgba(255, 255, 255, 0.30) 65%,
+        rgba(255, 255, 255, 0.02) 100%
+    );
+}
+
+.hero-text {
+    position: relative;
+    z-index: 1;
+    padding-left: 24px;
+}
+
+.hero-text h1 {
+    margin: 0 0 6px;
+    font-size: 23px;
+    line-height: 1.4;
+    font-weight: 800;
+}
+
+.hero-text p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.8;
+    font-weight: 700;
+}
+
+/* =========================
+   メニュー見出し
+========================= */
+.menu-section {
+    margin-top: 15px;
+}
+
+.section-title {
+    min-height: 25px;
+    margin: 0 0 9px 5px;
+    padding-left: 10px;
+
+    display: flex;
+    align-items: center;
+
+    border-left: 4px solid #2879f0;
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: 800;
+}
+
+/* =========================
+   メニューカード
+========================= */
+.menu-container {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 0 0 0 5px;
+}
+
+.menu-card {
+    position: relative;
+    min-width: 0;
+    min-height: 100px;
+    padding: 10px 24px 10px 12px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    border: 1px solid;
+    border-radius: 8px;
+
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.menu-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(25, 50, 90, 0.08);
+}
+
+.reservation {
+    background: #f6faff;
+    border-color: #cfe2ff;
+}
+
+.confirmation {
+    background: #f7fbf8;
+    border-color: #d5eadc;
+}
+
+.history {
+    background: #fffcf8;
+    border-color: #f3dfcd;
+}
+
+.card-icon {
+    width: 36px;
+    height: 38px;
+    flex: 0 0 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #405b78;
+}
+
+.card-icon .bi {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.menu-text {
+    min-width: 0;
+}
+
+.menu-text h3 {
+    margin: 0 0 4px;
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 800;
+}
+
+.menu-text p {
+    margin: 0;
+    color: #465d7b;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.arrow {
+    position: absolute;
+    top: 50%;
+    right: 7px;
+
+    color: #405b78;
+    font-size: 13px;
+
+    transform: translateY(-50%);
+}
+
+/* =========================
+   今週のアンケート
+========================= */
+.survey-section {
+    margin: 14px 0 0 5px;
+    overflow: hidden;
+
+    background: #fff;
+    border: 1px solid #cfe0f8;
+    border-radius: 8px;
+}
+
+/* 見出し */
+.survey-heading {
+    min-height: 38px;
+    padding: 0 14px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: linear-gradient(90deg, #edf5ff, #f3f8ff);
+}
+
+.survey-heading-icon {
+    color: #0878ff;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.survey-heading h2 {
+    margin: 0;
+    color: #14233b;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+/* アンケート本文 */
+.survey-content {
+    position: relative;
+    min-height: 68px;
+    margin: 9px 12px 0;
+    padding: 9px 215px 9px 12px;
+
+    display: flex;
+    align-items: center;
+
+    background: linear-gradient(90deg, #f8fbff, #fff);
+    border-radius: 5px;
+}
+
+.survey-info {
+    min-width: 0;
+}
+
+.survey-info h3 {
+    margin: 0 0 3px;
+    color: #0875ed;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
+.survey-info p {
+    margin: 0;
+    color: #405776;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* 回答ボタン */
+.survey-button {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+
+    width: 195px;
+    min-height: 48px;
+    padding: 0 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    color: #fff;
+    background: #e60012;
+    border: 1px solid #e60012;
+    border-radius: 7px;
+
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+    white-space: nowrap;
+
+    transition: background 0.2s;
+}
+
+.survey-button .bi {
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+/* =========================
+   実施期間・回答状況
+========================= */
+.survey-meta {
+    min-height: 42px;
+    padding: 7px 24px 9px;
+
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    color: #405776;
+    font-size: 11px;
+}
+
+.survey-period,
+.survey-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.survey-period > .bi {
+    color: #405776;
+    font-size: 16px;
+}
+
+.survey-status > .bi {
+    color: #ff252d;
+    font-size: 18px;
+}
+
+.meta-label {
+    font-weight: 700;
+}
+
+.meta-value {
+    color: #405776;
+}
+
+.survey-meta-divider {
+    width: 1px;
+    height: 22px;
+    flex-shrink: 0;
+    background: #cbd5e1;
+}
+
+.meta-status {
+    color: #e60012;
+    font-weight: 800;
+}
+
+/* =========================
+   タブレット
+========================= */
+@media (max-width: 850px) {
+    .top-header {
+        padding: 0 13px;
+    }
+
+    .site-title {
+        font-size: 15px;
+    }
+
+    .user-area {
+        gap: 7px;
+        font-size: 12px;
+    }
+
+    .header-divider {
+        display: none;
+    }
+
+    .sidebar {
+        width: 58px;
+    }
+
+    .sidebar a {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .sidebar a span {
+        display: none;
+    }
+
+    .sidebar a .bi {
+        width: auto;
+        font-size: 21px;
+    }
+
+    .main-content {
+        margin-left: 58px;
+        padding: 68px 14px 18px;
+    }
+
+    .survey-alert {
+        flex-wrap: wrap;
+        gap: 8px 12px;
+    }
+
+    .survey-alert-text h2 {
+        font-size: 14px;
+    }
+
+    .survey-alert-text p {
+        font-size: 11px;
+    }
+
+    .survey-alert-button {
+        min-width: 155px;
+        min-height: 38px;
+        font-size: 11px;
+    }
+
+    .hero {
+        height: 135px;
+    }
+
+    .menu-container {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-card {
+        min-height: 78px;
+    }
+
+    .survey-content {
+        padding-right: 180px;
+    }
+
+    .survey-button {
+        width: 165px;
+        min-height: 42px;
+        font-size: 10px;
+    }
+
+    .survey-meta {
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        padding: 9px 12px;
+    }
+
+    .survey-meta-divider {
+        display: none;
+    }
+}
+
+/* =========================
+   スマートフォン
+========================= */
+@media (max-width: 500px) {
+    .top-header {
+        height: 49px;
+        padding: 0 8px;
+    }
+
+    .site-title {
+        max-width: 48%;
+        font-size: 11px;
+        white-space: normal;
+    }
+
+    .user-area {
+        gap: 5px;
+        font-size: 10px;
+    }
+
+    .logout-link {
+        gap: 4px;
+        font-size: 10px;
+    }
+
+    .logout-link .bi {
+        font-size: 13px;
+    }
+
+    .sidebar {
+        top: 49px;
+        width: 45px;
+    }
+
+    .sidebar a {
+        min-height: 41px;
+    }
+
+    .main-content {
+        margin-left: 45px;
+        padding: 58px 8px 14px;
+    }
+
+    .survey-alert {
+        gap: 8px;
+        padding: 9px;
+    }
+
+    .survey-alert-icon {
+        width: 29px;
+        height: 29px;
+        flex-basis: 29px;
+    }
+
+    .survey-alert-icon .bi {
+        font-size: 21px;
+    }
+
+    .survey-alert-text h2 {
+        font-size: 11px;
+    }
+
+    .survey-alert-text p {
+        font-size: 9px;
+    }
+
+    .survey-alert-button {
+        width: 100%;
+        min-height: 35px;
+    }
+
+    .hero {
+        height: 112px;
+    }
+
+    .hero-text {
+        padding-left: 10px;
+    }
+
+    .hero-text h1 {
+        font-size: 17px;
+    }
+
+    .hero-text p {
+        font-size: 9px;
+    }
+
+    .menu-section {
+        margin-top: 12px;
+    }
+
+    .section-title {
+        min-height: 23px;
+        margin-bottom: 7px;
+        font-size: 14px;
+    }
+
+    .menu-container {
+        gap: 7px;
+        padding: 0;
+    }
+
+    .menu-card {
+        min-height: 70px;
+        padding: 7px 20px 7px 8px;
+        gap: 7px;
+    }
+
+    .card-icon {
+        width: 29px;
+        height: 32px;
+        flex-basis: 29px;
+    }
+
+    .card-icon .bi {
+        font-size: 26px;
+    }
+
+    .menu-text h3 {
+        margin-bottom: 3px;
+        font-size: 11px;
+    }
+
+    .menu-text p {
+        font-size: 9px;
+    }
+
+    .survey-section {
+        margin: 11px 0 0;
+    }
+
+    .survey-heading {
+        min-height: 33px;
+        padding: 0 9px;
+        gap: 7px;
+    }
+
+    .survey-heading-icon {
+        font-size: 19px;
+    }
+
+    .survey-heading h2 {
+        font-size: 12px;
+    }
+
+    .survey-content {
+        min-height: auto;
+        margin: 7px;
+        padding: 8px;
+
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .survey-info h3 {
+        font-size: 11px;
+    }
+
+    .survey-info p {
+        font-size: 9px;
+    }
+
+    .survey-button {
+        position: static;
+        transform: none;
+
+        width: 100%;
+        min-height: 36px;
+        font-size: 10px;
+    }
+
+    .survey-meta {
+        padding: 7px 9px 10px;
+        font-size: 9px;
+        gap: 7px;
+    }
+
+    .survey-period,
+    .survey-status {
+        flex-wrap: wrap;
+        gap: 5px;
+        white-space: normal;
+    }
+
+    .survey-period > .bi {
+        font-size: 14px;
+    }
+
+    .survey-status > .bi {
+        font-size: 15px;
+    }
+
+    .meta-status {
+        overflow-wrap: anywhere;
+    }
+}

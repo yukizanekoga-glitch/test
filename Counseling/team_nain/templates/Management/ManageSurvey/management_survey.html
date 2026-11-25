@@ -100,13 +100,14 @@
                     <!-- 円グラフ -->
                     <div class="chart-area">
 
-                        <div class="donut-chart">
+                        <div class="donut-chart"
+                             style="background: conic-gradient(#0d6efd 0% {{ rate }}%, #dce2ea {{ rate }}% 100%);">
 
                             <div class="donut-center">
                                 <span class="chart-label">回答率</span>
-                                <strong>78%</strong>
+                                <strong>{{ rate }}%</strong>
                                 <span class="chart-total">
-                                    (250 / 320人)
+                                    ({{ answered }} / {{ total }}人)
                                 </span>
                             </div>
 
@@ -122,7 +123,7 @@
                                 <span class="status-dot"></span>
                                 回答済み
                             </div>
-                            <strong>250 人</strong>
+                            <strong>{{ answered }} 人</strong>
                         </div>
 
                         <div class="status-item unanswered">
@@ -130,23 +131,23 @@
                                 <span class="status-dot"></span>
                                 未回答
                             </div>
-                            <strong>70 人</strong>
+                            <strong>{{ unanswered }} 人</strong>
                         </div>
 
                         <div class="status-item warning-pink">
                             <div class="status-name">
                                 <span class="status-dot"></span>
-                                要確認（低評価が継続）
+                                要確認（警告者）
                             </div>
-                            <strong>12 人</strong>
+                            <strong>{{ red_count }} 人</strong>
                         </div>
 
                         <div class="status-item warning-yellow">
                             <div class="status-name">
                                 <span class="status-dot"></span>
-                                要確認（悪化傾向）
+                                面談希望者
                             </div>
-                            <strong>8 人</strong>
+                            <strong>{{ wish_count }} 人</strong>
                         </div>
 
                     </div>
@@ -174,40 +175,33 @@
 
                             <tbody>
 
-                                {% set students = [
-                                    ('佐藤 みゆ', '低評価が継続', 'pink'),
-                                    ('鈴木 大輔', '低評価が継続', 'pink'),
-                                    ('高橋 葵', '悪化傾向', 'yellow'),
-                                    ('田中 悠真', '低評価が継続', 'pink'),
-                                    ('伊藤 さくら', '悪化傾向', 'yellow'),
-                                    ('渡辺 翔', '低評価が継続', 'pink'),
-                                    ('山本 結衣', '悪化傾向', 'yellow'),
-                                    ('中村 亮太', '低評価が継続', 'pink'),
-                                    ('小林 美咲', '悪化傾向', 'yellow'),
-                                    ('加藤 颯太', '低評価が継続', 'pink')
-                                ] %}
-
-                                {% for name, status, color in students %}
+                                {% for w in warnings %}
                                 <tr>
                                     <td>{{ loop.index }}</td>
 
                                     <td class="student-name">
-                                        {{ name }}
+                                        {{ w.student.display_name }}
                                     </td>
 
                                     <td>
-                                        <span class="status-badge {{ color }}">
-                                            {{ status }}
+                                        {% for color, label in w.labels %}
+                                        <span class="status-badge {{ 'pink' if color == 'red' else 'yellow' }}">
+                                            {{ label }}
                                         </span>
+                                        {% endfor %}
                                     </td>
 
                                     <td>
-                                        <a href="{{ url_for('management_graph') }}"
+                                        <a href="{{ url_for('management_graph', student_id=w.student.id) }}"
                                            class="graph-button">
                                             <i class="bi bi-bar-chart-line-fill"></i>
                                             詳細
                                         </a>
                                     </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4">今週の警告者はいません。</td>
                                 </tr>
                                 {% endfor %}
 

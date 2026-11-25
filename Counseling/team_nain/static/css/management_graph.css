@@ -652,3 +652,106 @@ body {
         width: auto;
     }
 }
+
+
+/* =========================
+   回答履歴のスライド・未提出 (追加分)
+========================= */
+.history-heading {
+    margin: 0 -14px 9px;
+    padding-right: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #edf5ff;
+}
+
+.history-heading .section-title {
+    margin: 0;
+    background: transparent;
+}
+
+.history-slider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #53627a;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.slide-button {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #c8d4e6;
+    border-radius: 5px;
+    background: #fff;
+    color: #075bd4;
+    cursor: pointer;
+}
+
+.slide-button:hover:not(:disabled) {
+    background: #edf4ff;
+}
+
+.slide-button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.history-table td.not-submitted {
+    color: #9aa7ba;
+    font-size: 12px;
+}
+
+.history-table [hidden] {
+    display: none;
+}
+
+
+/* =========================
+   面談希望 (黄) と状態バッジの並び (追加分)
+========================= */
+.warning-statuses {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.warning-status.yellow {
+    background: #fff1d2;
+    color: #934900;
+}
+
+.warning-status.yellow .warning-icon {
+    background: #ffae00;
+    color: #fff;
+}
+
+.history-table td.answer-text.wish {
+    background: #ffe5ac;
+    color: #934900;
+    font-weight: bold;
+}
+
+.judgment-box.yellow {
+    background: #fff1d2;
+}
+
+.judgment-box.yellow .judgment-icon {
+    background: #ffe5ac;
+    color: #e08a00;
+}
+
+.judgment-box.yellow strong {
+    color: #934900;
+}
+
+.judgment-reasons p + p {
+    margin-top: 4px;
+}

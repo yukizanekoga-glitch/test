@@ -133,10 +133,14 @@ class SurveyResponse(db.Model):
     q5 = db.Column(db.String(50), nullable=False)
     q6 = db.Column(db.String(50), nullable=False)
     q7 = db.Column(db.String(50), nullable=False)
-    q8 = db.Column(db.String(50), nullable=False)
-    q9 = db.Column(db.String(50), nullable=False)
-    q10 = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # どの週のアンケートか (その週の金曜日の日付)。1人の生徒は同じ日付に1回しか回答できない。
+    # 既存の回答 (この列を足す前のもの) は update_db.py が created_at から埋める。
+    survey_date = db.Column(db.Date, nullable=True)
+
+    __table_args__ = (
+        db.Index('uq_survey_student_date', 'student_id', 'survey_date', unique=True),
+    )
 
     student = db.relationship('User', foreign_keys=[student_id])
 

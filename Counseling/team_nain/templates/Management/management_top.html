@@ -155,11 +155,12 @@
 
                         <!-- 円グラフ -->
                         <div class="chart-area">
-                            <div class="donut-chart">
+                            <div class="donut-chart"
+                                 style="background: conic-gradient(#0d6efd 0% {{ survey.rate }}%, #dce2ea {{ survey.rate }}% 100%);">
                                 <div class="donut-center">
                                     <span>回答率</span>
-                                    <strong>78%</strong>
-                                    <small>（250 / 320人）</small>
+                                    <strong>{{ survey.rate }}%</strong>
+                                    <small>（{{ survey.answered }} / {{ survey.total }}人）</small>
                                 </div>
                             </div>
                         </div>
@@ -169,22 +170,22 @@
 
                             <div class="legend-row">
                                 <span><i class="dot blue"></i>回答済み</span>
-                                <strong>250 人</strong>
+                                <strong>{{ survey.answered }} 人</strong>
                             </div>
 
                             <div class="legend-row">
                                 <span><i class="dot gray"></i>未回答</span>
-                                <strong>70 人</strong>
+                                <strong>{{ survey.unanswered }} 人</strong>
                             </div>
 
                             <div class="legend-row">
-                                <span><i class="dot pink"></i>要確認（低評価が継続）</span>
-                                <strong>12 人</strong>
+                                <span><i class="dot pink"></i>要確認（警告者）</span>
+                                <strong>{{ survey.red_count }} 人</strong>
                             </div>
 
                             <div class="legend-row">
-                                <span><i class="dot yellow"></i>要確認（悪化傾向）</span>
-                                <strong>8 人</strong>
+                                <span><i class="dot yellow"></i>面談希望者</span>
+                                <strong>{{ survey.wish_count }} 人</strong>
                             </div>
 
                         </div>

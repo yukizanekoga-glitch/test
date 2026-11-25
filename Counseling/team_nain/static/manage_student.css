@@ -13,6 +13,13 @@
     font-size: 13px;
 }
 
+/* 更新などの成功メッセージは緑 */
+.flash-message.success {
+    border-color: #b7e1c4;
+    background: #e9f7ee;
+    color: #1e7a3c;
+}
+
 /* タイトル・登録ボタン */
 .student-page-header {
     display: flex;

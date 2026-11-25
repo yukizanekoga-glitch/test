@@ -8,24 +8,25 @@
 
 html,
 body {
-    margin: 0;
+    width: 100%;
     min-height: 100%;
+    margin: 0;
 }
 
 body {
     font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
     color: #101d3d;
-    background: #f5f7fb;
-    font-size: 14px;
+    background: #ffffff;
+    font-size: 13px;
 }
 
 a {
-    color: inherit;
     text-decoration: none;
 }
 
 /* ==============================
    上部ヘッダー
+   高さ：51px
 ============================== */
 .top-header {
     position: fixed;
@@ -46,6 +47,7 @@ a {
 }
 
 .site-title {
+    margin: 0;
     color: #20324b;
     font-size: 17px;
     font-weight: 800;
@@ -55,16 +57,17 @@ a {
 .user-area {
     display: flex;
     align-items: center;
-    gap: 13px;
+    gap: 10px;
+
+    font-size: 13px;
+    white-space: nowrap;
 }
 
 .user-name {
     display: flex;
     align-items: center;
     gap: 7px;
-
     color: #293a52;
-    font-size: 12px;
 }
 
 .user-name .bi {
@@ -75,7 +78,7 @@ a {
     width: 1px;
     height: 21px;
     margin: 0 5px;
-    background: #dce3ed;
+    background: #d8dee7;
 }
 
 .logout-link {
@@ -83,53 +86,57 @@ a {
     align-items: center;
     gap: 6px;
 
-    color: #526179;
+    color: #075bd4;
     font-size: 12px;
-    white-space: nowrap;
+    font-weight: 600;
+}
+
+.logout-link .bi {
+    font-size: 16px;
 }
 
 .logout-link:hover {
-    color: #1769e8;
+    color: #003e9e;
 }
 
 /* ==============================
-   左側メニュー
+   左側サイドバー
+   幅：185px
 ============================== */
 .sidebar {
     position: fixed;
-    top: 51px;
-    bottom: 0;
+    top: 35px;
     left: 0;
+    bottom: 0;
     z-index: 900;
 
     display: flex;
     flex-direction: column;
-    gap: 5px;
 
-    width: 222px;
-    min-width: 222px;
-    padding: 8px 0;
+    width: 185px;
+    min-width: 185px;
+    padding-top: 16px;
+
+    background: linear-gradient(135deg, #f8fbff, #f5f9fe);
+    border-right: 1px solid #e0e7f0;
 
     overflow-y: auto;
-
-    background: #f8faff;
-    border-right: 1px solid #e2e8f1;
 }
 
 .sidebar a {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 11px;
 
-    min-height: 40px;
-    padding: 9px 20px;
+    min-height: 44px;
+    padding: 0 16px;
 
-    border-left: 4px solid transparent;
+    border-left: 3px solid transparent;
 
-    color: #586580;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.5;
+    color: #172943;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
 
     transition: background 0.2s, color 0.2s;
 }
@@ -139,157 +146,276 @@ a {
     align-items: center;
     justify-content: center;
 
-    width: 17px;
-    font-size: 18px;
+    width: 22px;
+    flex-shrink: 0;
+
+    color: #3e4e63;
+    font-size: 19px;
 }
 
 .sidebar a:hover {
-    background: #edf3ff;
-    color: #1769e8;
+    background: #edf4ff;
 }
 
 .sidebar a.active {
-    border-left-color: #1769e8;
-    background: #eaf2ff;
-    color: #1769e8;
-    font-weight: 600;
+    color: #075bd4;
+    background: #dfecff;
+    border-left-color: #1876f2;
+}
+
+.sidebar a.active .bi {
+    color: #075bd4;
 }
 
 /* ==============================
-   メインコンテンツ
+   全体レイアウト
 ============================== */
-.main-content {
-    width: calc(100% - 222px);
-    min-width: 0;
+.layout {
+    display: flex;
     min-height: 100vh;
+    padding-top: 51px;
+}
 
-    margin-left: 222px;
-    padding: 51px 32px 60px;
+.main-content {
+    width: calc(100% - 185px);
+    min-width: 0;
+    min-height: calc(100vh - 51px);
+
+    margin-left: 185px;
+    padding: 9px 22px 8px;
 }
 
 /* ==============================
-   説明エリア
+   タイトル・説明エリア
 ============================== */
 .intro-panel {
-    max-width: 760px;
-    margin: 32px auto 0;
+    margin: 12px 0 0; /* 上に20pxの余白を追加 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    min-height: 108px;
+    margin-bottom: 10px;
+    padding: 10px 17px;
+
+    background: #f4f9ff;
+    border: 1px solid #cfe3ff;
+    border-radius: 6px;
 }
 
 .intro-panel h1 {
-    margin: 0 0 10px;
+    margin: 0 0 6px;
+
+    color: #101d3d;
     font-size: 24px;
     font-weight: 800;
+    line-height: 1.3;
 }
 
 .intro-panel p {
-    margin: 0 0 4px;
-    color: #586580;
-    font-size: 14px;
-    line-height: 1.7;
-}
+    margin: 2px 0;
 
-/* ==============================
-   flashメッセージ
-============================== */
-.flash-message {
-    max-width: 760px;
-    margin: 16px auto 0;
-    padding: 12px 16px;
-
-    border: 1px solid #f3c6c6;
-    border-radius: 8px;
-    background: #fdecec;
-    color: #b42318;
+    color: #17284c;
     font-size: 13px;
+    line-height: 1.45;
 }
 
 /* ==============================
    アンケートフォーム
 ============================== */
 .survey-form {
-    max-width: 760px;
-    margin: 24px auto 0;
+    width: 100%;
+    margin: 20px 0 0; /* 上に20pxの余白を追加 */
 }
 
 .survey-table {
-    border: 1px solid #d9e3ee;
-    border-radius: 14px;
-    background: #ffffff;
+    width: 100%;
     overflow: hidden;
+    border: 1px solid #d5e6ff;
+    border-radius: 5px;
 }
 
+/* ==============================
+   質問行
+============================== */
 .question-row {
     display: grid;
-    grid-template-columns: 56px 1fr;
-    gap: 4px 16px;
+    grid-template-columns: 40px minmax(0, 380px) minmax(0, 1fr);
+    align-items: stretch;
 
-    padding: 20px 24px;
-    border-bottom: 1px solid #e2e8f1;
+    min-height: 43px;
+
+    border-bottom: 1px solid #d5e6ff;
 }
 
-.question-row-last {
+.question-row:last-child {
     border-bottom: none;
 }
 
 .question-number {
-    grid-row: 1 / 3;
-    color: #1769e8;
-    font-size: 16px;
-    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 4px;
+
+    background: #f5faff;
+    border-right: 1px solid #d5e6ff;
+
+    color: #101d3d;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .question-text {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
 
-    font-size: 15px;
-    font-weight: 600;
-}
+    min-width: 0;
+    padding: 5px 10px;
 
-.required {
-    padding: 2px 8px;
-    border-radius: 4px;
-    background: #fdecec;
-    color: #d92d20;
-    font-size: 11px;
+    background: #f5faff;
+    border-right: 1px solid #d5e6ff;
+
+    color: #101d3d;
+    font-size: 12px;
     font-weight: 700;
-    white-space: nowrap;
+    line-height: 1.35;
 }
 
+.question-text > span:first-child {
+    min-width: 0;
+}
+
+/* 必須ラベル */
+.required {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    padding: 2px 6px;
+
+    border-radius: 4px;
+    background: #ff4b55;
+
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+/* ==============================
+   回答選択欄
+============================== */
 .answer-options {
-    grid-column: 2;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 18px;
-    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: center;
+
+    column-gap: 12px;
+    row-gap: 3px;
+    min-width: 10px;
+    padding: 5px 0;
+
+    background: #ffffff;
 }
 
 .answer-options label {
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: flex-start;
+    gap: 5px;
 
-    font-size: 13px;
-    color: #42608d;
+    min-width: 0;
+    min-height: 31px;
+    padding: 2px 3px 2px 7px;
+
+    color: #243454;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+
     cursor: pointer;
 }
 
+/* ラジオボタン */
 .answer-options input[type="radio"] {
-    accent-color: #1769e8;
-    width: 15px;
-    height: 15px;
+    appearance: none;
+    -webkit-appearance: none;
+
+    display: inline-grid;
+    place-content: center;
+
+    flex: 0 0 17px;
+    width: 17px;
+    height: 17px;
+    margin: 0;
+
+    border: 1.5px solid #a5b5d0;
+    border-radius: 50%;
+    background: #ffffff;
+
     cursor: pointer;
+}
+
+.answer-options input[type="radio"]::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+    background: #ffffff;
+
+    transform: scale(0);
+    transition: transform 0.12s ease-in-out;
+}
+
+.answer-options input[type="radio"]:checked {
+    border-color: #0875f9;
+    background: #0875f9;
+}
+
+.answer-options input[type="radio"]:checked::before {
+    transform: scale(1);
+}
+
+.answer-options input[type="radio"]:focus-visible {
+    outline: 2px solid #82b6ff;
+    outline-offset: 2px;
+}
+
+/* 3つ目の解答を少し左へ */
+.answer-options label:nth-child(3) {
+    transform: translateX(-5px);
+}
+
+/* 選択肢4つの質問 */
+.q8-options {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* 選択肢2つの質問 */
+.q10-options {
+    grid-template-columns: 115px 100px;
+    justify-content: start;
+    padding-left: 0px;
 }
 
 /* ==============================
-   ボタンエリア
+   下部ボタン
 ============================== */
 .button-area {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
 
-    margin-top: 24px;
+    width: 100%;
+    margin-top: 18px;
+    padding-right: 5px;
 }
 
 .btn-back,
@@ -298,42 +424,153 @@ a {
     align-items: center;
     justify-content: center;
 
-    min-width: 140px;
-    min-height: 46px;
-    padding: 10px 24px;
+    height: 40px;
+    border-radius: 5px;
 
-    border: none;
-    border-radius: 7px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
 
-    font-size: 14px;
-    font-weight: 600;
     cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
 }
 
 .btn-back {
-    background: #eef1f6;
-    color: #42608d;
+    width: 160px;
+
+    border: 1px solid #b9cbe5;
+    background: #ffffff;
+    color: #17284c;
 }
 
 .btn-back:hover {
-    background: #e1e6ee;
+    background: #f1f6ff;
+    border-color: #8caee0;
 }
 
 .btn-confirm {
-    background: #1769e8;
+    width: 210px;
+
+    border: 1px solid #0867f5;
+    background: #0867f5;
     color: #ffffff;
 }
 
 .btn-confirm:hover {
-    background: #1456c2;
+    background: #0054d6;
 }
 
-@media (max-width: 1000px) {
+/* ==============================
+   高さが小さい画面
+============================== */
+@media (max-height: 800px) {
     .main-content {
-        padding: 51px 20px 50px;
+        padding-top: 7px;
+        padding-bottom: 6px;
+    }
+
+    .intro-panel {
+        min-height: 96px;
+        margin-bottom: 8px;
+        padding: 8px 15px;
+    }
+
+    .intro-panel h1 {
+        margin-bottom: 4px;
+        font-size: 22px;
+    }
+
+    .intro-panel p {
+        font-size: 12px;
     }
 
     .question-row {
-        grid-template-columns: 32px 1fr;
+        min-height: 40px;
+    }
+
+    .question-text {
+        padding-top: 3px;
+        padding-bottom: 3px;
+        font-size: 11px;
+    }
+
+    .answer-options {
+        padding-top: 1px;
+        padding-bottom: 1px;
+    }
+
+    .answer-options label {
+        min-height: 25px;
+        gap: 3px;
+        font-size: 10px;
+    }
+
+    .answer-options input[type="radio"] {
+        flex-basis: 15px;
+        width: 15px;
+        height: 15px;
+    }
+
+    .answer-options input[type="radio"]::before {
+        width: 6px;
+        height: 6px;
+    }
+
+    .button-area {
+        margin-top: 8px;
+    }
+
+    .btn-back,
+    .btn-confirm {
+        height: 36px;
+    }
+}
+
+/* ==============================
+   横幅が狭い画面
+============================== */
+@media (max-width: 1100px) {
+    .main-content {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .question-row {
+        grid-template-columns: 45px minmax(0, 0.9fr) minmax(0, 1.4fr);
+    }
+
+    .question-text {
+        gap: 4px;
+        padding-right: 5px;
+        padding-left: 6px;
+        font-size: 10px;
+        white-space: normal;
+    }
+
+    .required {
+        padding: 2px 4px;
+        font-size: 9px;
+    }
+
+    .answer-options {
+        padding-right: 3px;
+        padding-left: 3px;
+    }
+
+    .answer-options label {
+        gap: 3px;
+        font-size: 9px;
+        white-space: normal;
+    }
+
+    .answer-options input[type="radio"] {
+        flex-basis: 14px;
+        width: 14px;
+        height: 14px;
+    }
+
+    .answer-options input[type="radio"]::before {
+        width: 6px;
+        height: 6px;
     }
 }

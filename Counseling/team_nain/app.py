@@ -108,7 +108,7 @@ def logout():
 @app.route("/top")
 @role_required(User.ROLE_STUDENT)
 def top():
-    return render_template("Student/top.html")
+    return render_template("Student/top.html", survey=_this_week_survey(session["user_id"]))
 
 
 # =========================
@@ -497,20 +497,77 @@ def history():
 # 今週のアンケート
 # =========================
 
-SURVEY_QUESTION_KEYS = [f"q{i}" for i in range(1, 11)]
+SURVEY_QUESTION_KEYS = [f"q{i}" for i in range(1, 8)]  # Q1〜Q7
+
+
+SURVEY_WEEKDAY = 4  # アンケートは金曜日に投稿され、その日のうちが期限
+# 開発中は True にすると、金曜日でなくても回答できる (本番では False にする)
+SURVEY_ANYTIME = True
+
+
+def _this_week_survey(student_id):
+    """今週のアンケートの実施日 (金曜日)・回答できるか・その生徒が回答済みかどうか
+
+    state: "open" (今日が金曜日で回答できる) / "upcoming" (金曜日より前) / "expired" (金曜日を過ぎた)
+    ※ 日付はサーバーの設定によらず日本時間で数える
+    """
+    today = (datetime.utcnow() + timedelta(hours=9)).date()
+    monday = today - timedelta(days=today.weekday())
+    survey_day = monday + timedelta(days=SURVEY_WEEKDAY)
+
+    # survey_date (その週の金曜日) で回答済みかを調べる。
+    # survey_date が空の古い回答は、created_at (UTC) が今週 (日本時間の月曜〜日曜) に入っているかで調べる
+    start_utc = datetime.combine(monday, time_cls(0, 0)) - timedelta(hours=9)
+    end_utc = start_utc + timedelta(days=7)
+    answered = SurveyResponse.query.filter(
+        SurveyResponse.student_id == student_id,
+        db.or_(
+            SurveyResponse.survey_date == survey_day,
+            db.and_(
+                SurveyResponse.survey_date.is_(None),
+                SurveyResponse.created_at >= start_utc,
+                SurveyResponse.created_at < end_utc,
+            ),
+        ),
+    ).first() is not None
+
+    if SURVEY_ANYTIME or today == survey_day:
+        state = "open"
+    elif today < survey_day:
+        state = "upcoming"
+    else:
+        state = "expired"
+
+    return {
+        "date": survey_day.strftime("%Y/%m/%d") + "（金）",
+        "state": state,
+        "answered": answered,
+        "survey_day": survey_day,
+    }
 
 
 @app.route("/student_survey", methods=["GET", "POST"])
 @role_required(User.ROLE_STUDENT)
 def student_survey():
+    # 回答できるのは金曜日だけ。回答済みの生徒も回答できない (トップ画面で状況を表示)
+    survey = _this_week_survey(session["user_id"])
+    if survey["state"] != "open" or survey["answered"]:
+        return redirect(url_for("top"))
+
     if request.method == "POST":
         answers = {key: request.form.get(key, "").strip() for key in SURVEY_QUESTION_KEYS}
         if not all(answers.values()):
-            flash("すべての質問に回答してください。")
+            flash("未回答です。")
             return render_template("Student/student_survey.html")
 
-        db.session.add(SurveyResponse(student_id=session["user_id"], **answers))
-        db.session.commit()
+        # 金曜日の日付を、どの週のアンケートかの印として残す
+        db.session.add(SurveyResponse(student_id=session["user_id"], survey_date=survey["survey_day"], **answers))
+        try:
+            db.session.commit()
+        except IntegrityError:
+            # 二重送信などで、同じ週にもう回答が入っていた
+            db.session.rollback()
+            return redirect(url_for("top"))
         return redirect(url_for("student_survey_complete"))
 
     return render_template("Student/student_survey.html")
@@ -1027,7 +1084,7 @@ def care_chadel():
             label = f"{slot.date.strftime('%Y/%m/%d')}（{'月火水木金土日'[slot.date.weekday()]}） {slot.start_time.strftime('%H:%M')} ～ {slot.end_time.strftime('%H:%M')}"
             db.session.delete(slot)
             db.session.commit()
-            flash(f"{label} の面談可能日時を削除しました。", "success")
+            flash(f"{label} の面談可能日時を削除しました。", "deleted")
             return redirect(url_for("care_reseva_top"))
 
         if action == "edit":
@@ -1188,7 +1245,8 @@ def management_top():
         .all()
     )
 
-    return render_template("Management/management_top.html", counts=counts, upcoming=upcoming)
+    return render_template("Management/management_top.html", counts=counts, upcoming=upcoming,
+                           survey=_survey_summary())
 
 
 # =========================
@@ -1259,7 +1317,7 @@ def manage_student_edit():
         if new_password:
             student.set_password(new_password)
         db.session.commit()
-        flash(f"{display_name}さんの情報を更新しました。")
+        flash(f"{display_name}さんの情報を更新しました。", "success")
 
     return redirect(url_for("manage_student"))
 
@@ -2374,15 +2432,234 @@ def manage_clarec_complete():
         return redirect(url_for("manage_class"))
     return render_template("Management/ManageClass/manage_clarec_complete.html", done=done)
 
+# アンケートの設問 (キー, 質問文, 選択肢)。選択肢は「よい順」に並べ、先頭を5点、最後を1点とする。
+# q7 (カウンセラーに相談したいか) は点数にせず、回答をそのまま表示する。
+SURVEY_QUESTIONS = [
+    ("q1", "担任の先生との関係について、どう感じていますか？",
+     ["とても良い", "良い", "普通", "あまり良くない", "良くない"]),
+    ("q2", "家で安心して過ごせていますか？",
+     ["とても安心している", "安心している", "どちらともいえない", "あまり充実していない", "充実していない"]),
+    ("q3", "友達との関係で困っていることはありますか？",
+     ["とても順調", "順調", "どちらともいえない", "やや不安", "とても不安"]),
+    ("q4", "学校で安心して過ごせていますか？",
+     ["とても良い", "良い", "どちらともいえない", "あまり良くない", "良くない"]),
+    ("q5", "この1週間、不安や心配を感じることはありましたか？",
+     ["とても良い", "良い", "どちらともいえない", "あまり良くない", "良くない"]),
+    ("q6", "この1週間、楽しいと感じることはありましたか？",
+     ["とても良い", "良い", "どちらともいえない", "あまり良くない", "良くない"]),
+    ("q7", "スクールカウンセラーに相談してみたいですか？", None),
+]
+SURVEY_HISTORY_WEEKS = 10  # アンケート詳細に出す週の数 (今週を含む)
+
+
+def _survey_score(options, answer):
+    """回答の文字を点数 (5〜1) にする。選択肢にない文字なら None"""
+    if options is None or answer not in options:
+        return None
+    return 5 - options.index(answer)
+
+
+def _survey_week_monday(response):
+    """回答がどの週 (月曜日の日付) のものか。survey_date (金曜日) があればそれを使い、
+    空の古い回答は created_at (UTC) を日本時間にして求める"""
+    if response.survey_date:
+        return response.survey_date - timedelta(days=4)
+    answered_on = (response.created_at + timedelta(hours=9)).date()
+    return answered_on - timedelta(days=answered_on.weekday())
+
+
+def _survey_flags(current, previous):
+    """今週の回答 (current) と前の週の回答 (previous。なければ None) から、警告の理由を返す
+
+    返すのは {理由: 当てはまった質問のキーのリスト} (wants だけは True / False)。
+    - "decline"   : 同じ質問が前週より3点以上低下
+    - "continued" : 同じ質問が2点以下で2週連続
+    - "multiple"  : 1回の回答で2点以下が3項目以上
+    - "wants"     : 面談を希望している (Q7 が「ある」。点数に関係なく)
+    """
+    def scores(response):
+        return {
+            key: _survey_score(options, getattr(response, key))
+            for key, _text, options in SURVEY_QUESTIONS if options
+        }
+
+    now = scores(current)
+    flags = {"decline": [], "continued": [], "multiple": [], "wants": current.q7 == "ある"}
+
+    low = [key for key, score in now.items() if score is not None and score <= 2]
+    if len(low) >= 3:
+        flags["multiple"] = low
+
+    if previous is not None:
+        before = scores(previous)
+        for key, score in now.items():
+            old = before.get(key)
+            if score is None or old is None:
+                continue
+            if old - score >= 3:
+                flags["decline"].append(key)
+            if score <= 2 and old <= 2:
+                flags["continued"].append(key)
+    return flags
+
+
+def _survey_labels(flags):
+    """警告の理由から、一覧に出す状態 [(色, 名前)] を作る。
+    「複数の低評価」は、「悪化傾向」「低評価が継続」のどちらかと重なるときは出さない (後者を優先)"""
+    labels = []
+    if flags["decline"]:
+        labels.append(("red", "悪化傾向"))
+    if flags["continued"]:
+        labels.append(("red", "低評価が継続"))
+    if flags["multiple"] and not (flags["decline"] or flags["continued"]):
+        labels.append(("red", "複数の低評価"))
+    if flags["wants"]:
+        labels.append(("yellow", "面談希望者"))
+    return labels
+
+
+def _survey_summary():
+    """今週のアンケートの回答状況と警告者 (アンケート結果画面・管理者のホームで共通に使う)"""
+    students = User.query.filter_by(role=User.ROLE_STUDENT).order_by(User.class_id, User.class_number, User.id).all()
+
+    today = (datetime.utcnow() + timedelta(hours=9)).date()
+    this_monday = today - timedelta(days=today.weekday())
+    last_monday = this_monday - timedelta(days=7)
+
+    # 今週と前の週の回答 (生徒ごと・週ごと。同じ週に複数あれば新しいほう)
+    recent = (
+        SurveyResponse.query
+        .filter(SurveyResponse.created_at >= datetime.utcnow() - timedelta(days=21))
+        .order_by(SurveyResponse.created_at)
+        .all()
+    )
+    by_student = {}
+    for r in recent:
+        by_student.setdefault(r.student_id, {})[_survey_week_monday(r)] = r
+
+    answered = 0
+    warnings = []
+    for student in students:
+        weeks = by_student.get(student.id, {})
+        current = weeks.get(this_monday)
+        if current is None:
+            continue
+        answered += 1
+
+        labels = _survey_labels(_survey_flags(current, weeks.get(last_monday)))
+        if labels:
+            warnings.append({"student": student, "labels": labels,
+                             "is_red": any(color == "red" for color, _ in labels)})
+
+    # 赤 (要確認) を先に、そのあとに黄 (面談希望者のみ)
+    warnings.sort(key=lambda w: not w["is_red"])
+
+    total = len(students)
+    return {
+        "total": total,
+        "answered": answered,
+        "unanswered": total - answered,
+        "rate": round(answered * 100 / total) if total else 0,
+        "red_count": sum(1 for w in warnings if w["is_red"]),
+        "wish_count": sum(1 for w in warnings if any(c == "yellow" for c, _ in w["labels"])),
+        "warnings": warnings,
+    }
+
+
 @app.route("/management_survey")
 @role_required(User.ROLE_ADMIN)
 def management_survey():
-    return render_template("Management/ManageSurvey/management_survey.html")
+    return render_template("Management/ManageSurvey/management_survey.html", **_survey_summary())
+
 
 @app.route("/management_graph")
 @role_required(User.ROLE_ADMIN)
 def management_graph():
-    return render_template("Management/ManageSurvey/management_graph.html")
+    # 対象の生徒 (指定がなければ、いちばん最近回答した生徒)
+    students = User.query.filter_by(role=User.ROLE_STUDENT)
+    student = students.filter_by(id=request.args.get("student_id", type=int)).first()
+    if student is None:
+        latest = SurveyResponse.query.order_by(SurveyResponse.created_at.desc()).first()
+        student = latest.student if latest else students.order_by(User.id).first()
+    if student is None:
+        return redirect(url_for("management_survey"))
+
+    # created_at は UTC で保存しているので、日本時間 (+9時間) にして週に分ける。
+    # 週は月曜始まりで、列の見出しはその週の金曜 (アンケートの投稿日) にする。
+    jst_offset = timedelta(hours=9)
+    today = (datetime.utcnow() + jst_offset).date()
+    this_monday = today - timedelta(days=today.weekday())
+    mondays = [this_monday - timedelta(weeks=i) for i in range(SURVEY_HISTORY_WEEKS)]  # 新しい週が先頭
+
+    by_week = {}
+    for r in (SurveyResponse.query.filter_by(student_id=student.id)
+              .order_by(SurveyResponse.created_at).all()):  # 同じ週に複数あれば、あとの回答で上書き
+        by_week[_survey_week_monday(r)] = r
+
+    weekdays = "月火水木金土日"
+    weeks = []
+    for monday in mondays:
+        friday = monday + timedelta(days=4)
+        weeks.append({
+            "label": f"{friday.month}月{friday.day}日（{weekdays[friday.weekday()]}）",
+            "response": by_week.get(monday),  # None なら未提出
+        })
+
+    rows = []
+    for number, (key, text, options) in enumerate(SURVEY_QUESTIONS, start=1):
+        cells = []
+        for week in weeks:
+            response = week["response"]
+            if response is None:
+                cells.append({"kind": "missing"})
+                continue
+            answer = getattr(response, key)
+            score = _survey_score(options, answer)
+            if options is None:
+                # 面談を希望する (Q7 が「ある」) は黄色で表示する
+                cells.append({"kind": "text", "value": answer, "wish": answer == "ある"})
+            else:
+                cells.append({"kind": "score", "value": score if score is not None else answer,
+                              "low": score is not None and score <= 2})
+        rows.append({"number": number, "text": text, "cells": cells})
+
+    # 要確認・面談希望の判定 (今週の回答と、その前の週の回答で判定する)
+    current = by_week.get(this_monday)
+    badges = []     # 右上の状態 [(色, 名前)]
+    reasons = []    # 判定理由の文
+    judgment_color = None
+    if current is not None:
+        flags = _survey_flags(current, by_week.get(this_monday - timedelta(days=7)))
+
+        def short_date(monday):
+            friday = monday + timedelta(days=4)
+            return f"{friday.month}/{friday.day}"
+
+        this_day = short_date(this_monday)
+        pair = f"{short_date(this_monday - timedelta(days=7))}、{this_day}"
+        red_reasons = []
+        if flags["continued"]:
+            red_reasons.append(f"2週連続で低評価が出ています（{pair}）")
+        if flags["decline"]:
+            red_reasons.append(f"評価が悪化傾向にあります（{pair}）")
+        if flags["multiple"] and not (flags["decline"] or flags["continued"]):
+            numbers = "・".join(f"Q{int(key[1:])}" for key in flags["multiple"])
+            red_reasons.append(f"複数の項目に低評価が出ています（{this_day}：{numbers}）")
+
+        if red_reasons:
+            badges.append(("red", "要確認"))
+            reasons += red_reasons
+            judgment_color = "red"
+        if flags["wants"]:
+            badges.append(("yellow", "面談を希望"))
+            reasons.append(f"面談を希望しています（{this_day}）")
+            judgment_color = judgment_color or "yellow"
+
+    return render_template(
+        "Management/ManageSurvey/management_graph.html",
+        student=student, weeks=weeks, rows=rows, weeks_count=len(weeks),
+        badges=badges, reasons=reasons, judgment_color=judgment_color,
+    )
 
 @app.route("/management_warning")
 @role_required(User.ROLE_ADMIN)

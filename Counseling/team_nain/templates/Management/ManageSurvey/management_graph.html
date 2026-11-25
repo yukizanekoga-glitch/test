@@ -83,17 +83,6 @@
         <!-- メインコンテンツ -->
         <main class="main-content">
 
-            <!-- パンくずリスト -->
-            <div class="breadcrumb">
-                <i class="bi bi-house-fill"></i>
-                <span>ホーム</span>
-                <i class="bi bi-chevron-right"></i>
-                <span>アンケート結果</span>
-                <i class="bi bi-chevron-right"></i>
-                <span>生徒詳細</span>
-            </div>
-
-
             <!-- ページタイトル -->
             <div class="page-heading">
 
@@ -115,23 +104,30 @@
                     </div>
 
                     <div class="student-text">
-                        <h2>佐藤 太郎</h2>
+                        <h2>{{ student.display_name }}</h2>
 
                         <div class="student-subinfo">
-                            <span>1年1組</span>
+                            <span>{{ student.school_class.name if student.school_class else 'クラス未設定' }}</span>
                             <span class="vertical-line"></span>
-                            <span>出席番号：1</span>
+                            <span>出席番号：{{ student.class_number if student.class_number else '－' }}</span>
                         </div>
                     </div>
 
                 </div>
 
-                <div class="warning-status">
-                    <span class="warning-icon">
-                        <i class="bi bi-exclamation-lg"></i>
-                    </span>
-                    <span>要確認（友人関係）</span>
+                <!-- 状態: 要確認 (赤) / 面談を希望 (黄) -->
+                {% if badges %}
+                <div class="warning-statuses">
+                    {% for color, label in badges %}
+                    <div class="warning-status {{ color }}">
+                        <span class="warning-icon">
+                            <i class="bi {{ 'bi-exclamation-lg' if color == 'red' else 'bi-chat-dots-fill' }}"></i>
+                        </span>
+                        <span>{{ label }}</span>
+                    </div>
+                    {% endfor %}
                 </div>
+                {% endif %}
 
             </section>
 
@@ -139,104 +135,53 @@
             <!-- アンケート回答履歴 -->
             <section class="history-card">
 
-                <h2 class="section-title">
-                    アンケート回答履歴（直近4週間）
-                </h2>
+                <div class="history-heading">
+                    <h2 class="section-title">
+                        アンケート回答履歴（直近{{ weeks_count }}週間）
+                    </h2>
+
+                    <!-- 4週間ずつ表示して、前後にスライドする -->
+                    <div class="history-slider" aria-label="表示する週の切り替え">
+                        <button type="button" class="slide-button" id="slideNewer" aria-label="新しい週へ">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <span class="slide-range" id="slideRange"></span>
+                        <button type="button" class="slide-button" id="slideOlder" aria-label="古い週へ">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
 
                 <div class="table-wrapper">
 
-                    <table class="history-table">
+                    <table class="history-table" id="historyTable">
 
                         <thead>
                             <tr>
                                 <th class="number-column">No.</th>
                                 <th class="question-column">質問項目</th>
-                                <th>11月2日（月）</th>
-                                <th>10月26日（月）</th>
-                                <th>10月19日（月）</th>
-                                <th>10月12日（月）</th>
+                                {% for week in weeks %}
+                                <th class="week-column">{{ week.label }}</th>
+                                {% endfor %}
                             </tr>
                         </thead>
 
                         <tbody>
-
+                            {% for row in rows %}
                             <tr>
-                                <td>1</td>
-                                <td class="question">
-                                    担任の先生との関係について、どう感じていますか？
-                                </td>
-                                <td>5</td>
-                                <td>5</td>
-                                <td>5</td>
-                                <td>4</td>
+                                <td>{{ row.number }}</td>
+                                <td class="question">{{ row.text }}</td>
+                                {% for cell in row.cells %}
+                                {% if cell.kind == 'missing' %}
+                                <td class="week-column not-submitted">未提出</td>
+                                {% elif cell.kind == 'text' %}
+                                <td class="week-column answer-text{{ ' wish' if cell.wish }}">{{ cell.value }}</td>
+                                {% else %}
+                                <td class="week-column{{ ' low-score' if cell.low }}">{{ cell.value }}</td>
+                                {% endif %}
+                                {% endfor %}
                             </tr>
-
-                            <tr>
-                                <td>2</td>
-                                <td class="question">
-                                    家で安心して過ごせていますか？
-                                </td>
-                                <td>5</td>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>4</td>
-                            </tr>
-
-                            <tr>
-                                <td>3</td>
-                                <td class="question">
-                                    友達との関係で困っていることはありますか？
-                                </td>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>5</td>
-                            </tr>
-
-                            <tr>
-                                <td>4</td>
-                                <td class="question">
-                                    学校で安心して過ごせていますか？
-                                </td>
-                                <td class="low-score">2</td>
-                                <td class="low-score">2</td>
-                                <td>3</td>
-                                <td>4</td>
-                            </tr>
-
-                            <tr>
-                                <td>5</td>
-                                <td class="question">
-                                    この1週間、不安や心配を感じることはありましたか？
-                                </td>
-                                <td>3</td>
-                                <td>3</td>
-                                <td>4</td>
-                                <td>4</td>
-                            </tr>
-
-                            <tr>
-                                <td>6</td>
-                                <td class="question">
-                                   この1週間、楽しいと感じることはありましたか？
-                                </td>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>4</td>
-                                <td>4</td>
-                            </tr>
-
-                            <tr>
-                                <td>7</td>
-                                <td class="question">
-                                    スクールカウンセラーに相談してみたいですか？
-                                </td>
-                                <td class="answer-text">希望しない</td>
-                                <td class="answer-text">希望しない</td>
-                                <td class="answer-text">希望しない</td>
-                                <td class="answer-text">希望しない</td>
-                            </tr>
-
+                            {% endfor %}
                         </tbody>
 
                     </table>
@@ -244,22 +189,26 @@
                 </div>
 
 
+                {% if reasons %}
                 <!-- 判定理由 -->
-                <div class="judgment-box">
+                <div class="judgment-box {{ judgment_color }}">
 
                     <div class="judgment-icon">
-                        <i class="bi bi-exclamation-lg"></i>
+                        <i class="bi {{ 'bi-exclamation-lg' if judgment_color == 'red' else 'bi-chat-dots-fill' }}"></i>
                     </div>
 
                     <strong>判定理由</strong>
 
                     <span class="judgment-divider"></span>
 
-                    <p>
-                        友人関係の評価が2週連続で低下しています（10/26、11/2）。
-                    </p>
+                    <div class="judgment-reasons">
+                        {% for reason in reasons %}
+                        <p>{{ reason }}</p>
+                        {% endfor %}
+                    </div>
 
                 </div>
+                {% endif %}
 
             </section>
 
@@ -297,6 +246,35 @@
         </main>
 
     </div>
+
+    <!-- 回答履歴を4週間ずつ表示して、前後にスライドする -->
+    <script>
+        (function () {
+            const VISIBLE = 4;
+            const table = document.getElementById("historyTable");
+            const newer = document.getElementById("slideNewer");
+            const older = document.getElementById("slideOlder");
+            const range = document.getElementById("slideRange");
+            const heads = table.querySelectorAll("thead th.week-column");
+            const total = heads.length;
+            let offset = 0; // 0 = いちばん新しい週から表示
+
+            function render() {
+                table.querySelectorAll("tr").forEach(function (row) {
+                    row.querySelectorAll(".week-column").forEach(function (cell, index) {
+                        cell.hidden = index < offset || index >= offset + VISIBLE;
+                    });
+                });
+                newer.disabled = offset <= 0;
+                older.disabled = offset + VISIBLE >= total;
+                range.textContent = heads[Math.min(offset + VISIBLE, total) - 1].textContent.trim() + " ～ " + heads[offset].textContent.trim();
+            }
+
+            newer.addEventListener("click", function () { offset = Math.max(0, offset - 1); render(); });
+            older.addEventListener("click", function () { offset = Math.min(total - VISIBLE, offset + 1); render(); });
+            render();
+        })();
+    </script>
 
     <!-- ログアウトの確認ポップアップ (全画面共通) -->
     <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
