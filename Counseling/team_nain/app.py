@@ -2013,9 +2013,10 @@ def teacher_student_top():
         students = (
             User.query
             .filter_by(role=User.ROLE_STUDENT, class_id=school_class.id)
-            .order_by(User.username)
             .all()
         )
+        # 出席番号順 (出席番号が無い生徒は最後に、ID順)
+        students.sort(key=lambda s: (s.class_number is None, s.class_number or 0, s.username))
 
         # 生徒ごとの、これからの面談予約のうち一番早いもの
         next_slot = {}
@@ -2034,7 +2035,7 @@ def teacher_student_top():
             for r in reservations:
                 next_slot.setdefault(r.student_id, r.slot)
 
-        for no, s in enumerate(students, start=1):
+        for s in students:
             slot = next_slot.get(s.id)
             if slot:
                 schedule = "{}（{}） {}".format(
@@ -2044,7 +2045,13 @@ def teacher_student_top():
                 )
             else:
                 schedule = "未定"
-            rows.append({"no": no, "id": s.id, "name": s.display_name, "schedule": schedule})
+            rows.append({
+                "no": s.class_number,  # 出席番号
+                "id": s.id,
+                "name": s.display_name,
+                "survey_answered": _this_week_survey(s.id)["answered"],  # 今週のアンケート
+                "schedule": schedule,
+            })
 
     return render_template(
         "Teacher/teacher_student_top.html",

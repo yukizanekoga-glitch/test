@@ -146,7 +146,7 @@
 
                 <thead>
                     <tr>
-                        <th>No.</th>
+                        <th>出席番号</th>
                         <th>氏名</th>
                         <th>アンケート回答状況</th>
                         <th>面談予定日時</th>
@@ -157,10 +157,14 @@
                 <tbody>
                     {% for row in rows %}
                     <tr class="student-row" data-name="{{ row.name }}">
-                        <td>{{ row.no }}</td>
+                        <td>{{ row.no if row.no is not none else '―' }}</td>
                         <td>{{ row.name }}</td>
                         <td>
-                            <span class="status">―</span>
+                            {% if row.survey_answered %}
+                            <span class="status answered">回答済み</span>
+                            {% else %}
+                            <span class="status unanswered">未回答</span>
+                            {% endif %}
                         </td>
                         <td>{{ row.schedule }}</td>
                         <td>
