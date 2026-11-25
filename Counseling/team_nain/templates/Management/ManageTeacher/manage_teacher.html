@@ -1,77 +1,439 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>先生一覧 | スクールカウンセラー相談予約システム</title>
 
-  <!-- ページのタイトル -->
-  <title>先生一覧 管理者</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- 先生一覧CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/manage_teacher.css') }}">
 </head>
 
 <body>
 
-  <!-- ナビゲーションバー -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー 先生一覧</span>
-    </div>
-  </nav>
+    <!-- ヘッダー -->
+    <header class="top-header">
 
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
-
-    <!-- ページの見出し -->
-    <h2 class="text-center mb-4">先生一覧</h2>
-
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-danger">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <!-- 先生一覧 -->
-    <div class="row justify-content-center">
-
-      {% for teacher in teachers %}
-      <div class="col-md-6 mb-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">{{ teacher.display_name }}</h5>
-            <a href="{{ url_for('manage_teapass', teacher_id=teacher.id) }}" class="btn btn-primary">
-              パスワード変更
-            </a>
-            <a href="{{ url_for('manage_teadel_check', teacher_id=teacher.id) }}" class="btn btn-primary">
-              削除
-            </a>
-          </div>
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
         </div>
-      </div>
-      {% else %}
-      <p class="text-center text-muted">先生が登録されていません。</p>
-      {% endfor %}
+
+        <div class="header-right">
+
+            <span class="admin-name">
+                <i class="bi bi-person-fill"></i>
+                {{ session.display_name }}
+                <i class="bi bi-chevron-down"></i>
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+
+        </div>
+
+    </header>
+
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+
+            <a href="{{ url_for('management_top') }}">
+                <span><i class="bi bi-house-door"></i></span>
+                ホーム
+            </a>
+
+            <a href="{{ url_for('manage_student') }}">
+                <span><i class="bi bi-people"></i></span>
+                生徒管理
+            </a>
+
+            <a href="{{ url_for('manage_teacher') }}" class="active">
+                <span><i class="bi bi-person-badge"></i></span>
+                先生管理
+            </a>
+
+            <a href="{{ url_for('manage_care') }}">
+                <span><i class="bi bi-calendar3"></i></span>
+                カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}">
+                <span><i class="bi bi-file-earmark-text"></i></span>
+                クラス管理
+            </a>
+
+            <a href="{{ url_for('management_survey') }}">
+                <span><i class="bi bi-clipboard-data"></i></span>
+                アンケート結果
+            </a>
+
+        </aside>
+
+        <!-- メイン -->
+        <main class="main-content">
+
+            <!-- CSSのみで開閉する一括削除モーダル用 -->
+            <input type="checkbox"
+                   id="delete-modal-toggle"
+                   class="modal-toggle">
+
+            <!-- タイトル -->
+            <div class="teacher-page-header">
+
+                <div class="page-heading">
+                    <h1>先生一覧</h1>
+                    <p>
+                        登録されている先生の一覧です。
+                        先生情報の編集や一括削除、一括登録ができます。
+                    </p>
+                </div>
+
+                <!-- 一括登録 -->
+                <a href="{{ url_for('manage_tearec') }}"
+                   class="btn btn-primary btn-register">
+                    一括登録
+                </a>
+
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-danger">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- 検索エリア -->
+            <form method="get" action="{{ url_for('manage_teacher') }}" class="teacher-toolbar">
+
+                <div class="teacher-search">
+                    <input type="text"
+                           name="q"
+                           value="{{ q }}"
+                           class="form-control"
+                           placeholder="先生名で検索"
+                           aria-label="先生名で検索">
+                </div>
+
+                <div class="class-search">
+                    <label for="classFilter">クラス</label>
+
+                    <select id="classFilter" name="class_id" class="form-select" onchange="this.form.submit()">
+                        <option value="" {{ "selected" if not selected_class_id }}>すべて</option>
+                        <option value="none" {{ "selected" if selected_class_id == "none" }}>未設定（-）</option>
+                        {% for school_class in classes %}
+                        <option value="{{ school_class.id }}" {{ "selected" if selected_class_id == school_class.id|string }}>
+                            {{ school_class.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-outline-secondary">検索</button>
+
+                <!-- 一括削除 -->
+                <label for="delete-modal-toggle"
+                       class="btn btn-bulk-delete">
+                    一括削除
+                </label>
+
+            </form>
+
+            <!-- 先生一覧 -->
+            <div class="table-responsive teacher-table-box">
+
+                <table class="table teacher-table align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>先生名</th>
+                            <th>クラス</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for teacher in teachers %}
+                        <tr>
+
+                            <td>{{ teacher.display_name }}</td>
+                            <td>{{ teacher.homeroom_class.name if teacher.homeroom_class else "未設定（-）" }}</td>
+
+                            <td>
+                                <div class="teacher-actions">
+
+                                    <!-- 編集モーダルを開く -->
+                                    <label for="edit-{{ teacher.id }}"
+                                           class="btn btn-edit">
+                                        編集
+                                    </label>
+
+                                    <!-- 削除対象選択 -->
+                                    <input type="checkbox"
+                                           class="form-check-input teacher-checkbox"
+                                           name="teacher_ids"
+                                           value="{{ teacher.id }}"
+                                           form="bulkDeleteForm"
+                                           aria-label="{{ teacher.display_name }}を選択">
+
+                                </div>
+                            </td>
+
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">
+                                該当する先生が見つかりません。
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- 戻る・ページ選択 -->
+            <div class="bottom-controls">
+
+                <a href="{{ url_for('management_top') }}"
+                   class="btn btn-secondary btn-back">
+                    戻る
+                </a>
+
+                <div class="pagination-area">
+                    {% if page > 1 %}
+                    <a href="{{ url_for('manage_teacher', q=q, class_id=selected_class_id, page=page-1) }}" class="page-btn">‹</a>
+                    {% endif %}
+
+                    {% for p in range(1, total_pages + 1) %}
+                    <a href="{{ url_for('manage_teacher', q=q, class_id=selected_class_id, page=p) }}"
+                       class="page-btn {{ 'active' if p == page else '' }}">{{ p }}</a>
+                    {% endfor %}
+
+                    {% if page < total_pages %}
+                    <a href="{{ url_for('manage_teacher', q=q, class_id=selected_class_id, page=page+1) }}" class="page-btn">›</a>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <!-- 一括削除フォーム（チェックボックスとモーダルを紐付ける） -->
+            <form id="bulkDeleteForm" method="post" action="{{ url_for('manage_teacher_bulk_delete') }}"></form>
+
+            <!-- 先生ごとの編集モーダル -->
+            {% for teacher in teachers %}
+
+            <input type="checkbox"
+                   id="edit-{{ teacher.id }}"
+                   class="modal-toggle">
+
+            <div class="css-modal">
+
+                <label for="edit-{{ teacher.id }}"
+                       class="modal-overlay"></label>
+
+                <div class="css-modal-dialog">
+
+                    <form method="post" action="{{ url_for('manage_teacher_edit') }}">
+
+                    <input type="hidden" name="teacher_id" value="{{ teacher.id }}">
+
+                    <div class="modal-header">
+                        <h2 class="modal-title">先生情報の編集</h2>
+
+                        <label for="edit-{{ teacher.id }}"
+                               class="modal-close"
+                               aria-label="閉じる">
+                            <i class="bi bi-x-lg"></i>
+                        </label>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="edit-row">
+                            <label>先生番号</label>
+                            <input type="text"
+                                   class="form-control"
+                                   value="{{ teacher.id }}"
+                                   readonly>
+                        </div>
+
+                        <div class="edit-row">
+                            <label>
+                                先生名
+                                <span class="required">※必須</span>
+                            </label>
+
+                            <input type="text"
+                                   name="display_name"
+                                   class="form-control"
+                                   value="{{ teacher.display_name }}">
+                        </div>
+
+                        <div class="edit-row">
+                            <label>クラス</label>
+
+                            <div class="edit-input-area">
+                                <select name="class_id" class="form-select">
+
+                                    <option value="">未設定（-）</option>
+
+                                    {% for cls in classes %}
+
+                                    <option value="{{ cls.id }}"
+                                        {% if teacher.homeroom_class and teacher.homeroom_class.id == cls.id %}selected{% endif %}>
+                                        {{ cls.name }}
+                                    </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                                <small>
+                                    担当するクラスを選択してください。
+                                </small>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <h3 class="password-heading">
+                            パスワード変更
+                        </h3>
+
+                        <p class="password-description">
+                            変更する場合のみ、新しいパスワードを入力してください。
+                            空欄の場合は現在のパスワードを維持します。
+                        </p>
+
+                        <div class="edit-row">
+                            <label>新しいパスワード</label>
+
+                            <input type="password"
+                                   name="new_password"
+                                   class="form-control"
+                                   placeholder="新しいパスワードを入力">
+                        </div>
+
+                        <div class="edit-row">
+                            <label>新しいパスワード（確認）</label>
+
+                            <input type="password"
+                                   name="confirm_password"
+                                   class="form-control"
+                                   placeholder="新しいパスワードを再入力">
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <label for="edit-{{ teacher.id }}"
+                               class="btn btn-cancel">
+                            キャンセル
+                        </label>
+
+                        <button type="submit" class="btn btn-save">
+                            保存する
+                        </button>
+
+                    </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+            <!-- 一括削除確認モーダル -->
+            <div class="css-modal delete-modal">
+
+                <label for="delete-modal-toggle"
+                       class="modal-overlay"></label>
+
+                <div class="css-modal-dialog">
+
+                    <div class="modal-header">
+                        <h2 class="modal-title">
+                            先生情報の一括削除
+                        </h2>
+
+                        <label for="delete-modal-toggle"
+                               class="modal-close"
+                               aria-label="閉じる">
+                            <i class="bi bi-x-lg"></i>
+                        </label>
+                    </div>
+
+                    <div class="modal-body delete-modal-body">
+
+                        <p>選択した先生情報を削除しますか？</p>
+
+                        <p class="delete-note">
+                            選択件数：<strong id="selectedCount">0</strong> 件
+                        </p>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <label for="delete-modal-toggle"
+                               class="btn btn-cancel">
+                            キャンセル
+                        </label>
+
+                        <button type="submit"
+                                form="bulkDeleteForm"
+                                class="btn btn-delete-confirm">
+                            削除
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
 
     </div>
 
-     
-    <!-- 戻るボタン -->
-    <div class="text-center mt-4">
-      <a href="{{ url_for('management_top') }}" class="btn btn-secondary">
-        戻る
-      </a>
+    <script>
+        // 一括削除モーダルを開いたときに選択件数を表示
+        const deleteModalToggle = document.getElementById("delete-modal-toggle");
 
-     <a href="{{ url_for('manage_tearec') }}" class="btn btn-primary">新規登録</a>
-    </div>
+        deleteModalToggle.addEventListener("change", function() {
+            if (!this.checked) return;
 
-  </div>
+            const count = document.querySelectorAll(
+                ".teacher-checkbox:checked"
+            ).length;
 
+            document.getElementById("selectedCount").textContent = count;
+        });
+    </script>
+
+    <!-- ログアウトの確認ポップアップ (全画面共通) -->
+    <script src="{{ url_for('static', filename='Js/logout_confirm.js') }}"></script>
 </body>
 </html>

@@ -1,51 +1,152 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <!-- 文字コードをUTF-8に設定 -->
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>先生の一括登録（CSV）</title>
 
-  <!-- スマートフォンなどの画面サイズに合わせて表示する -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- ページのタイトル -->
-  <title>先生登録完了 管理者</title>
+    <!-- management_top と同じ共通レイアウト -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='management_top.css') }}">
 
-  <!-- Bootstrap 5.3.0のCSSを読み込む -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- この画面専用CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='manage_tearec_complete.css') }}">
+
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
 
-  <!-- ナビゲーションバー -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <!-- サイト名を表示 -->
-      <span class="navbar-brand">スクールカウンセラー 先生登録</span>
+  <!-- ヘッダー -->
+    <header class="top-header">
+        <div class="system-title">
+            スクールカウンセラー相談予約システム
+        </div>
+
+        <div class="header-right">
+            <span class="admin-name">
+                <i class="bi bi-person-fill"></i>
+                管理者
+                <i class="bi bi-chevron-down"></i>
+            </span>
+
+            <span class="header-divider"></span>
+
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="bi bi-box-arrow-right"></i>
+                ログアウト
+            </a>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- サイドバー -->
+        <aside class="sidebar">
+
+            <a href="/management_top">
+                <span><i class="bi bi-house-door"></i></span>
+                ホーム
+            </a>
+
+            <a href="/manage_student">
+                <span><i class="bi bi-people"></i></span>
+                生徒管理
+            </a>
+
+            <a href="/manage_teacher" class="active">
+                <span><i class="bi bi-person-badge"></i></span>
+                先生管理
+            </a>
+
+            <a href="/manage_care">
+                <span><i class="bi bi-calendar3"></i></span>
+                カウンセラー管理
+            </a>
+
+            <a href="{{ url_for('manage_class') }}">
+                <span><i class="bi bi-file-earmark-text"></i></span>
+                クラス管理
+            </a>
+
+            <a href="/management_survey">
+                <span><i class="bi bi-clipboard-data"></i></span>
+                アンケート結果
+            </a>
+
+        </aside>
+
+        <!-- メイン -->
+        <main class="main-content">
+
+            <div class="complete-container">
+
+                <!-- 完了アイコン -->
+                <div class="complete-icon">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+
+                <!-- 完了メッセージ -->
+                <h1 class="complete-title">
+                    先生の一括登録が完了しました。
+                </h1>
+
+                <p class="complete-description">
+                    先生情報が正常に登録されました。
+                </p>
+
+                <!-- 登録情報 -->
+                <div class="complete-info-box">
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            登録件数
+                        </div>
+
+                        <div class="info-value">
+                            {{ created|length }}件
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 発行されたログイン情報 -->
+                <div class="complete-info-box">
+                    {% for row in created %}
+                    <div class="info-row">
+                        <div class="info-label">
+                            {{ row.display_name }}
+                        </div>
+
+                        <div class="info-value">
+                            {{ row.username }} / {{ row.password }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <p class="complete-description">
+                    上記のユーザー名・パスワードは今だけ表示されます。必ず各先生に伝えてください。
+                </p>
+
+                <!-- 戻るボタン -->
+                <div class="complete-button-area">
+
+                    <a href="{{ url_for('manage_teacher') }}"
+                       class="back-student-btn">
+                        <i class="bi bi-arrow-left"></i>
+                        先生一覧に戻る
+                    </a>
+
+                </div>
+
+            </div>
+
+        </main>
+
     </div>
-  </nav>
 
-  <!-- メインコンテンツ -->
-  <div class="container mt-5">
-
-    <!-- フォームを中央寄せにするための行 -->
-    <div class="row justify-content-center">
-
-      <!-- フォームの横幅を設定（中画面以上では4/12） -->
-      <div class="col-md-4">
-
-        <!-- ページの見出し -->
-        <h2 class="text-center mb-4">登録が完了しました</h2>
-
-        <p>先生名: {{ result.display_name }}</p>
-        <p>ユーザー名: {{ result.username }}</p>
-        <p>初期パスワード: {{ result.password }}</p>
-        <p class="text-muted">このパスワードは今だけ表示されます。必ず先生に伝えてください。</p>
-
-        <a href="{{ url_for('manage_teacher') }}" class="btn btn-secondary">戻る</a>
-
-      </div>
-    </div>
-  </div>
-  
 </body>
 </html>

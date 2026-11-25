@@ -1270,7 +1270,10 @@ def manage_student():
         query = query.filter(User.class_id.is_(None))
     elif class_id:
         query = query.filter(User.class_id == int(class_id))
-    query = query.order_by(User.id)
+    query = (
+        query.outerjoin(Class, User.class_id == Class.id)
+        .order_by(Class.name.is_(None), Class.name, User.display_name, User.class_number)
+    )
 
     total = query.count()
     total_pages = max(1, (total + STUDENTS_PER_PAGE - 1) // STUDENTS_PER_PAGE)
@@ -1345,12 +1348,6 @@ def manage_student_bulk_delete():
     return redirect(url_for("manage_student"))
 
 
-def _generate_student_password():
-    """自動登録される生徒の初期パスワードを生成する"""
-    alphabet = string.ascii_letters + string.digits
-    return "".join(secrets.choice(alphabet) for _ in range(10))
-
-
 def _generate_unique_student_username():
     """自動登録される生徒のログインユーザー名を、重複しないように生成する"""
     while True:
@@ -1405,16 +1402,14 @@ def manage_sturec():
         created = []
         for name in names:
             username = _generate_unique_student_username()
-            raw_password = _generate_student_password()
             student = User(username=username, display_name=name, role=User.ROLE_STUDENT)
-            student.set_password(raw_password)
+            student.set_password("")
             db.session.add(student)
             db.session.flush()
             created.append({
                 "id": student.id,
                 "username": student.username,
                 "display_name": student.display_name,
-                "password": raw_password,
             })
         db.session.commit()
 
@@ -2696,11 +2691,122 @@ def manage_stupass():
 def manage_stupass_complete():
     return render_template("Management/ManageStudent/manage_stupass_complete.html")
 
+TEACHERS_PER_PAGE = 10
+
+
 @app.route("/manage_teacher")
 @role_required(User.ROLE_ADMIN)
 def manage_teacher():
-    teachers = User.query.filter_by(role=User.ROLE_TEACHER).order_by(User.id).all()
-    return render_template("Management/ManageTeacher/manage_teacher.html", teachers=teachers)
+    q = request.args.get("q", "").strip()
+    class_id = request.args.get("class_id", "")
+    page = request.args.get("page", 1, type=int) or 1
+
+    classes = Class.query.order_by(Class.name).all()
+    homeroom_by_teacher = {c.homeroom_teacher_id: c for c in classes if c.homeroom_teacher_id}
+
+    query = User.query.filter_by(role=User.ROLE_TEACHER)
+    if q:
+        query = query.filter(User.display_name.contains(q))
+    if class_id == "none":
+        assigned_ids = list(homeroom_by_teacher.keys())
+        if assigned_ids:
+            query = query.filter(~User.id.in_(assigned_ids))
+    elif class_id:
+        target_class = next((c for c in classes if c.id == int(class_id)), None)
+        if target_class and target_class.homeroom_teacher_id:
+            query = query.filter(User.id == target_class.homeroom_teacher_id)
+        else:
+            query = query.filter(User.id == -1)
+    query = query.order_by(User.id)
+
+    total = query.count()
+    total_pages = max(1, (total + TEACHERS_PER_PAGE - 1) // TEACHERS_PER_PAGE)
+    page = min(max(page, 1), total_pages)
+    teachers = query.offset((page - 1) * TEACHERS_PER_PAGE).limit(TEACHERS_PER_PAGE).all()
+
+    for teacher in teachers:
+        teacher.homeroom_class = homeroom_by_teacher.get(teacher.id)
+
+    return render_template(
+        "Management/ManageTeacher/manage_teacher.html",
+        teachers=teachers,
+        classes=classes,
+        q=q,
+        selected_class_id=class_id,
+        page=page,
+        total_pages=total_pages,
+    )
+
+
+@app.route("/manage_teacher_edit", methods=["POST"])
+@role_required(User.ROLE_ADMIN)
+def manage_teacher_edit():
+    teacher_id = request.form.get("teacher_id", type=int)
+    display_name = request.form.get("display_name", "").strip()
+    class_id = request.form.get("class_id", "")
+    new_password = request.form.get("new_password", "")
+    confirm_password = request.form.get("confirm_password", "")
+
+    teacher = User.query.filter_by(id=teacher_id, role=User.ROLE_TEACHER).first()
+
+    if teacher is None:
+        flash("対象の先生が見つかりません。")
+    elif not display_name:
+        flash("先生名を入力してください。")
+    elif new_password and len(new_password) < 8:
+        flash("パスワードは八文字以上にしてください。")
+    elif new_password and not re.fullmatch(r"[A-Za-z0-9]+", new_password):
+        flash("パスワードは半角英数字で入力してください。")
+    elif new_password and new_password != confirm_password:
+        flash("パスワードが一致しません。")
+    else:
+        current_class = Class.query.filter_by(homeroom_teacher_id=teacher.id).first()
+        target_class = Class.query.filter_by(id=int(class_id)).first() if class_id else None
+        if class_id and target_class is None:
+            flash("対象のクラスが見つかりません。")
+            return redirect(url_for("manage_teacher"))
+        if target_class:
+            if target_class.homeroom_teacher_id and target_class.homeroom_teacher_id != teacher.id:
+                flash(f"{target_class.name}には既に別の先生が担任として設定されています。")
+                return redirect(url_for("manage_teacher"))
+            if current_class and current_class.id != target_class.id:
+                current_class.homeroom_teacher_id = None
+            target_class.homeroom_teacher_id = teacher.id
+        elif current_class:
+            current_class.homeroom_teacher_id = None
+
+        teacher.display_name = display_name
+        if new_password:
+            teacher.set_password(new_password)
+        db.session.commit()
+        flash(f"{display_name}さんの情報を更新しました。")
+
+    return redirect(url_for("manage_teacher"))
+
+
+@app.route("/manage_teacher_bulk_delete", methods=["POST"])
+@role_required(User.ROLE_ADMIN)
+def manage_teacher_bulk_delete():
+    teacher_ids = request.form.getlist("teacher_ids", type=int)
+    teachers = User.query.filter(
+        User.id.in_(teacher_ids), User.role == User.ROLE_TEACHER
+    ).all() if teacher_ids else []
+
+    if not teachers:
+        flash("削除する先生を選択してください。")
+        return redirect(url_for("manage_teacher"))
+
+    ids = [t.id for t in teachers]
+    Class.query.filter(Class.homeroom_teacher_id.in_(ids)).update(
+        {"homeroom_teacher_id": None}, synchronize_session=False
+    )
+    for teacher in teachers:
+        db.session.delete(teacher)
+    db.session.commit()
+
+    flash(f"{len(teachers)}件の先生を削除しました。")
+    return redirect(url_for("manage_teacher"))
+
 
 @app.route("/manage_teacher_check")
 @role_required(User.ROLE_ADMIN)
@@ -2829,12 +2935,33 @@ def _generate_unique_teacher_username():
 @role_required(User.ROLE_ADMIN)
 def manage_tearec():
     if request.method == "POST":
-        display_name = request.form.get("display_name", "").strip()
-        if not display_name:
-            flash("先生名を入力してください。")
+        csv_file = request.files.get("csv_file")
+
+        if csv_file is None or csv_file.filename == "":
+            flash("CSVファイルを選択してください。")
             return redirect(url_for("manage_tearec"))
 
-        session["tearec_pending_name"] = display_name
+        if not csv_file.filename.lower().endswith(".csv"):
+            flash("拡張子が「.csv」のファイルを選択してください。")
+            return redirect(url_for("manage_tearec"))
+
+        try:
+            text = csv_file.read().decode("utf-8")
+        except UnicodeDecodeError:
+            flash("CSVファイルの文字コードはUTF-8にしてください。")
+            return redirect(url_for("manage_tearec"))
+
+        names = []
+        for row in csv.reader(io.StringIO(text)):
+            if row and row[0].strip():
+                names.append(row[0].strip())
+
+        if not names:
+            flash("有効な先生名がCSVファイルに見つかりませんでした。")
+            return redirect(url_for("manage_tearec"))
+
+        session["tearec_pending_names"] = names
+        session["tearec_pending_filename"] = csv_file.filename
         return redirect(url_for("manage_tearec_check"))
 
     return render_template("Management/ManageTeacher/manage_tearec.html")
@@ -2842,35 +2969,46 @@ def manage_tearec():
 @app.route("/manage_tearec_check", methods=["GET", "POST"])
 @role_required(User.ROLE_ADMIN)
 def manage_tearec_check():
-    display_name = session.get("tearec_pending_name")
-    if not display_name:
+    names = session.get("tearec_pending_names")
+    if not names:
         return redirect(url_for("manage_tearec"))
 
     if request.method == "POST":
-        username = _generate_unique_teacher_username()
-        raw_password = _generate_teacher_password()
-        teacher = User(username=username, display_name=display_name, role=User.ROLE_TEACHER)
-        teacher.set_password(raw_password)
-        db.session.add(teacher)
+        created = []
+        for name in names:
+            username = _generate_unique_teacher_username()
+            raw_password = _generate_teacher_password()
+            teacher = User(username=username, display_name=name, role=User.ROLE_TEACHER)
+            teacher.set_password(raw_password)
+            db.session.add(teacher)
+            db.session.flush()
+            created.append({
+                "id": teacher.id,
+                "username": teacher.username,
+                "display_name": teacher.display_name,
+                "password": raw_password,
+            })
         db.session.commit()
 
-        session.pop("tearec_pending_name", None)
-        session["tearec_result"] = {
-            "display_name": teacher.display_name,
-            "username": teacher.username,
-            "password": raw_password,
-        }
+        session.pop("tearec_pending_names", None)
+        session.pop("tearec_pending_filename", None)
+        session["tearec_result"] = created
         return redirect(url_for("manage_tearec_complete"))
 
-    return render_template("Management/ManageTeacher/manage_tearec_check.html", display_name=display_name)
+    filename = session.get("tearec_pending_filename", "")
+    return render_template(
+        "Management/ManageTeacher/manage_tearec_check.html",
+        names=names,
+        filename=filename,
+    )
 
 @app.route("/manage_tearec_complete")
 @role_required(User.ROLE_ADMIN)
 def manage_tearec_complete():
-    result = session.pop("tearec_result", None)
-    if not result:
+    created = session.pop("tearec_result", None)
+    if not created:
         return redirect(url_for("manage_teacher"))
-    return render_template("Management/ManageTeacher/manage_tearec_complete.html", result=result)
+    return render_template("Management/ManageTeacher/manage_tearec_complete.html", created=created)
 
 
 if __name__ == "__main__":
